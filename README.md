@@ -55,7 +55,7 @@ A comprehensive personal finance management application built with the MERN stac
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/bachatSaathi.git
+   git clone https://github.com/heyaryanmittal/bachatSaathi.git
    cd bachatSaathi
    ```
 

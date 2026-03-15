@@ -38,10 +38,16 @@
 // server.js
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const dns = require("dns");
 const app = require("./app"); // Express app (your routes & middleware)
 
 // Load environment variables
 dotenv.config();
+
+// Fix for Node.js DNS resolution issues with MongoDB SRV records
+// In some environments (like Windows/certain ISPs), the default DNS doesn't handle SRV correctly.
+// We force Google DNS to ensure SRV records (mongodb+srv) resolve properly.
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 // ========================
 // MongoDB Connection

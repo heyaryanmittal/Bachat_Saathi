@@ -5,8 +5,13 @@ exports.signupRequestOtp = async (req, res) => {
     const { name, email, password } = req.body;
     // Check if user already exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ status: 'error', message: 'Email already registered' });
+    
+    // If user exists and has a passwordHash, they are fully registered
+    if (existingUser && existingUser.passwordHash) {
+      return res.status(400).json({ 
+        status: 'error', 
+        message: 'This email is already registered. Please login instead.' 
+      });
     }
     // Validate email format
     if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -63,6 +68,7 @@ exports.signupVerifyOtp = async (req, res) => {
     const token = generateToken(user._id);
     res.status(201).json({
       status: 'success',
+      message: 'User registered successfully',
       data: {
         user: { id: user._id, name: user.name, email: user.email },
         token

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, StatsCard, LoadingSpinner, Alert } from '../components/ui';
 import useFinanceStore from '../stores/financeStore';
 import DonutChart from "../components/DonutChart";
@@ -125,13 +126,13 @@ function Dashboard() {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
+
     // Get current month transactions
     const currentMonthTransactions = transactions.filter(t => {
       const date = new Date(t.date || t.createdAt);
       return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
     });
-    
+
     // Get previous month transactions
     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
@@ -139,29 +140,29 @@ function Dashboard() {
       const date = new Date(t.date || t.createdAt);
       return date.getMonth() === prevMonth && date.getFullYear() === prevYear;
     });
-    
+
     // Calculate current month totals
     const currentIncome = currentMonthTransactions
       .filter(t => t.type?.toLowerCase() === 'income')
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-    
+
     const currentExpenses = currentMonthTransactions
       .filter(t => t.type?.toLowerCase() === 'expense')
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-    
+
     // Calculate previous month totals
     const prevIncome = prevMonthTransactions
       .filter(t => t.type?.toLowerCase() === 'income')
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-    
+
     const prevExpenses = prevMonthTransactions
       .filter(t => t.type?.toLowerCase() === 'expense')
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-    
+
     // Calculate trend percentages
     const incomeTrend = prevIncome > 0 ? ((currentIncome - prevIncome) / prevIncome) * 100 : 0;
     const expenseTrend = prevExpenses > 0 ? ((currentExpenses - prevExpenses) / prevExpenses) * 100 : 0;
-    
+
     return {
       incomeTrend: Math.abs(incomeTrend).toFixed(1),
       expenseTrend: Math.abs(expenseTrend).toFixed(1)
@@ -184,7 +185,7 @@ function Dashboard() {
       const freshBudgets = budgetsResponse || [];
 
       if ((freshTransactions.length === 0 && transactions.length > 0) ||
-          (freshBudgets.length === 0 && budgets.length > 0)) {
+        (freshBudgets.length === 0 && budgets.length > 0)) {
         console.log('Backend data cleared, clearing cache...');
         clearAllData();
       }
@@ -273,12 +274,12 @@ function Dashboard() {
               >
                 Retry Loading
               </button>
-              <a
-                href="/transactions"
+              <Link
+                to="/transactions"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Add Transactions
-              </a>
+              </Link>
             </div>
           </Alert>
         </Card>
@@ -309,12 +310,12 @@ function Dashboard() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Start by recording your income and expenses
               </p>
-              <a
-                href="/transactions"
+              <Link
+                to="/transactions"
                 className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
               >
                 Go to Transactions
-              </a>
+              </Link>
             </div>
 
             <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl">
@@ -323,12 +324,12 @@ function Dashboard() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Set spending limits for different categories
               </p>
-              <a
-                href="/budgets"
+              <Link
+                to="/budgets"
                 className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
               >
                 Go to Budgets
-              </a>
+              </Link>
             </div>
 
             <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl">
@@ -337,12 +338,12 @@ function Dashboard() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Define your financial targets and milestones
               </p>
-              <a
-                href="/goals"
+              <Link
+                to="/goals"
                 className="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
               >
                 Go to Goals
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -437,13 +438,13 @@ function Dashboard() {
 
         {/* Budget vs Spent - Enhanced Bar Chart */}
         <Card variant="gradient" hover="glow" className="relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-28 h-28 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full transform -translate-x-14 -translate-y-14 animate-bounce" style={{animationDuration: '3s'}}></div>
-          <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tr from-cyan-200/20 to-blue-200/20 rounded-full transform translate-x-10 translate-y-10 animate-bounce" style={{animationDelay: '1.5s', animationDuration: '3s'}}></div>
+          <div className="absolute top-0 left-0 w-28 h-28 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full transform -translate-x-14 -translate-y-14 animate-bounce" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tr from-cyan-200/20 to-blue-200/20 rounded-full transform translate-x-10 translate-y-10 animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '3s' }}></div>
 
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center mr-4 shadow-lg animate-float3D" style={{animationDelay: '0.5s'}}>
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center mr-4 shadow-lg animate-float3D" style={{ animationDelay: '0.5s' }}>
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
@@ -482,13 +483,13 @@ function Dashboard() {
       {/* Income vs Expense Trend - Enhanced Line Chart */}
       <Card variant="gradient" hover="glow" className="relative overflow-hidden">
         <div className="absolute top-1/2 left-0 w-40 h-40 bg-gradient-to-br from-emerald-200/15 to-teal-200/15 rounded-full transform -translate-x-20 -translate-y-20 animate-pulse"></div>
-        <div className="absolute top-0 right-1/4 w-32 h-32 bg-gradient-to-br from-cyan-200/15 to-emerald-200/15 rounded-full transform translate-y-16 animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-200/15 to-cyan-200/15 rounded-full transform translate-x-12 translate-y-12 animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-0 right-1/4 w-32 h-32 bg-gradient-to-br from-cyan-200/15 to-emerald-200/15 rounded-full transform translate-y-16 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-200/15 to-cyan-200/15 rounded-full transform translate-x-12 translate-y-12 animate-pulse" style={{ animationDelay: '1s' }}></div>
 
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl flex items-center justify-center mr-4 shadow-lg animate-float3D" style={{animationDelay: '1s'}}>
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl flex items-center justify-center mr-4 shadow-lg animate-float3D" style={{ animationDelay: '1s' }}>
                 <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                 </svg>
@@ -506,7 +507,7 @@ function Dashboard() {
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Income</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-gradient-to-r from-red-400 to-pink-500 rounded-full shadow-md animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                <div className="w-4 h-4 bg-gradient-to-r from-red-400 to-pink-500 rounded-full shadow-md animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Expense</span>
               </div>
               <div className="flex items-center space-x-2">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -35,7 +35,7 @@ function Login() {
       if (result) {
         window.history.replaceState({}, document.title);
         const from = location.state?.from?.pathname || '/dashboard';
-        window.location.href = from;
+        navigate(from, { replace: true });
       } else {
         toast.error('Login failed. Please try again.');
       }
@@ -66,7 +66,7 @@ function Login() {
         setShowOtpModal(false);
         window.history.replaceState({}, document.title);
         const from = location.state?.from?.pathname || '/dashboard';
-        window.location.href = from;
+        navigate(from, { replace: true });
       } else {
         setOtpError('Invalid response from server.');
       }
@@ -184,9 +184,9 @@ function Login() {
             <div className="text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Don't have an account?{' '}
-                <a href="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
                   Sign up here
-                </a>
+                </Link>
               </p>
             </div>
           </form>

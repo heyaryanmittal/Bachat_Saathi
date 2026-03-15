@@ -247,6 +247,13 @@ export function AuthProvider({ children }) {
     toast.success('You have been logged out.');
   };
 
+  const setAuthData = useCallback((userData, token) => {
+    localStorage.setItem('token', token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    setUser(userData);
+    setError(null);
+  }, []);
+
   const value = {
     user,
     error,
@@ -255,6 +262,7 @@ export function AuthProvider({ children }) {
     signup,
     logout,
     updateUser,
+    setAuthData,
     isAuthenticated: !!user
   };
 

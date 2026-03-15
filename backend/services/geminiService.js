@@ -1,7 +1,5 @@
 const axios = require('axios');
 const { apiKey, endpoint } = require('../config/gemini');
-
-// messages: array of Gemini message objects, e.g., [{ parts: [{ text: 'your prompt' }] }]
 async function generateGeminiContent(messages) {
   try {
     const response = await axios.post(

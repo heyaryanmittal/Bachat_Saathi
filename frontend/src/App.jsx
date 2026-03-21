@@ -20,6 +20,7 @@ import Leaderboard from './pages/Leaderboard';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import PointsInfoPage from './pages/PointsInfoPage';
+import TransferHistory from './pages/TransferHistory';
 import AIAssistant from './components/AIAssistant';
 
 // Create a custom history object to access navigation outside components
@@ -136,7 +137,7 @@ function App() {
             <Route
               path="/login"
               element={
-                <AppLayout showNavbar={true} showContainer={true}>
+                <AppLayout showNavbar={false} showContainer={false}>
                   <Login />
                 </AppLayout>
               }
@@ -144,7 +145,7 @@ function App() {
             <Route
               path="/signup"
               element={
-                <AppLayout showNavbar={true} showContainer={true}>
+                <AppLayout showNavbar={false} showContainer={false}>
                   <Signup />
                 </AppLayout>
               }
@@ -258,6 +259,16 @@ function App() {
                 <ProtectedRoute>
                   <AppLayout showNavbar={true} showContainer={true}>
                     <PointsInfoPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transfers"
+              element={
+                <ProtectedRoute>
+                  <AppLayout showNavbar={true} showContainer={true}>
+                    <TransferHistory />
                   </AppLayout>
                 </ProtectedRoute>
               }

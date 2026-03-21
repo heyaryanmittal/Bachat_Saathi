@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { Button, Card, Input } from '../components/ui';
+import { Wallet, LogIn, ShieldCheck, Mail, Lock } from 'lucide-react';
 import api from '../services/api';
+import Logo from '../components/Logo';
 
 function Login() {
   const [error, setError] = useState('');
@@ -22,8 +25,6 @@ function Login() {
     setError('');
     setIsLoading(true);
     setOtpError('');
-    setShowOtpModal(false);
-    setPending2FAEmail('');
     try {
       const result = await login(data.email, data.password);
       if (result && result.require2FA) {
@@ -33,24 +34,19 @@ function Login() {
         return;
       }
       if (result) {
-        window.history.replaceState({}, document.title);
         const from = location.state?.from?.pathname || '/dashboard';
         navigate(from, { replace: true });
       } else {
-        toast.error('Login failed. Please try again.');
+        toast.error('Login failed.');
       }
     } catch (error) {
-      if (!error.response) {
-        const errorMsg = 'Network error. Please check your connection.';
-        setError(errorMsg);
-        toast.error(errorMsg);
-      }
+      setError('Invalid credentials or network issue.');
+      toast.error('Login error.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle OTP submit
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     setOtpError('');
@@ -58,188 +54,146 @@ function Login() {
     try {
       setIsLoading(true);
       const response = await api.post('/auth/login-2fa', { email: pending2FAEmail, otp });
-      if (response.data?.data?.token && response.data?.data?.user) {
-        // Store token and set auth header
+      if (response.data?.data?.token) {
         localStorage.setItem('token', response.data.data.token);
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
-        toast.success('2FA verification successful!');
-        setShowOtpModal(false);
-        window.history.replaceState({}, document.title);
-        const from = location.state?.from?.pathname || '/dashboard';
-        navigate(from, { replace: true });
-      } else {
-        setOtpError('Invalid response from server.');
+        toast.success('Login successful!');
+        navigate('/dashboard');
       }
     } catch (error) {
-      setOtpError(error.response?.data?.message || 'Invalid OTP. Please try again.');
+      setOtpError('Invalid OTP.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        {/* Login Card */}
-        <div className="card-modern p-8 animate-fadeInUp">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-2xl">₹</span>
+    <div className="h-screen grid lg:grid-cols-2 bg-background overflow-hidden relative">
+      <div className="absolute top-8 left-8 z-50 pointer-events-auto">
+        <Logo isLight={true} />
+      </div>
+
+      {/* Visual Side */}
+      <div className="hidden lg:flex flex-col items-center justify-center p-20 relative overflow-hidden bg-emerald-950 group">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/20 mix-blend-overlay opacity-50 group-hover:opacity-60 transition-opacity"></div>
+        <div className="absolute top-0 -left-10 w-80 h-80 bg-primary/20 rounded-full blur-[100px] animate-blob"></div>
+        <div className="absolute bottom-40 -right-20 w-80 h-80 bg-accent/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+        
+        <div className="relative z-10 text-center text-white max-w-md">
+            <div className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-8 animate-float">
+                <Wallet className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Welcome Back! 👋
-              </span>
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Sign in to manage your finances
-            </p>
+            <h1 className="text-4xl font-black mb-6 leading-tight">Your Financial Future Starts and Scales Here.</h1>
+            <p className="text-white/70 text-lg mb-10 leading-relaxed">Join 10,000+ users who track their wealth with bank-grade security and AI-powered insights.</p>
+            
+            <div className="space-y-4">
+                {['End-to-end Encryption', 'Instant Expense Tracking', 'Intelligent Budgeting'].map((item, i) => (
+                    <div key={i} className="flex items-center space-x-3 bg-white/5 p-4 rounded-xl border border-white/10 transition-colors hover:bg-white/10">
+                        <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                        <span className="text-sm font-bold opacity-80">{item}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+      </div>
+
+      {/* Form Side */}
+      <div className="flex items-center justify-center p-8 sm:p-12 animate-entrance bg-white dark:bg-gray-950 overflow-y-auto">
+        <div className="max-w-md w-full">
+          <div className="text-center lg:text-left mb-10">
+            <div className="lg:hidden w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-6">
+                <Wallet className="text-white w-7 h-7" />
+            </div>
+            <h2 className="text-4xl font-black tracking-tighter mb-2">Welcome <span className="text-gradient">Back</span></h2>
+            <p className="text-muted-foreground font-medium italic">Secure access to your BachatSaathi account.</p>
           </div>
+
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 animate-fadeInUp">
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-sm font-medium text-red-800 dark:text-red-200">{error}</p>
-                </div>
+              <div className="bg-rose-50 text-rose-600 p-4 rounded-xl text-xs font-bold border border-rose-100 dark:bg-rose-900/10 dark:border-rose-800">
+                {error}
               </div>
             )}
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address'
-                    }
-                  })}
-                  className="input-modern"
-                  placeholder="Enter your email"
-                />
-                {errors.email && (
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 6,
-                      message: 'Password must be at least 6 characters'
-                    }
-                  })}
-                  className="input-modern"
-                  placeholder="Enter your password"
-                />
-                {errors.password && (
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+
+            <Input
+              label="Email Workspace"
+              type="email"
+              placeholder="name@company.com"
+              {...register('email', { required: 'Email required' })}
+              error={errors.email?.message}
+            />
+
+            <Input
+              label="Password Key"
+              type="password"
+              placeholder="••••••••"
+              {...register('password', { required: 'Password required' })}
+              error={errors.password?.message}
+            />
+
+            <div className="flex items-center justify-between text-xs font-bold text-primary italic hover:underline cursor-pointer">
+                <span>Forgot password?</span>
             </div>
-            <button
+
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="btn-primary w-full flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              size="xl"
+              className="w-full btn-saas-primary group"
+              loading={isLoading}
+              loadingText="AUTHENTICATING"
             >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                  <span>Sign In</span>
-                </>
-              )}
-            </button>
-            {/* Sign Up Link */}
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Don't have an account?{' '}
-                <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                  Sign up here
-                </Link>
-              </p>
+              Log In Now
+              <LogIn className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+
+            <div className="relative py-4">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border"></div></div>
+                <div className="relative flex justify-center text-xs uppercase font-black text-muted-foreground/30"><span className="bg-background px-4">OR CONTINUE WITH</span></div>
             </div>
+
+            <p className="text-center text-sm font-medium text-muted-foreground">
+              New to our ecosystem? <Link to="/signup" className="text-primary font-bold hover:underline">Create a free account</Link>
+            </p>
           </form>
         </div>
-        {/* OTP Modal */}
-        {showOtpModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 animate-fadeInUp">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Enter OTP</h3>
-                <button
-                  onClick={() => setShowOtpModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <form onSubmit={handleOtpSubmit} className="space-y-4">
-                <p className="text-gray-700 dark:text-gray-300">An OTP has been sent to your email. Please enter it below to continue.</p>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={e => setOtp(e.target.value)}
-                  className={`input-modern w-full ${otpError ? 'border-red-500' : ''}`}
-                  placeholder="Enter OTP"
-                  maxLength={6}
-                  autoFocus
-                />
-                {otpError && <p className="text-red-500 text-sm mt-1">{otpError}</p>}
-                <div className="flex space-x-3 mt-6">
-                  <button
-                    type="submit"
-                    disabled={isLoading || !otp}
-                    className={`flex-1 btn-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {isLoading ? 'Verifying...' : 'Verify'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowOtpModal(false)}
-                    disabled={isLoading}
-                    className="flex-1 btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* OTP MODAL */}
+      {showOtpModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+              <Card variant="glass" className="max-w-sm w-full animate-entrance">
+                  <h3 className="text-xl font-black mb-4">2-Step Verification</h3>
+                  <p className="text-sm text-muted-foreground mb-6">We've sent a 6-digit code to your email for added security.</p>
+                  <form onSubmit={handleOtpSubmit} className="space-y-4">
+                      <Input
+                        label="6-Digit OTP"
+                        maxLength={6}
+                        value={otp}
+                        onChange={e => setOtp(e.target.value)}
+                        placeholder="000 000"
+                        error={otpError}
+                      />
+                      <div className="grid grid-cols-2 gap-4 pt-4">
+                          <Button 
+                            variant="secondary" 
+                            type="button" 
+                            onClick={() => setShowOtpModal(false)}
+                            disabled={isLoading}
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            className="btn-saas-primary" 
+                            type="submit" 
+                            loading={isLoading}
+                          >
+                            Verify
+                          </Button>
+                      </div>
+                  </form>
+              </Card>
+          </div>
+      )}
     </div>
   );
 }

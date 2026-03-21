@@ -1,279 +1,196 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { 
+  ArrowLeft, Activity, Target, Zap, 
+  ShieldCheck, Info, Sparkles, Trophy,
+  Wallet, Landmark, Receipt, Calendar,
+  TrendingUp, AlertTriangle, ShieldAlert,
+  ChevronRight, BarChart3
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../config';
+import { Card, Button, LoadingSpinner, StatsCard } from '../components/ui';
+import { motion } from 'framer-motion';
 
 function PointsInfoPage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [usageStats, setUsageStats] = useState({
-    totalTransactions: 0,
-    totalBudgets: 0,
-    totalDebts: 0,
-    totalGoals: 0,
-    totalWallets: 0,
-    daysActive: 0,
-    lastLogin: null,
-    joinedDate: null
-  });
-  const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const [usageStats, setUsageStats] = useState({
+        totalTransactions: 0,
+        totalBudgets: 0,
+        totalDebts: 0,
+        totalGoals: 0,
+        totalWallets: 0,
+        daysActive: 0,
+    });
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUsageStats = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/users/usage-stats`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if (response.data.status === 'success') {
-          setUsageStats(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching usage stats:', error);
-      } finally {
-        setLoading(false);
-      }
+    useEffect(() => {
+        const fetchUsageStats = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${API_URL}/users/usage-stats`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (response.data.status === 'success') {
+                    setUsageStats(response.data.data);
+                }
+            } catch (error) { /* silent */ }
+            finally { setLoading(false); }
+        };
+        if (user) fetchUsageStats();
+    }, [user]);
+
+    if (loading) return <div className="fixed inset-0 z-[10000] bg-background flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Initializing protocol analytics..." /></div>;
+
+    const containers = {
+        animate: { transition: { staggerChildren: 0.1 } }
     };
 
-    if (user) {
-      fetchUsageStats();
-    }
-  }, [user]);
+    const item = {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 }
+    };
 
-  return (
-    <div className="fixed inset-0 z-[10000] overflow-y-auto bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto relative z-10">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-8 transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Back to Dashboard
-        </button>
+    return (
+        <div className="fixed inset-0 z-[10000] overflow-y-auto bg-background/95 backdrop-blur-xl py-12 px-4 selection:bg-primary selection:text-white">
+            <div className="max-w-5xl mx-auto space-y-12 animate-entrance pb-24">
+                {/* Back Button */}
+                <button onClick={() => navigate(-1)} className="group flex items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center mr-3 group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                        <ArrowLeft className="h-4 w-4" />
+                    </div>
+                    Back to Command Center
+                </button>
 
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
-          <div className="px-6 py-8 sm:p-10">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Points System, Policies & Analytics</h1>
-            
-            <div className="space-y-10">
-              {/* Usage Analytics Section - First */}
-              <div>
-                <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                  📊 Your Usage Analytics
-                </h2>
-                {loading ? (
-                  <div className="text-center py-8 text-gray-600 dark:text-gray-400">
-                    <p>Loading statistics...</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Days Active</p>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{usageStats.daysActive || 0}</p>
-                    </div>
-                    <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Transactions</p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">{usageStats.totalTransactions || 0}</p>
-                    </div>
-                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Active Budgets</p>
-                      <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{usageStats.totalBudgets || 0}</p>
-                    </div>
-                    <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Active Debts</p>
-                      <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{usageStats.totalDebts || 0}</p>
-                    </div>
-                    <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 border border-indigo-200 dark:border-indigo-800">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Savings Goals</p>
-                      <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{usageStats.totalGoals || 0}</p>
-                    </div>
-                    <div className="bg-cyan-50 dark:bg-cyan-900/20 rounded-lg p-4 border border-cyan-200 dark:border-cyan-800">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Total Wallets</p>
-                      <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">{usageStats.totalWallets || 0}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Website Usage Tips */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-                <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4">
-                  💡 Website Usage Tips
-                </h2>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Log in regularly</strong> to maintain your login streak and earn bonus points</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Track all transactions</strong> to get accurate spending insights and financial analytics</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Set and monitor budgets</strong> to stay on top of your spending habits</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Create savings goals</strong> to motivate yourself and track progress</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Review leaderboard ranking</strong> to see how you compare with other users</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Check monthly reports</strong> to understand your financial trends and patterns</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Use the wallet feature</strong> to organize and manage multiple accounts</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-500 mr-3 mt-1">✓</span>
-                    <span><strong>Enable recurring transactions</strong> for automated bill and savings tracking</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                  🎯 How to Earn Points
-                </h2>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  <li className="flex items-start">
-                    <span className="text-green-500 mr-2">•</span>
-                    <div>
-                      <span className="font-medium">Complete your profile:</span> 
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">+100 points</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-500 mr-2">•</span>
-                    <div>
-                      <span className="font-medium">Add first transaction:</span> 
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">+50 points</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-500 mr-2">•</span>
-                    <div>
-                      <span className="font-medium">Maintain budget for a week:</span> 
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">+200 points</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-500 mr-2">•</span>
-                    <div>
-                      <span className="font-medium">Pay off a debt:</span> 
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">+150 points</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-500 mr-2">•</span>
-                    <div>
-                      <span className="font-medium">Reach a savings goal:</span> 
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">+300 points</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-green-500 mr-2">•</span>
-                    <div>
-                      <span className="font-medium">7-day login streak:</span> 
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">+100 points</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                  🏆 Points Tiers
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { tier: 'Bronze', points: '0-999', color: 'from-amber-600 to-amber-700' },
-                    { tier: 'Silver', points: '1,000-4,999', color: 'from-gray-400 to-gray-500' },
-                    { tier: 'Gold', points: '5,000-9,999', color: 'from-yellow-400 to-yellow-500' },
-                    { tier: 'Platinum', points: '10,000+', color: 'from-purple-500 to-pink-500' }
-                  ].map((item) => (
-                    <div key={item.tier} className={`bg-gradient-to-r ${item.color} rounded-lg p-6 text-white`}>
-                      <h3 className="text-xl font-bold mb-1">{item.tier}</h3>
-                      <p className="text-sm opacity-90">{item.points} points</p>
-                    </div>
-                  ))}
+                {/* Header */}
+                <div className="text-center space-y-4">
+                    <h1 className="text-5xl font-black tracking-tighter uppercase tracking-widest leading-none">Protocol <span className="text-gradient">Analytics</span></h1>
+                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">System policies, reward logic, and operational telemetry.</p>
                 </div>
-              </div>
 
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r">
-                <h2 className="text-xl font-semibold text-yellow-700 dark:text-yellow-400 mb-3">
-                  📝 Debt Deletion Policy
-                </h2>
-                <ul className="space-y-2 text-yellow-700 dark:text-yellow-300">
-                  <li className="flex items-start">
-                    <span className="text-yellow-500 mr-2">•</span>
-                    Debts marked as "Paid" will be archived automatically after 30 days
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-yellow-500 mr-2">•</span>
-                    You can't manually delete unpaid debts at any time
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-yellow-500 mr-2">•</span>
-                    Deleting a debt will remove it from all reports and statistics
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-yellow-500 mr-2">•</span>
-                    Points earned from paying off a debt will not be revoked if the debt is later deleted
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-yellow-500 mr-2">•</span>
-                    We recommend exporting your debt history before deleting if you need to keep records
-                  </li>
-                </ul>
-              </div>
+                {/* Metrics Grid */}
+                <motion.div variants={containers} initial="initial" animate="animate" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <motion.div variants={item}><StatsCard title="Survival Days" value={usageStats.daysActive} variant="primary" icon={<Calendar />} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Data Streams" value={usageStats.totalTransactions} variant="success" icon={<Receipt />} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Active Flux" value={usageStats.totalBudgets} variant="gradient" icon={<BarChart3 />} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Neutralized" value={usageStats.totalDebts} variant="error" icon={<Landmark />} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Objectives" value={usageStats.totalGoals} variant="secondary" icon={<Target />} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Node Count" value={usageStats.totalWallets} variant="primary" icon={<Wallet />} /></motion.div>
+                </motion.div>
 
-              <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 rounded-r">
-                <h2 className="text-xl font-semibold text-red-700 dark:text-red-400 mb-3">
-                  🗑️ Wallet Deletion Policy
-                </h2>
-                <ul className="space-y-2 text-red-700 dark:text-red-300">
-                  <li className="flex items-start">
-                    <span className="text-red-500 mr-2">•</span>
-                    You can delete wallets only when they have a zero balance
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-500 mr-2">•</span>
-                    Deleting a wallet will remove all associated transactions and history
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-500 mr-2">•</span>
-                    Wallets deleted are permanent and cannot be recovered
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-500 mr-2">•</span>
-                    All budgets and goals linked to the wallet will be affected
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-500 mr-2">•</span>
-                    We recommend exporting your wallet data before deletion for record keeping
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-500 mr-2">•</span>
-                    Primary or default wallets require special handling before deletion
-                  </li>
-                </ul>
-              </div>
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Efficiency Tips */}
+                    <Card variant="glass" className="saas-card p-8 lg:col-span-2">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-8 flex items-center"><Sparkles className="w-4 h-4 mr-2" /> Optimization Protocols</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {[
+                                { title: 'Temporal Consistency', desc: 'Sync daily to maximize login energy streaks.' },
+                                { title: 'Data Integrity', desc: 'Log every transaction for absolute net-worth clarity.' },
+                                { title: 'Flux Management', desc: 'Review budget deviations before the weekly cycle end.' },
+                                { title: 'Objective Tracking', desc: 'Update goal progress to trigger reward multipliers.' },
+                                { title: 'Global Matrix', desc: 'Monitor rankings to optimize competitive standing.' },
+                                { title: 'Node Organization', desc: 'Distribute capital across multiple wallet nodes.' },
+                            ].map((tip, i) => (
+                                <div key={i} className="group p-4 bg-muted/20 rounded-2xl border border-border/50 hover:bg-muted/30 transition-all">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">0{i+1}</div>
+                                        <h4 className="font-black text-[11px] uppercase tracking-tighter">{tip.title}</h4>
+                                    </div>
+                                    <p className="text-[10px] font-medium text-muted-foreground italic leading-relaxed">{tip.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Reward Multipliers */}
+                    <Card variant="glass" className="saas-card p-8 bg-primary/5 border-primary/20">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-8 flex items-center"><Zap className="w-4 h-4 mr-2" /> Energy Capture</h3>
+                        <div className="space-y-4">
+                            {[
+                                { label: 'Node Initialization', val: '+100 PT', icon: <Activity className="w-4 h-4" /> },
+                                { label: 'First Data Stream', val: '+50 PT', icon: <Receipt className="w-4 h-4" /> },
+                                { label: '7-Day Survival', val: '+100 PT', icon: <Calendar className="w-4 h-4" /> },
+                                { label: 'Liability Neutralization', val: '+150 PT', icon: <Landmark className="w-4 h-4" /> },
+                                { label: 'Objective Realization', val: '+300 PT', icon: <Target className="w-4 h-4" /> },
+                            ].map((row, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 bg-background/50 rounded-xl border border-border/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-primary">{row.icon}</div>
+                                        <span className="font-black text-[10px] uppercase tracking-tighter">{row.label}</span>
+                                    </div>
+                                    <span className="font-black text-xs text-primary">{row.val}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+                </div>
+
+                {/* Tiers */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center justify-center"><Trophy className="w-4 h-4 mr-2" /> Authority Tiers</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        {[
+                            { name: 'Bronze', pts: '0 - 999', color: 'from-amber-600/20' },
+                            { name: 'Silver', pts: '1,000 - 4,999', color: 'from-slate-400/20' },
+                            { name: 'Gold', pts: '5,000 - 9,999', color: 'from-yellow-500/20' },
+                            { name: 'Platinum', pts: '10,000+', color: 'from-cyan-400/20' },
+                        ].map((t, i) => (
+                            <div key={i} className={`bg-gradient-to-br ${t.color} to-transparent p-6 rounded-3xl border border-border/50 text-center group hover:scale-105 transition-transform`}>
+                                <h4 className="font-black text-xl tracking-tighter uppercase mb-1">{t.name}</h4>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">{t.pts} PTS</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Policies */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Card variant="glass" className="saas-card p-8 border-amber-500/20 bg-amber-500/5">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center"><ShieldCheck className="w-4 h-4 mr-2" /> Liability Archive Logic</h3>
+                        <ul className="space-y-4">
+                            {[
+                                'Archivals occur 30 cycles post-neutralization.',
+                                'Manual purging of active streams is prohibited.',
+                                'Archive actions propagate to all linked telemetry.',
+                                'Reward points are permanent post-archive.',
+                            ].map((rule, i) => (
+                                <li key={i} className="flex items-start gap-3 text-[11px] font-black text-amber-500/80 uppercase tracking-tighter italic">
+                                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></div>
+                                    {rule}
+                                </li>
+                            ))}
+                        </ul>
+                    </Card>
+
+                    <Card variant="glass" className="saas-card p-8 border-rose-500/20 bg-rose-500/5">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-rose-500 mb-6 flex items-center"><ShieldAlert className="w-4 h-4 mr-2" /> Node Deletion Protocol</h3>
+                        <ul className="space-y-4">
+                            {[
+                                'Nodes must be at zero balance for terminal deletion.',
+                                'Deletion erases all associated data streams permanently.',
+                                'Linked objectives and budgets will destabilize.',
+                                'Primary vault nodes require elevated clearance.',
+                            ].map((rule, i) => (
+                                <li key={i} className="flex items-start gap-3 text-[11px] font-black text-rose-500/80 uppercase tracking-tighter italic">
+                                    <div className="mt-1 w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></div>
+                                    {rule}
+                                </li>
+                            ))}
+                        </ul>
+                    </Card>
+                </div>
+
+                {/* Contact/Support CTA */}
+                <div className="text-center pt-8">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground mb-4 italic">Require further clarification on protocol mechanics?</p>
+                    <Button variant="secondary" size="xl" className="font-black uppercase text-[10px] tracking-widest">Open Encryption Channel</Button>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default PointsInfoPage;

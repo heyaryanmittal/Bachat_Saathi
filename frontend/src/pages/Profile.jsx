@@ -3,753 +3,271 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { Card, Button, Input } from '../components/ui';
 import {
-  User,
-  Settings,
-  Shield,
-  Palette,
-  Bell,
-  Key,
-  Edit3,
-  Save,
-  X,
-  Camera,
-  TrendingUp,
-  Calendar,
-  Mail
+  User, Settings, Shield, Bell, Key, Edit3, 
+  Save, X, Camera, TrendingUp, Calendar, Mail, 
+  ChevronLeft, Smartphone, Globe, Lock
 } from 'lucide-react';
 
-// Tab configuration
 const TABS = [
-  { id: 'overview', label: 'Overview', icon: User },
-  { id: 'settings', label: 'Settings', icon: Settings },
-  { id: 'security', label: 'Security', icon: Shield },
-  // Preferences tab removed
-];
-
-// Form field configuration
-const FORM_FIELD_CONFIG = [
-  { key: 'name', label: 'Full Name', type: 'text', placeholder: 'Enter your full name' },
-  { key: 'email', label: 'Email Address', type: 'email', placeholder: 'Enter your email' },
-  { key: 'phone', label: 'Phone Number', type: 'tel', placeholder: 'Enter your phone number' },
-  { key: 'location', label: 'Location', type: 'text', placeholder: 'Enter your location' }
+  { id: 'overview', label: 'Identity', icon: User },
+  { id: 'settings', label: 'Preferences', icon: Settings },
+  { id: 'security', label: 'Vault', icon: Shield },
 ];
 
 const Profile = () => {
-  // Context and navigation
-  const { user, updateUser } = useAuth();
-  const navigate = useNavigate();
+    const { user, updateUser } = useAuth();
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('overview');
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [editedUser, setEditedUser] = useState({});
+    const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [show2FAModal, setShow2FAModal] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-  // State management
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState({});
-  const [activeTab, setActiveTab] = useState('overview');
-  const [isSaving, setIsSaving] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [passwordErrors, setPasswordErrors] = useState({});
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  // 2FA states
-  const [show2FAModal, setShow2FAModal] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [otpError, setOtpError] = useState('');
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-  // Notification toggles
-  const [budgetAlertEnabled, setBudgetAlertEnabled] = useState(user?.budgetAlertEnabled ?? true);
-  const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(user?.emailNotificationsEnabled ?? true);
-
-  // Save notification toggle changes immediately
-  const handleToggleChange = async (field, value) => {
-    if (field === 'budgetAlertEnabled') setBudgetAlertEnabled(value);
-    if (field === 'emailNotificationsEnabled') setEmailNotificationsEnabled(value);
-    try {
-      await updateUser({
-        ...editedUser,
-        budgetAlertEnabled: field === 'budgetAlertEnabled' ? value : budgetAlertEnabled,
-        emailNotificationsEnabled: field === 'emailNotificationsEnabled' ? value : emailNotificationsEnabled
-      });
-    } catch (error) {
-      // Optionally show error toast
-    }
-  };
-  // Fetch 2FA status on mount
-  useEffect(() => {
-    const fetch2FAStatus = async () => {
-      try {
-        const res = await api.get('/auth/2fa/status');
-        setIs2FAEnabled(res.data.is2FAEnabled);
-      } catch (e) {
-        setIs2FAEnabled(false);
-      }
-    };
-    fetch2FAStatus();
-  }, [refreshTrigger]);
-  // Handle 2FA Enable button click
-  const handleEnable2FA = async () => {
-    setIsSendingOtp(true);
-    setOtp('');
-    setOtpError('');
-    try {
-      await api.post('/auth/2fa/send-otp');
-      setShow2FAModal(true);
-    } catch (e) {
-      setOtpError('Failed to send OTP. Please try again.');
-    } finally {
-      setIsSendingOtp(false);
-    }
-  };
-
-  // Handle OTP verification
-  const handleVerifyOtp = async () => {
-    setIsVerifyingOtp(true);
-    setOtpError('');
-    try {
-      await api.post('/auth/2fa/verify-otp', { otp });
-      setShow2FAModal(false);
-      setIs2FAEnabled(true);
-      setRefreshTrigger(prev => prev + 1);
-      alert('Two-factor authentication enabled!');
-    } catch (e) {
-      setOtpError(e.response?.data?.message || 'Invalid OTP. Please try again.');
-    } finally {
-      setIsVerifyingOtp(false);
-    }
-  };
-
-  // Initialize form data when user loads
-  useEffect(() => {
-    if (user) {
-      setEditedUser({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        location: user.location || '',
-        bio: user.bio || ''
-      });
-      setBudgetAlertEnabled(user.budgetAlertEnabled ?? true);
-      setEmailNotificationsEnabled(user.emailNotificationsEnabled ?? true);
-    }
-  }, [user]);
-
-  // Handle input changes
-  const handleInputChange = (field, value) => {
-    setEditedUser(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // Handle edit cancellation
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditedUser({
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      location: user?.location || '',
-      bio: user?.bio || ''
-    });
-  };
-
-  // Handle profile save
-  const handleSaveProfile = async () => {
-    if (isSaving) return;
-
-    try {
-      setIsSaving(true);
-      const updatedUserData = await updateUser({
-        ...editedUser,
-        budgetAlertEnabled,
-        emailNotificationsEnabled
-      });
-
-      setEditedUser({
-        name: updatedUserData.name || '',
-        email: updatedUserData.email || '',
-        phone: updatedUserData.phone || '',
-        location: updatedUserData.location || '',
-        bio: updatedUserData.bio || ''
-      });
-      setBudgetAlertEnabled(updatedUserData.budgetAlertEnabled ?? true);
-      setEmailNotificationsEnabled(updatedUserData.emailNotificationsEnabled ?? true);
-      setIsEditing(false);
-      setRefreshTrigger(prev => prev + 1);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Handle password input changes
-  const handlePasswordInputChange = (field, value) => {
-    setPasswordData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-
-    if (passwordErrors[field]) {
-      setPasswordErrors(prev => ({
-        ...prev,
-        [field]: ''
-      }));
-    }
-  };
-
-  // Validate password form
-  const validatePasswordForm = () => {
-    const errors = {};
-
-    if (!passwordData.currentPassword) {
-      errors.currentPassword = 'Current password is required';
-    }
-
-    if (!passwordData.newPassword) {
-      errors.newPassword = 'New password is required';
-    } else if (passwordData.newPassword.length < 6) {
-      errors.newPassword = 'Password must be at least 6 characters long';
-    }
-
-    if (!passwordData.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your new password';
-    } else if (passwordData.newPassword !== passwordData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-    }
-
-    setPasswordErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // Handle password change
-  const handlePasswordChange = async () => {
-    if (!validatePasswordForm()) return;
-
-    try {
-      setIsChangingPassword(true);
-      await api.put('/auth/change-password', {
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      });
-
-      setShowPasswordModal(false);
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-      setPasswordErrors({});
-      toast.success('Password changed successfully!');
-    } catch (error) {
-      console.error('Error changing password:', error);
-      if (error.response?.data?.message) {
-          if (error.response.data.message.includes('Current password is incorrect')) {
-          setPasswordErrors({ currentPassword: 'Current password is incorrect' });
-        } else {
-          toast.error(error.response.data.message);
+    useEffect(() => {
+        if (user) {
+            setEditedUser({
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                location: user.location || '',
+                bio: user.bio || ''
+            });
         }
-      } else {
-        toast.error('Failed to change password. Please try again.');
-      }
-    } finally {
-      setIsChangingPassword(false);
-    }
-  };
+    }, [user]);
 
-  // Handle password modal cancellation
-  const handleCancelPasswordChange = () => {
-    setShowPasswordModal(false);
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
-    setPasswordErrors({});
-  };
+    useEffect(() => {
+        const fetch2FA = async () => {
+            try {
+                const res = await api.get('/auth/2fa/status');
+                setIs2FAEnabled(res.data.is2FAEnabled);
+            } catch (e) { /* silent */ }
+        };
+        fetch2FA();
+    }, []);
 
-  // Generate unique key for React reconciliation
-  const renderKey = user ? `user-${user._id}-${refreshTrigger}` : 'no-user';
+    const handleSave = async () => {
+        try {
+            setIsSaving(true);
+            await updateUser(editedUser);
+            toast.success('Identity synchronized.');
+            setIsEditing(false);
+        } catch (e) { toast.error('Sync failed.'); }
+        finally { setIsSaving(false); }
+    };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-4">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <X className="w-4 h-4" />
-              <span>Back to Dashboard</span>
-            </button>
-          </div>
+    const handleEnable2FA = async () => {
+        try {
+            setIsLoading(true);
+            await api.post('/auth/2fa/send-otp');
+            setShow2FAModal(true);
+            toast.success('Transmission code sent.');
+        } catch (e) { toast.error('Stream error.'); }
+        finally { setIsLoading(false); }
+    };
 
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Profile Settings
-              </span>
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Manage your account information and preferences
-            </p>
-          </div>
-        </div>
+    const handleVerifyOtp = async () => {
+        try {
+            setIsLoading(true);
+            await api.post('/auth/2fa/verify-otp', { otp });
+            setIs2FAEnabled(true);
+            setShow2FAModal(false);
+            toast.success('Vault secured.');
+        } catch (e) { toast.error('Integrity failure.'); }
+        finally { setIsLoading(false); }
+    };
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-1">
-            <div className="card-modern p-6">
-              <nav className="space-y-2">
-                {TABS.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
-                        activeTab === tab.id
-                          ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span className="font-medium">{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
+    return (
+        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
+            {/* SaaS Header */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl font-black tracking-tighter mb-2">Command <span className="text-gradient">Center</span></h1>
+                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Managing your digital identity and security parameters.</p>
+                </div>
+                <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg"><ChevronLeft className="mr-2 w-5 h-5" />Back to Matrix</Button>
             </div>
-          </div>
 
-          {/* Main Content Area */}
-          <div key={renderKey} className="lg:col-span-3">
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                {/* Profile Header Card */}
-                <div className="card-modern p-8">
-                  <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
-                    {/* Profile Avatar */}
-                    <div className="relative">
-                      <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-                        {(user?.name || 'U').charAt(0).toUpperCase()}
-                      </div>
-                      <button className="absolute bottom-0 right-0 w-10 h-10 bg-white dark:bg-gray-800 rounded-full border-4 border-white dark:border-gray-900 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                        <Camera className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      </button>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Sidebar Navigation */}
+                <Card variant="glass" className="lg:col-span-1 h-fit sticky top-24 p-2">
+                    <div className="space-y-1">
+                        {TABS.map(tab => {
+                            const Icon = tab.icon;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest ${activeTab === tab.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-muted/50'}`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    <span>{tab.label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
+                </Card>
 
-                    {/* User Information */}
-                    <div className="flex-1 text-center md:text-left">
-                      <div className="flex items-center justify-center md:justify-start space-x-4 mb-4">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                          {user?.name || 'Not provided'}
-                        </h2>
-                        {isEditing ? (
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={handleSaveProfile}
-                              disabled={isSaving}
-                              className={`btn-primary flex items-center space-x-1 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                              <Save className="w-4 h-4" />
-                              <span>{isSaving ? 'Saving...' : 'Save'}</span>
-                            </button>
-                            <button
-                              onClick={handleCancelEdit}
-                              className="btn-secondary flex items-center space-x-1"
-                            >
-                              <X className="w-4 h-4" />
-                              <span>Cancel</span>
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setIsEditing(true)}
-                            className="btn-secondary flex items-center space-x-1"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                            <span>Edit</span>
-                          </button>
-                        )}
-                      </div>
+                {/* Main Content Area */}
+                <div className="lg:col-span-3 space-y-8">
+                    {activeTab === 'overview' && (
+                        <>
+                            <Card variant="glass" className="saas-card p-8">
+                                <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
+                                    <div className="relative group">
+                                        <div className="w-32 h-32 gradient-primary rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-primary/30 group-hover:scale-105 transition-transform duration-500">
+                                            {(user?.name || 'U').charAt(0).toUpperCase()}
+                                        </div>
+                                        <button className="absolute bottom-1 right-1 w-10 h-10 bg-background border-2 border-border rounded-full flex items-center justify-center shadow-xl hover:text-primary transition-colors">
+                                            <Camera className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                    <div className="flex-1 text-center md:text-left space-y-4">
+                                        <div>
+                                            <h2 className="text-3xl font-black tracking-tighter mb-1">{user?.name}</h2>
+                                            <p className="text-sm font-black text-muted-foreground uppercase tracking-widest flex items-center justify-center md:justify-start">
+                                                <Mail className="w-3.5 h-3.5 mr-2 text-primary" />
+                                                {user?.email}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                                            <div className="bg-muted/30 px-3 py-1.5 rounded-xl border border-border/50 flex items-center">
+                                                <Calendar className="w-3.5 h-3.5 mr-2 text-primary" />
+                                                <span className="text-[10px] font-black uppercase">Joined {new Date(user?.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20 flex items-center">
+                                                <Star className="w-3.5 h-3.5 mr-2 text-primary" />
+                                                <span className="text-[10px] font-black uppercase text-primary">Premium Authority</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button variant={isEditing ? 'danger' : 'secondary'} size="lg" onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}>
+                                        {isEditing ? <><X className="mr-2 w-4 h-4" /> Cancel</> : <><Edit3 className="mr-2 w-4 h-4" /> Modify</>}
+                                    </Button>
+                                </div>
+                            </Card>
 
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-center md:justify-start space-x-2 text-gray-600 dark:text-gray-400">
-                          <Mail className="w-4 h-4" />
-                          <span>{user?.email || 'Not provided'}</span>
-                        </div>
-                        <div className="flex items-center justify-center md:justify-start space-x-2 text-gray-600 dark:text-gray-400">
-                          <Calendar className="w-4 h-4" />
-                          <span>Member since {new Date(user?.createdAt || Date.now()).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Personal Information Section */}
-                <div className="card-modern p-6">
-                  <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Personal Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {FORM_FIELD_CONFIG.map((field) => (
-                      <FormField
-                        key={field.key}
-                        field={field}
-                        isEditing={isEditing}
-                        editedUser={editedUser}
-                        user={user}
-                        onChange={handleInputChange}
-                      />
-                    ))}
-                  </div>
-
-                  <BioField
-                    isEditing={isEditing}
-                    editedUser={editedUser}
-                    user={user}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                {/* Account Statistics */}
-                <div className="card-modern p-6">
-                  <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Account Statistics</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <TrendingUp className="w-8 h-8 text-white" />
-                      </div>
-                      <h4 className="text-2xl font-bold text-gray-900 dark:text-white">127</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Total Transactions</p>
-                    </div>
-
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Calendar className="w-8 h-8 text-white" />
-                      </div>
-                      <h4 className="text-2xl font-bold text-gray-900 dark:text-white">45</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Days Active</p>
-                    </div>
-
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <User className="w-8 h-8 text-white" />
-                      </div>
-                      <h4 className="text-2xl font-bold text-gray-900 dark:text-white">Premium</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Account Type</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Settings Tab */}
-            {activeTab === 'settings' && (
-              <div className="card-modern p-6">
-                <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Account Settings</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Email Notifications</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Receive updates about your account</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={emailNotificationsEnabled}
-                        onChange={e => handleToggleChange('emailNotificationsEnabled', e.target.checked)}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Budget Alerts</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Get notified when approaching budget limits</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={budgetAlertEnabled}
-                        onChange={e => handleToggleChange('budgetAlertEnabled', e.target.checked)}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Security Tab */}
-            {activeTab === 'security' && (
-              <div className="card-modern p-6">
-                <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Security Settings</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Key className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Change Password</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Update your account password</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setShowPasswordModal(true)}
-                      className="btn-primary"
-                    >
-                      Change
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Two-Factor Authentication</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security</p>
-                      </div>
-                    </div>
-                    {is2FAEnabled ? (
-                      <span className="text-green-600 font-semibold">Enabled</span>
-                    ) : (
-                      <button
-                        className={`btn-secondary ${isSendingOtp ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        onClick={handleEnable2FA}
-                        disabled={isSendingOtp}
-                      >
-                        {isSendingOtp ? 'Sending OTP...' : 'Enable'}
-                      </button>
+                            <Card variant="glass" className="saas-card p-8 space-y-8">
+                                <div className="flex items-center space-x-2 text-primary">
+                                    <Smartphone className="w-5 h-5" />
+                                    <h3 className="font-black text-xs uppercase tracking-widest">Temporal Records</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <Input label="Full Name" value={editedUser.name} onChange={e => setEditedUser({...editedUser, name: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Primary Sequence (Email)" value={editedUser.email} readOnly={true} className="opacity-50" />
+                                    <Input label="Phone Link" value={editedUser.phone} onChange={e => setEditedUser({...editedUser, phone: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Matrix Location" value={editedUser.location} onChange={e => setEditedUser({...editedUser, location: e.target.value})} readOnly={!isEditing} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Bio Sequence</label>
+                                    <textarea 
+                                        rows={4} 
+                                        value={editedUser.bio} 
+                                        onChange={e => setEditedUser({...editedUser, bio: e.target.value})} 
+                                        readOnly={!isEditing}
+                                        className="input-saas w-full resize-none min-h-[120px]"
+                                        placeholder="No bio sequence defined..."
+                                    />
+                                </div>
+                                {isEditing && (
+                                    <Button variant="primary" size="xl" className="w-full btn-saas-primary" onClick={handleSave} loading={isSaving}>Save Identity</Button>
+                                )}
+                            </Card>
+                        </>
                     )}
-                  </div>
-                      {/* 2FA OTP Modal */}
-                      {show2FAModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-                            <div className="flex items-center justify-between mb-6">
-                              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Enter OTP</h3>
-                              <button
-                                onClick={() => setShow2FAModal(false)}
-                                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                              >
-                                <X className="w-6 h-6" />
-                              </button>
+
+                    {activeTab === 'settings' && (
+                        <Card variant="glass" className="saas-card p-8 space-y-8">
+                             <div className="flex items-center space-x-2 text-primary">
+                                <Globe className="w-5 h-5" />
+                                <h3 className="font-black text-xs uppercase tracking-widest">Interface Logic</h3>
                             </div>
-                            <div className="space-y-4">
-                              <p className="text-gray-700 dark:text-gray-300">An OTP has been sent to your email. Please enter it below to enable 2FA.</p>
-                              <input
-                                type="text"
-                                value={otp}
-                                onChange={e => setOtp(e.target.value)}
-                                className={`input-modern w-full ${otpError ? 'border-red-500' : ''}`}
-                                placeholder="Enter OTP"
-                                maxLength={6}
-                              />
-                              {otpError && <p className="text-red-500 text-sm mt-1">{otpError}</p>}
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-2xl hover:bg-muted/30 transition-colors">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="p-3 bg-primary/10 rounded-xl"><Bell className="w-6 h-6 text-primary" /></div>
+                                        <div>
+                                            <p className="font-black text-lg tracking-tight">Email Telemetry</p>
+                                            <p className="text-xs text-muted-foreground italic font-medium">Receive monthly financial report streams.</p>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" className="w-6 h-6 border-2 border-primary rounded accent-primary bg-transparent focus:ring-primary" checked={user?.emailNotificationsEnabled} readOnly />
+                                </div>
+
+                                <div className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-2xl hover:bg-muted/30 transition-colors">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="p-3 bg-amber-500/10 rounded-xl"><Lock className="w-6 h-6 text-amber-500" /></div>
+                                        <div>
+                                            <p className="font-black text-lg tracking-tight">Constraint Alerts</p>
+                                            <p className="text-xs text-muted-foreground italic font-medium">Get notified when proxies reach 90% consumption.</p>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" className="w-6 h-6 border-2 border-amber-500 rounded accent-amber-500 bg-transparent" checked={user?.budgetAlertEnabled} readOnly />
+                                </div>
                             </div>
-                            <div className="flex space-x-3 mt-6">
-                              <button
-                                onClick={handleVerifyOtp}
-                                disabled={isVerifyingOtp || !otp}
-                                className={`flex-1 btn-primary ${isVerifyingOtp ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              >
-                                {isVerifyingOtp ? 'Verifying...' : 'Verify'}
-                              </button>
-                              <button
-                                onClick={() => setShow2FAModal(false)}
-                                disabled={isVerifyingOtp}
-                                className="flex-1 btn-secondary"
-                              >
-                                Cancel
-                              </button>
+                        </Card>
+                    )}
+
+                    {activeTab === 'security' && (
+                        <Card variant="glass" className="saas-card p-8 space-y-8">
+                             <div className="flex items-center space-x-2 text-rose-500">
+                                <Shield className="w-5 h-5" />
+                                <h3 className="font-black text-xs uppercase tracking-widest">Vault Security</h3>
                             </div>
-                          </div>
-                        </div>
-                      )}
+                            <div className="space-y-6">
+                                <div className="p-6 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                         <div className="p-3 bg-rose-500/10 rounded-xl"><Key className="w-6 h-6 text-rose-500" /></div>
+                                         <div>
+                                            <p className="font-black text-lg tracking-tight">Access Key</p>
+                                            <p className="text-xs text-muted-foreground italic font-medium">Reset your vault primary entry code.</p>
+                                         </div>
+                                    </div>
+                                    <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>Rotate Key</Button>
+                                </div>
+
+                                <div className="p-6 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                         <div className={`p-3 rounded-xl ${is2FAEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}><Smartphone className={`w-6 h-6 ${is2FAEnabled ? 'text-emerald-500' : 'text-muted-foreground'}`} /></div>
+                                         <div>
+                                            <p className="font-black text-lg tracking-tight">Two-Factor Authentication</p>
+                                            <p className="text-xs text-muted-foreground italic font-medium">Add a secondary verification layer for vault egress.</p>
+                                         </div>
+                                    </div>
+                                    {is2FAEnabled ? (
+                                        <span className="font-black text-[10px] uppercase tracking-widest text-emerald-500 flex items-center"><CheckCircle className="w-4 h-4 mr-2" /> Enabled</span>
+                                    ) : (
+                                        <Button variant="secondary" onClick={handleEnable2FA} loading={isLoading}>Activate</Button>
+                                    )}
+                                </div>
+                            </div>
+                        </Card>
+                    )}
                 </div>
-              </div>
+            </div>
+
+            {/* 2FA Modal */}
+            {show2FAModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+                    <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="xl">
+                        <Smartphone className="w-12 h-12 text-primary mx-auto mb-6 animate-pulse" />
+                        <h3 className="text-2xl font-black mb-2 tracking-tighter uppercase tracking-widest">Verify Signal</h3>
+                        <p className="text-sm text-muted-foreground mb-8 italic">Enter the 6-digit binary sequence sent to <span className="text-foreground font-black">{user.email}</span>.</p>
+                        <form onSubmit={e => { e.preventDefault(); handleVerifyOtp(); }}>
+                            <Input label="Sequence Key" value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" maxLength={6} required autoFocus />
+                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8" loading={isLoading}>Authorize Setup</Button>
+                            <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShow2FAModal(false)}>Decline</Button>
+                        </form>
+                    </Card>
+                </div>
             )}
-
-            {/* Preferences Tab removed */}
-          </div>
         </div>
-      </div>
-
-      {/* Password Change Modal */}
-      <PasswordChangeModal
-        show={showPasswordModal}
-        onClose={handleCancelPasswordChange}
-        passwordData={passwordData}
-        passwordErrors={passwordErrors}
-        isChangingPassword={isChangingPassword}
-        onInputChange={handlePasswordInputChange}
-        onSubmit={handlePasswordChange}
-        onCancel={handleCancelPasswordChange}
-      />
-    </div>
-  );
-};
-
-// Form Field Component
-const FormField = ({ field, isEditing, editedUser, user, onChange, errors = {} }) => {
-  const { key, label, type, placeholder } = field;
-
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        {label}
-      </label>
-      {isEditing ? (
-        <input
-          type={type}
-          value={(editedUser[key] !== undefined ? editedUser[key] : user?.[key]) || ''}
-          onChange={(e) => onChange(key, e.target.value)}
-          className={`input-modern w-full ${errors[key] ? 'border-red-500' : ''}`}
-          placeholder={placeholder}
-        />
-      ) : (
-        <p className="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-lg">
-          {user?.[key] || 'Not provided'}
-        </p>
-      )}
-    </div>
-  );
-};
-
-// Bio Field Component
-const BioField = ({ isEditing, editedUser, user, onChange }) => (
-  <div className="mt-6">
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-      Bio
-    </label>
-    {isEditing ? (
-      <textarea
-        value={(editedUser.bio !== undefined ? editedUser.bio : user?.bio) || ''}
-        onChange={(e) => onChange('bio', e.target.value)}
-        rows={4}
-        className="input-modern w-full"
-        placeholder="Tell us about yourself..."
-      />
-    ) : (
-      <p className="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 px-3 py-6 rounded-lg">
-        {user?.bio || 'No bio provided'}
-      </p>
-    )}
-  </div>
-);
-
-// Password Change Modal Component
-const PasswordChangeModal = ({
-  show,
-  onClose,
-  passwordData,
-  passwordErrors,
-  isChangingPassword,
-  onInputChange,
-  onSubmit,
-  onCancel
-}) => {
-  if (!show) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Change Password</h3>
-          <button
-            onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Current Password
-            </label>
-            <input
-              type="password"
-              value={passwordData.currentPassword}
-              onChange={(e) => onInputChange('currentPassword', e.target.value)}
-              className={`input-modern w-full ${passwordErrors.currentPassword ? 'border-red-500' : ''}`}
-              placeholder="Enter your current password"
-            />
-            {passwordErrors.currentPassword && (
-              <p className="text-red-500 text-sm mt-1">{passwordErrors.currentPassword}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              New Password
-            </label>
-            <input
-              type="password"
-              value={passwordData.newPassword}
-              onChange={(e) => onInputChange('newPassword', e.target.value)}
-              className={`input-modern w-full ${passwordErrors.newPassword ? 'border-red-500' : ''}`}
-              placeholder="Enter your new password"
-            />
-            {passwordErrors.newPassword && (
-              <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              value={passwordData.confirmPassword}
-              onChange={(e) => onInputChange('confirmPassword', e.target.value)}
-              className={`input-modern w-full ${passwordErrors.confirmPassword ? 'border-red-500' : ''}`}
-              placeholder="Confirm your new password"
-            />
-            {passwordErrors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex space-x-3 mt-6">
-          <button
-            onClick={onSubmit}
-            disabled={isChangingPassword}
-            className={`flex-1 btn-primary ${isChangingPassword ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isChangingPassword ? 'Changing...' : 'Change Password'}
-          </button>
-          <button
-            onClick={onCancel}
-            disabled={isChangingPassword}
-            className="flex-1 btn-secondary"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Profile;

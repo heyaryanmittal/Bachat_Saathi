@@ -1,639 +1,208 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import * as api from "../services/api";
 import BudgetForm from "../components/BudgetForm";
-import {
-  Calendar,
-  Target,
-  Edit3,
-  ClipboardList,
-  FolderOpen,
-  TrendingUp,
-  DollarSign,
-  TrendingDown,
-  Zap,
-  CheckCircle,
-  XCircle,
-  Plus,
-  Trash2
+import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui';
+import { 
+  Target, Edit3, FolderOpen, TrendingUp, TrendingDown, 
+  Plus, Trash2, Calendar, PieChart, Layers, Info
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const Budgets = () => {
   const [budgets, setBudgets] = useState([]);
-  const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingBudget, setEditingBudget] = useState(null);
+  const [summary, setSummary] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
-  const [summary, setSummary] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
-  const [deleteDialog, setDeleteDialog] = useState({
-    isOpen: false,
-    budgetId: null,
-    category: "",
-    isDeleting: false
-  });
+  const [isCreating, setIsCreating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingBudget, setEditingBudget] = useState(null);
+  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null, category: '', isDeleting: false });
 
-  useEffect(() => {
-    fetchBudgets();
-  }, [currentMonth]);
+  useEffect(() => { fetchBudgets(); }, [currentMonth]);
 
   const fetchBudgets = async () => {
     try {
       setIsLoading(true);
       const [year, month] = currentMonth.split("-").map(Number);
-
-      // Get only this month's transactions and budgets
-      const [budgetsResponse, transactionsResponse] = await Promise.all([
+      const [budgetsRes, transRes] = await Promise.all([
         api.getBudgets({ month, year }),
-        api.getTransactions({ month, year }),
+        api.getTransactions({ month, year, limit: 1000 })
       ]);
 
-      const budgetsList = budgetsResponse.data.data?.budgets || [];
-      const transactions = transactionsResponse.data.data?.transactions || [];
+      const bList = budgetsRes.data.data?.budgets || [];
+      const tList = transRes.data.data?.transactions || [];
 
-      // Only show categories that have budgets created by user
-      const completeSummary = budgetsList.map((budget) => {
-        const categoryTransactions = transactions.filter(
-          (t) =>
-            t.category === budget.category &&
-            t.type.toLowerCase() === "expense" &&
-            new Date(t.date).getMonth() + 1 === month
-        );
-
-        const spent = categoryTransactions.reduce(
-          (sum, t) => sum + Number(t.amount),
-          0
-        );
-
-        return {
-          category: budget.category,
-          budgeted: Number(budget.amount),
-          spent: spent,
-          _id: budget._id, // Keep the budget ID for delete functionality
-        };
+      const sum = bList.map(b => {
+        const spent = tList
+          .filter(t => t.category === b.category && t.type?.toLowerCase() === 'expense')
+          .reduce((s, t) => s + Number(t.amount || 0), 0);
+        return { ...b, budgeted: Number(b.amount), spent };
       });
 
-      setBudgets(budgetsList);
-      setSummary(completeSummary);
-      setError("");
-    } catch (err) {
-      setError(err.response?.data?.message || "Error fetching budgets");
-    } finally {
-      setIsLoading(false);
-    }
+      setBudgets(bList);
+      setSummary(sum);
+    } catch (e) { toast.error('Sync failed.'); }
+    finally { setIsLoading(false); }
   };
 
-  const handleEditBudget = (budget) => {
-    console.log('Editing budget:', budget); // Debug: Check budget structure
-
-    // Ensure all required fields are properly mapped for the form
-    const formData = {
-      category: budget.category || '',
-      amount: budget.amount || 0,
-      alertThreshold: (budget.alertThreshold || 0.8) * 100, // Convert fraction to percentage
-      monthYear: `${budget.year}-${String(budget.month).padStart(2, '0')}`,
-      year: budget.year,
-      month: budget.month
-    };
-
-    console.log('Form data mapping:', formData); // Debug: Check form data mapping
-
-    setEditingBudget({
-      ...budget,
-      ...formData // Override with form-compatible data
-    });
-    setIsEditing(true);
-  };
-
-  const handleCreateBudget = async (data) => {
+  const handleAction = async (data, isEdit) => {
     try {
       const [year, month] = currentMonth.split("-").map(Number);
-      await api.createBudget({ ...data, month, year });
-      setIsCreating(false);
-      await fetchBudgets();
-      setInfoMessage('Budget created successfully!');
-      setTimeout(() => setInfoMessage(''), 3000);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error creating budget');
-    }
-  };
-
-  const handleUpdateBudget = async (data) => {
-    try {
-      const [year, month] = currentMonth.split("-").map(Number);
-      await api.updateBudget(editingBudget._id, { ...data, month, year });
-      setIsEditing(false);
-      setEditingBudget(null);
-      await fetchBudgets();
-      setInfoMessage('Budget updated successfully!');
-      setTimeout(() => setInfoMessage(''), 3000);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error updating budget');
-    }
-  };
-
-  const handleDeleteBudget = (id, category) => {
-    setDeleteDialog({
-      isOpen: true,
-      budgetId: id,
-      category: category,
-      isDeleting: false
-    });
+      if (isEdit) {
+        await api.updateBudget(editingBudget._id, { ...data, month, year });
+        toast.success('Strategy updated.');
+      } else {
+        await api.createBudget({ ...data, month, year });
+        toast.success('Goal initialized.');
+      }
+      setIsCreating(false); setIsEditing(false);
+      fetchBudgets();
+    } catch (e) { toast.error('Command failed.'); }
   };
 
   const confirmDelete = async () => {
-    if (!deleteDialog.budgetId) return;
-    
     try {
-      setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
-      
-      await api.deleteBudget(deleteDialog.budgetId);
-      await fetchBudgets();
-      
-      setInfoMessage('Budget deleted successfully!');
-      setTimeout(() => setInfoMessage(''), 3000);
-      
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error deleting budget');
-    } finally {
-      setDeleteDialog({
-        isOpen: false,
-        budgetId: null,
-        category: "",
-        isDeleting: false
-      });
-    }
+      setDeleteDialog(p => ({ ...p, isDeleting: true }));
+      await api.deleteBudget(deleteDialog.id);
+      toast.success('Strategy purged.');
+      setDeleteDialog({ isOpen: false, id: null, category: '', isDeleting: false });
+      fetchBudgets();
+    } catch (e) { toast.error('Purge error.'); }
   };
 
-  const cancelDelete = () => {
-    setDeleteDialog({
-      isOpen: false,
-      budgetId: null,
-      category: "",
-      isDeleting: false
-    });
-  };
-
-  const formatAmount = (amount) => {
-    // Ensure amount is a valid number
-    const num = Number(amount);
-    return Number.isFinite(num)
-      ? new Intl.NumberFormat("en-IN", {
-          style: "currency",
-          currency: "INR",
-          maximumFractionDigits: 0,
-        }).format(num)
-      : "₹0";
-  };
-
-  const calculateBudgetProgress = (budget, spent) => {
-    const budgetAmount = Number(budget.amount);
-    const spentAmount = Number(spent);
-    const remaining = budgetAmount - spentAmount;
-    const progress =
-      budgetAmount > 0
-        ? Math.min((spentAmount / budgetAmount) * 100, 100)
-        : 0;
-
-    return {
-      remaining: remaining,
-      progress: progress.toFixed(1),
-    };
-  };
+  const stats = useMemo(() => {
+    const budgeted = summary.reduce((s, i) => s + i.budgeted, 0);
+    const spent = summary.reduce((s, i) => s + i.spent, 0);
+    return { budgeted, spent, remaining: budgeted - spent };
+  }, [summary]);
 
   if (isLoading && !budgets.length) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-gray-200 dark:border-gray-700 rounded-full animate-spin"></div>
-            <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
-          </div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Loading your budgets...</p>
-        </div>
-      </div>
-    );
+    return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Calculating limits..." /></div>;
   }
 
-  const totalBudgeted = summary.reduce((sum, item) => sum + Number(item.budgeted), 0);
-  const totalSpent = summary.reduce((sum, item) => sum + Number(item.spent), 0);
-  const totalRemaining = totalBudgeted - totalSpent;
-  const overallProgress = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
-
   return (
-    <div className="space-y-8 animate-fadeInUp">
-      {/* Header Section */}
-      <div className="text-center py-8 px-4">
-        <h1 className="text-4xl font-bold mb-2">
-          <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Budget Management
-          </span>
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-lg">
-          Plan and track your monthly spending goals
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Total Budgeted */}
-        <div className="card-modern card-hover p-6 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Total Budgeted</p>
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {formatAmount(totalBudgeted)}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-          </div>
+    <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
+      {/* SaaS Header */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h1 className="text-4xl font-black tracking-tighter mb-2">Spending <span className="text-gradient">Logic</span></h1>
+          <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Configuring your monthly financial constraints.</p>
         </div>
-
-        {/* Total Spent */}
-        <div className="card-modern card-hover p-6 bg-gradient-to-br from-orange-50 to-red-100 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
-                {formatAmount(totalSpent)}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        {/* Remaining Budget */}
-        <div className={`card-modern card-hover p-6 bg-gradient-to-br ${totalRemaining >= 0 ? 'from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800' : 'from-red-50 to-pink-100 dark:from-red-900/20 dark:to-pink-900/20 border-red-200 dark:border-red-800'}`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm font-medium mb-1 ${totalRemaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>Remaining Budget</p>
-              <p className={`text-2xl font-bold ${totalRemaining >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'}`}>
-                {formatAmount(totalRemaining)}
-              </p>
-            </div>
-            <div className={`w-12 h-12 ${totalRemaining >= 0 ? 'bg-green-500' : 'bg-red-500'} rounded-xl flex items-center justify-center`}>
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={totalRemaining >= 0 ? "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" : "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"} />
-              </svg>
-            </div>
-          </div>
+        <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50">
+             <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4" />
+             <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />Create Proxy</Button>
         </div>
       </div>
 
-      {/* Action Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-            {summary.length} budget{summary.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-        <button
-          onClick={() => setIsCreating(true)}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span>Create Budget</span>
-        </button>
+      {/* Stats QuickView */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <StatsCard title="Budgeted Scope" value={stats.budgeted} variant="primary" icon={<Target />} />
+        <StatsCard title="Actual Consumption" value={stats.spent} variant="error" icon={<TrendingDown />} />
+        <StatsCard title="Residual Capacity" value={stats.remaining} variant="success" icon={<Layers />} />
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 animate-fadeInUp">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-sm font-medium text-red-800 dark:text-red-200">{error}</p>
-          </div>
-        </div>
-      )}
-
-      {infoMessage && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 mb-6 animate-fadeInUp">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <p className="text-sm font-medium text-green-800 dark:text-green-200">{infoMessage}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Month Selector */}
-      <div className="card-modern p-6 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Budget Period</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Select the month to view budgets</p>
-            </div>
-          </div>
-          <div>
-            <input
-              type="month"
-              value={currentMonth}
-              onChange={(e) => setCurrentMonth(e.target.value)}
-              className="input-modern w-48"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Create Budget Form */}
-      {isCreating && (
-        <div className="card-modern p-8 mb-8 animate-fadeInUp">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Create New Budget
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Set spending limits for your categories
-            </p>
-          </div>
-          <BudgetForm onSubmit={handleCreateBudget} />
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={() => setIsCreating(false)}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <span>Cancel</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Budget Form */}
-      {isEditing && editingBudget && (
-        <div className="card-modern p-8 mb-8 animate-fadeInUp">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Edit Budget
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Update your budget amount and category
-            </p>
-          </div>
-          <BudgetForm onSubmit={handleUpdateBudget} initialData={editingBudget} />
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setEditingBudget(null);
-              }}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <span>Cancel</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Budgets Table */}
-      <div className="card-modern overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-            Budget Overview
-          </h3>
-        </div>
-        
+      {/* Budget Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {summary.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No budgets found</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">Create your first budget to start tracking expenses</p>
-            <button
-              onClick={() => setIsCreating(true)}
-              className="btn-primary"
-            >
-              Create Budget
-            </button>
+          <div className="col-span-full py-20 text-center glass-card border-dashed p-10 border-2">
+             <Info className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-20" />
+             <p className="text-xl font-bold text-muted-foreground">No Budget Strategies Defined</p>
+             <p className="text-sm text-muted-foreground italic mb-8 mt-2">Initialize your first category limit to see telemetry.</p>
+             <Button onClick={() => setIsCreating(true)} variant="secondary">Start Strategy</Button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Budgeted
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Spent
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Remaining
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Progress
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {summary.map((item) => {
-                  const budgeted = Number(item.budgeted) || 0;
-                  const spent = Number(item.spent) || 0;
-                  const { remaining, progress } = calculateBudgetProgress(
-                    budgets.find((b) => b.category === item.category),
-                    spent
-                  );
+          summary.map(item => {
+            const progress = item.budgeted > 0 ? (item.spent / item.budgeted) * 100 : 0;
+            const isCritical = progress >= 90;
+            const isWarning = progress >= 75 && progress < 90;
 
-                  return (
-                    <tr key={item.category} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center mr-3">
-                            <FolderOpen className="w-5 h-5 text-white" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{item.category}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                          {formatAmount(budgeted)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-orange-600 dark:text-orange-400">
-                          {formatAmount(spent)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`text-sm font-semibold ${remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                          {formatAmount(remaining)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-1">
-                            <div className="w-full bg-gray-200 rounded-full h-3 dark:bg-gray-700 overflow-hidden">
-                              <div
-                                className={`h-3 rounded-full transition-all duration-500 ${
-                                  progress >= 100
-                                    ? "bg-gradient-to-r from-red-500 to-red-600"
-                                    : progress >= 80
-                                    ? "bg-gradient-to-r from-yellow-400 to-orange-500"
-                                    : "bg-gradient-to-r from-green-400 to-green-600"
-                                }`}
-                                style={{ width: `${Math.min(100, progress)}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                          <span className={`text-xs font-medium min-w-[3rem] text-right ${
-                            progress >= 100 ? 'text-red-600 dark:text-red-400' :
-                            progress >= 80 ? 'text-yellow-600 dark:text-yellow-400' :
-                            'text-green-600 dark:text-green-400'
-                          }`}>
-                            {progress}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => handleEditBudget(
-                              budgets.find((b) => b.category === item.category)
-                            )}
-                            className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors duration-200 group"
-                          >
-                            <svg className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            <span className="group-hover:scale-105 transition-transform">Edit</span>
-                          </button>
-                          {budgets.find((b) => b.category === item.category) && (
-                            <button
-                              onClick={() => handleDeleteBudget(
-                                budgets.find((b) => b.category === item.category)._id,
-                                item.category
-                              )}
-                              className="inline-flex items-center px-3 py-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition-colors duration-200 group"
-                            >
-                              <svg className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                              <span className="group-hover:scale-105 transition-transform">Delete</span>
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+            return (
+              <Card key={item.category} variant="glass" className="saas-card group p-6 h-full flex flex-col">
+                <div className="flex justify-between items-start mb-6">
+                   <div className="flex items-center space-x-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform ${isCritical ? 'bg-rose-500 shadow-rose-500/20' : isWarning ? 'bg-amber-500 shadow-amber-500/20' : 'gradient-primary shadow-primary/20'}`}>
+                         <FolderOpen className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-black tracking-tight uppercase truncate max-w-[150px]">{item.category}</h3>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Active Limit</p>
+                      </div>
+                   </div>
+                   <div className="text-right">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Spent</p>
+                      <p className={`text-xl font-black tracking-tighter ${isCritical ? 'text-rose-500' : 'text-foreground'}`}>₹{item.spent.toLocaleString()}</p>
+                   </div>
+                </div>
+
+                <div className="space-y-3 mb-8 flex-grow">
+                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      <span>Consumption</span>
+                      <span>{progress.toFixed(0)}%</span>
+                   </div>
+                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-1000 ease-out rounded-full ${isCritical ? 'bg-rose-500' : isWarning ? 'bg-amber-500' : 'bg-primary'}`}
+                        style={{ width: `${Math.min(100, progress)}%` }}
+                      ></div>
+                   </div>
+                   <div className="flex justify-between items-center bg-muted/30 p-3 rounded-xl">
+                      <div>
+                         <p className="text-[9px] font-black text-muted-foreground uppercase">Target</p>
+                         <p className="text-sm font-black">₹{item.budgeted.toLocaleString()}</p>
+                      </div>
+                      <div className="text-right">
+                         <p className="text-[9px] font-black text-muted-foreground uppercase">Remaining</p>
+                         <p className={`text-sm font-black ${item.budgeted - item.spent < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>₹{(item.budgeted - item.spent).toLocaleString()}</p>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mt-auto">
+                    <Button variant="secondary" size="sm" onClick={() => { setEditingBudget(item); setIsEditing(true); }} className="font-black text-[10px] tracking-widest uppercase">Modify</Button>
+                    <Button variant="danger" size="sm" onClick={() => setDeleteDialog({ isOpen: true, id: item._id, category: item.category, isDeleting: false })} className="font-black text-[10px] tracking-widest uppercase">Purge</Button>
+                </div>
+              </Card>
+            )
+          })
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
-      {deleteDialog.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 hover:scale-100">
-            <div className="p-6 text-center">
-              {/* Animated Trash Icon */}
-              <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
-                <div className="relative">
-                  <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </div>
-                  {/* Pulse effect */}
-                  <div className="absolute inset-0 rounded-full bg-red-400 opacity-0 group-hover:opacity-40 transition-opacity duration-300 animate-ping"></div>
-                </div>
-              </div>
-              
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Delete Budget</h3>
-              
-              <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-6 text-center">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Are you sure you want to delete the budget for
-                </p>
-                <p className="text-lg font-semibold text-red-600 dark:text-red-400 mt-1">
-                  {deleteDialog.category}?
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  This will remove all tracking for this category's budget.
-                </p>
-              </div>
-
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                This action cannot be undone. Are you sure you want to continue?
-              </p>
-              
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={cancelDelete}
-                  disabled={deleteDialog.isDeleting}
-                  className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  disabled={deleteDialog.isDeleting}
-                  className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors duration-200 flex items-center disabled:opacity-50"
-                >
-                  {deleteDialog.isDeleting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Deleting...
-                    </>
-                  ) : (
-                    'Delete Budget'
-                  )}
-                </button>
-              </div>
-            </div>
+      {/* Creation/Edit Modal */}
+      {(isCreating || isEditing) && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+              <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
+                  <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">
+                      {isEditing ? 'Sync Proxy Logic' : 'Initiate New Limit'}
+                  </h3>
+                  <BudgetForm 
+                    onSubmit={data => handleAction(data, isEditing)} 
+                    initialData={isEditing ? { ...editingBudget, amount: editingBudget.budgeted } : null} 
+                  />
+                  <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingBudget(null); }}>Abort Sequence</Button>
+              </Card>
           </div>
-        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteDialog.isOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+              <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
+                  <Trash2 className="w-12 h-12 text-rose-500 mx-auto mb-6 animate-bounce" />
+                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Proxy?</h3>
+                  <p className="text-muted-foreground text-sm font-medium mb-8">This will erase the tracking strategy for <span className="font-black text-foreground">{deleteDialog.category}</span>. History remains untethered.</p>
+                  <div className="grid grid-cols-2 gap-4">
+                      <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, id: null, category: '', isDeleting: false })}>Retain</Button>
+                      <Button 
+                        variant="danger" 
+                        loading={deleteDialog.isDeleting}
+                        onClick={confirmDelete}
+                      > Purge </Button>
+                  </div>
+              </Card>
+          </div>
       )}
     </div>
   );

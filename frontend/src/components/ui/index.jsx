@@ -4,16 +4,16 @@ import { cn } from '../../utils/cn';
 
 // Modern Card component with variants and animations
 const cardVariants = cva(
-    "rounded-xl shadow-sm border transition-all duration-200 hover:shadow-md",
+    "rounded-2xl border transition-all duration-300",
     {
         variants: {
             variant: {
-                default: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700",
-                gradient: "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800",
-                success: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
-                warning: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
-                error: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
-                glass: "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-white/20 dark:border-gray-700/20"
+                default: "bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-sm",
+                gradient: "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/10 dark:to-indigo-900/10 border-blue-100/50 dark:border-blue-800/50 shadow-md",
+                success: "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800",
+                warning: "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800",
+                error: "bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-800",
+                glass: "glass-card backdrop-blur-xl border-white/20 dark:border-white/10"
             },
             size: {
                 sm: "p-4",
@@ -23,9 +23,9 @@ const cardVariants = cva(
             },
             hover: {
                 none: "",
-                lift: "hover:shadow-lg hover:-translate-y-1",
-                glow: "hover:shadow-xl hover:shadow-blue-500/25",
-                scale: "hover:scale-[1.02]"
+                lift: "hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1.5",
+                glow: "hover:shadow-2xl hover:shadow-primary/20",
+                scale: "hover:scale-[1.01]"
             }
         },
         defaultVariants: {
@@ -67,83 +67,68 @@ export const StatsCard = ({
     className,
     ...props
 }) => (
-    <Card variant={variant} size={size} className={cn("relative overflow-hidden", className)} {...props}>
-        {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-white/5 dark:to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+    <Card variant={variant} size={size} className={cn("relative overflow-hidden group", className)} {...props}>
+        {/* Animated background gradient shine */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
 
         <div className="relative z-10 flex items-center justify-between">
             <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                     {title}
                 </p>
                 <div className="flex items-baseline space-x-2">
-                    <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white animate-fadeInUp">
-                        ₹{typeof value === 'number' ? value.toLocaleString() : value}
+                    <p className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+                        ₹{typeof value === 'number' ? value.toLocaleString('en-IN') : value}
                     </p>
-                    {trend && trendValue && (
-                        <div className={cn(
-                            "flex items-center text-sm font-medium",
-                            trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                        )}>
-                            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={
-                                    trend === 'up' ? "M7 11l5-5m0 0l5 5m-5-5v12" : "M17 13l-5 5m0 0l-5-5m5 5V6"
-                                } />
-                            </svg>
-                            {trendValue}%
-                        </div>
-                    )}
                 </div>
+                {trend && trendValue && (
+                    <div className={cn(
+                        "flex items-center text-sm font-bold mt-2 px-2 py-0.5 rounded-full w-fit",
+                        trend === 'up' 
+                          ? 'bg-emerald-100/50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' 
+                          : 'bg-rose-100/50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'
+                    )}>
+                        <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={
+                                trend === 'up' ? "M7 11l5-5m0 0l5 5m-5-5v12" : "M17 13l-5 5m0 0l-5-5m5 5V6"
+                            } />
+                        </svg>
+                        {trendValue}%
+                    </div>
+                )}
             </div>
 
             {icon && (
                 <div className="flex-shrink-0 ml-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                        {typeof icon === 'string' ? (
-                            <span className="text-xl">{icon}</span>
-                        ) : (
-                            icon
-                        )}
+                    <div className="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
+                        <div className="text-white">
+                            {icon}
+                        </div>
                     </div>
                 </div>
             )}
         </div>
-
-        {/* Animated progress bar for budget cards */}
-        {variant === 'warning' && trendValue && (
-            <div className="mt-4">
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div
-                        className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${Math.min(trendValue, 100)}%` }}
-                    />
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {trendValue}% of budget used
-                </p>
-            </div>
-        )}
     </Card>
 );
 
 // Modern Button component with variants and loading states
 const buttonVariants = cva(
-    "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
+    "btn-saas inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 transform outline-none",
     {
         variants: {
             variant: {
-                primary: "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg focus:ring-blue-500",
-                secondary: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 focus:ring-gray-500",
-                success: "bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg focus:ring-green-500",
-                warning: "bg-yellow-600 hover:bg-yellow-700 text-white shadow-md hover:shadow-lg focus:ring-yellow-500",
-                danger: "bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg focus:ring-red-500",
-                ghost: "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-gray-500"
+                primary: "btn-saas-primary",
+                secondary: "btn-saas-secondary",
+                success: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20",
+                warning: "bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20",
+                danger: "bg-rose-600 hover:bg-rose-700 text-white shadow-xl shadow-rose-500/20",
+                ghost: "text-muted-foreground hover:text-foreground hover:bg-muted"
             },
             size: {
-                sm: "px-3 py-1.5 text-sm",
-                md: "px-4 py-2 text-sm",
-                lg: "px-6 py-3 text-base",
-                xl: "px-8 py-4 text-lg"
+                sm: "px-4 py-2 text-xs rounded-lg",
+                md: "px-6 py-3 text-sm rounded-xl",
+                lg: "px-8 py-4 text-base rounded-2xl",
+                xl: "px-10 py-5 text-lg rounded-2xl"
             }
         },
         defaultVariants: {
@@ -158,7 +143,7 @@ export const Button = React.forwardRef(({
     variant,
     size,
     loading = false,
-    loadingText = "Loading...",
+    loadingText = "", // Keep it clean
     children,
     ...props
 }, ref) => (
@@ -168,124 +153,23 @@ export const Button = React.forwardRef(({
         disabled={loading || props.disabled}
         {...props}
     >
-        {loading && (
-            <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-        )}
-        {loading ? loadingText : children}
+        {loading ? (
+            <>
+                <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {loadingText && <span className="ml-2">{loadingText}</span>}
+            </>
+        ) : children}
     </button>
 ));
 
 Button.displayName = "Button";
 
-// Enhanced Loading Spinner with variants
-export const LoadingSpinner = ({
-    size = "md",
-    variant = "default",
-    className,
-    text
-}) => {
-    const sizeClasses = {
-        sm: "w-4 h-4",
-        md: "w-8 h-8",
-        lg: "w-12 h-12",
-        xl: "w-16 h-16"
-    };
+// Modal component omitted for brevity in replacement (not needed to change)
 
-    const spinnerClasses = {
-        default: "border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400",
-        primary: "border-blue-200 border-t-blue-600",
-        white: "border-white/30 border-t-white"
-    };
-
-    return (
-        <div className={cn("flex flex-col items-center justify-center", className)}>
-            <div className={cn(
-                "border-2 rounded-full animate-spin",
-                sizeClasses[size],
-                spinnerClasses[variant]
-            )} />
-            {text && (
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 animate-pulse">
-                    {text}
-                </p>
-            )}
-        </div>
-    );
-};
-
-// Modal component with animations and accessibility
-export const Modal = ({
-    isOpen,
-    onClose,
-    title,
-    children,
-    size = "md",
-    className,
-    ...props
-}) => {
-    if (!isOpen) return null;
-
-    const sizeClasses = {
-        sm: "max-w-md",
-        md: "max-w-lg",
-        lg: "max-w-2xl",
-        xl: "max-w-4xl"
-    };
-
-    return (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-            {/* Backdrop */}
-            <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            />
-
-            {/* Modal */}
-            <div className="flex min-h-full items-center justify-center p-4">
-                <div
-                    className={cn(
-                        "relative w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl transform transition-all",
-                        sizeClasses[size],
-                        "animate-in fade-in-0 zoom-in-95 duration-300",
-                        className
-                    )}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="modal-title"
-                    {...props}
-                >
-                    {/* Close button */}
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                        aria-label="Close modal"
-                    >
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-
-                    {title && (
-                        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                            <h3 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {title}
-                            </h3>
-                        </div>
-                    )}
-
-                    <div className="px-6 py-4">
-                        {children}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Input component with validation and accessibility
+// Input component with premium styling
 export const Input = React.forwardRef(({
     label,
     error,
@@ -293,33 +177,32 @@ export const Input = React.forwardRef(({
     className,
     ...props
 }, ref) => (
-    <div className="space-y-1">
+    <div className="space-y-2">
         {label && (
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-bold text-muted-foreground uppercase tracking-wider ml-1">
                 {label}
-                {props.required && <span className="text-red-500 ml-1">*</span>}
+                {props.required && <span className="text-destructive ml-1">*</span>}
             </label>
         )}
-        <input
-            ref={ref}
-            className={cn(
-                "block w-full rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors",
-                "focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20",
-                "disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:cursor-not-allowed",
-                error ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600",
-                className
-            )}
-            aria-invalid={error ? "true" : "false"}
-            aria-describedby={error ? `${props.id}-error` : helperText ? `${props.id}-help` : undefined}
-            {...props}
-        />
+        <div className="relative">
+            <input
+                ref={ref}
+                className={cn(
+                    "input-saas w-full placeholder:text-muted-foreground/50",
+                    error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
+                    className
+                )}
+                aria-invalid={error ? "true" : "false"}
+                {...props}
+            />
+        </div>
         {error && (
-            <p id={`${props.id}-error`} className="text-sm text-red-600 dark:text-red-400">
+            <p className="text-xs font-bold text-rose-500 animate-entrance ml-1">
                 {error}
             </p>
         )}
         {helperText && !error && (
-            <p id={`${props.id}-help`} className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground ml-1">
                 {helperText}
             </p>
         )}
@@ -530,12 +413,12 @@ export const Skeleton = ({
     height = '1rem',
     ...props
 }) => {
-    const baseClasses = 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded';
+    const baseClasses = 'animate-pulse bg-muted-foreground/10 rounded-xl';
     const variantClasses = {
         default: '',
         text: 'h-4',
         circle: 'rounded-full',
-        rectangle: 'rounded',
+        rectangle: 'rounded-xl',
     };
 
     return (
@@ -548,5 +431,84 @@ export const Skeleton = ({
             style={{ width, height, ...props.style }}
             {...props}
         />
+    );
+};
+
+// LoadingSpinner component
+export const LoadingSpinner = ({ size = 'md', variant = 'primary', text = '' }) => {
+    const sizeClasses = {
+        sm: 'h-4 w-4 border-2',
+        md: 'h-8 w-8 border-3',
+        lg: 'h-12 w-12 border-4',
+        xl: 'h-16 w-16 border-4'
+    };
+
+    const variantClasses = {
+        primary: 'border-primary/20 border-t-primary',
+        secondary: 'border-secondary/20 border-t-secondary',
+        success: 'border-emerald-200 border-t-emerald-600',
+        error: 'border-rose-200 border-t-rose-600',
+        white: 'border-white/20 border-t-white'
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center space-y-4">
+            <div className={cn(
+                "animate-spin rounded-full",
+                sizeClasses[size],
+                variantClasses[variant]
+            )} />
+            {text && <p className="text-sm font-black uppercase tracking-widest text-muted-foreground animate-pulse">{text}</p>}
+        </div>
+    );
+};
+
+// Modal component
+export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
+    if (!isOpen) return null;
+
+    const sizeClasses = {
+        sm: 'max-w-md',
+        md: 'max-w-2xl',
+        lg: 'max-w-4xl',
+        xl: 'max-w-6xl',
+        full: 'max-w-[95vw]'
+    };
+
+    return (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+            <div 
+                className="absolute inset-0 bg-background/80 backdrop-blur-md animate-entrance"
+                onClick={onClose}
+            />
+            <Card 
+                variant="glass" 
+                size="none" 
+                className={cn(
+                    "relative z-10 w-full animate-entrance shadow-2xl overflow-hidden",
+                    sizeClasses[size]
+                )}
+            >
+                {/* Header */}
+                <div className="px-8 py-6 border-b border-border/50 flex items-center justify-between gradient-surface">
+                    <h3 className="text-2xl font-black tracking-tighter uppercase tracking-widest leading-none">
+                        {title}
+                    </h3>
+                    <button 
+                        onClick={onClose}
+                        className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="px-8 py-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
+                    {children}
+                </div>
+            </Card>
+        </div>
     );
 };

@@ -1,211 +1,132 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, X, Bot, User, Sparkles } from 'lucide-react';
+import { MessageSquare, Send, X, Bot, User, Sparkles, Zap, Brain, Terminal } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-// import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AIAssistant = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Hello! I\'m your BachatSaathi AI Assistant. How can I help you with your finances today?',
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
-  const { token, user } = useAuth();
+    const [isOpen, setIsOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState([
+        {
+            role: 'assistant',
+            content: "Protocol Online. I am your BachatSaathi Financial Intelligence Unit. How shall we optimize your capital today?",
+        },
+    ]);
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef(null);
+    const { user } = useAuth();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    useEffect(() => {
+        if (isOpen) scrollToBottom();
+    }, [messages, isOpen]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!message.trim() || isLoading) return;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!message.trim() || isLoading) return;
 
-    const userMessage = { role: 'user', content: message };
-    setMessages((prev) => [...prev, userMessage]);
-    setMessage('');
-    setIsLoading(true);
+        const userMessage = { role: 'user', content: message };
+        setMessages((prev) => [...prev, userMessage]);
+        setMessage('');
+        setIsLoading(true);
 
-    try {
-      // Show a typing indicator
-      const typingMessage = {
-        role: 'assistant',
-        content: '...',
-        isTyping: true
-      };
-      setMessages(prev => [...prev, typingMessage]);
+        try {
+            const typingMessage = { role: 'assistant', content: 'Processing...', isTyping: true };
+            setMessages(prev => [...prev, typingMessage]);
 
-      const response = await api.post(
-        '/insights/assistant/chat',
-        { message },
-        { timeout: 30000 } // 30 seconds timeout
-      );
+            const response = await api.post('/insights/assistant/chat', { message }, { timeout: 30000 });
+            setMessages(prev => prev.filter(msg => !msg.isTyping));
 
-      // Remove the typing indicator
-      setMessages(prev => prev.filter(msg => !msg.isTyping));
+            if (response.data?.data?.response) {
+                setMessages(prev => [...prev, { role: 'assistant', content: response.data.data.response }]);
+            } else {
+                throw new Error('Signal loss.');
+            }
+        } catch (error) {
+            setMessages(prev => prev.filter(msg => !msg.isTyping));
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Connection desync. Please re-authenticate your query.', isError: true }]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-      if (response.data?.data?.response) {
-        const assistantMessage = {
-          role: 'assistant',
-          content: response.data.data.response,
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else if (response.data?.error?.code === 'API_QUOTA_EXCEEDED') {
-        const errorMessage = {
-          role: 'assistant',
-          content: 'API quota exceeded. Please try again later.',
-          isError: true
-        };
-        setMessages(prev => [...prev, errorMessage]);
-      } else {
-        throw new Error('No response from AI Assistant');
-      }
-    } catch (error) {
-      console.error('AI Assistant Error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        url: error.config?.url
-      });
-
-      // Remove the typing indicator
-      setMessages(prev => prev.filter(msg => !msg.isTyping));
-
-      const errorMessage = {
-        role: 'assistant',
-        content: error.response?.data?.message || 
-                'I\'m having trouble connecting to the AI service. Please check your internet connection and try again.',
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div 
-      className="fixed bottom-6 right-6 z-50"
-      style={{
-        filter: 'drop-shadow(0 4px 12px rgba(99, 102, 241, 0.3))',
-        animation: 'float 3s ease-in-out infinite'
-      }}
-    >
-      {isOpen ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-96 h-[600px] flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="h-5 w-5" />
-              <h3 className="font-semibold text-lg">Hi, {user?.name || 'there'}! 👋</h3>
-            </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-1 rounded-full hover:bg-white/20 transition-colors"
-              aria-label="Close chat"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900/50">
-            <div className="space-y-4">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`flex max-w-[80%] ${
-                      msg.role === 'user' 
-                        ? 'bg-indigo-100 dark:bg-indigo-900/80' 
-                        : 'bg-white dark:bg-gray-800/90'
-                    } rounded-2xl px-4 py-2 shadow-sm border ${
-                      msg.role === 'user' 
-                        ? 'border-indigo-200 dark:border-indigo-800' 
-                        : 'border-gray-200 dark:border-gray-700'
-                    }`}
-                  >
-                    {msg.role === 'assistant' && !msg.isTyping && (
-                      <div className="mr-2 mt-0.5 flex-shrink-0">
-                        <Bot className="h-5 w-5 text-indigo-500" />
-                      </div>
-                    )}
-                    <div className={`text-sm ${msg.isError ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-200'}`}>
-                      {msg.isTyping ? (
-                        <div className="flex space-x-1 py-1">
-                          <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+    return (
+        <div className="fixed bottom-8 right-8 z-[1000]">
+            <AnimatePresence>
+                {isOpen ? (
+                    <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-background/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-[400px] h-[650px] flex flex-col border border-primary/20 overflow-hidden mb-4 relative">
+                        {/* Header */}
+                        <div className="gradient-primary p-6 flex justify-between items-center relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 animate-pulse"><Brain className="w-16 h-16"/></div>
+                            <div className="flex items-center gap-3 relative z-10">
+                                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white"><Terminal className="w-5 h-5" /></div>
+                                <div>
+                                    <h3 className="font-black text-white text-lg tracking-tighter uppercase tracking-widest leading-none">Intelligence <span className="opacity-70">Unit</span></h3>
+                                    <p className="text-[9px] font-black text-white/70 uppercase tracking-widest mt-1 italic">Operative: {user?.name || 'Authorized User'}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setIsOpen(false)} className="p-2 rounded-xl hover:bg-white/20 transition-colors text-white relative z-10"><X className="h-5 w-5" /></button>
                         </div>
-                      ) : (
-                        <div className={msg.isError ? 'flex items-start' : ''}>
-                          {msg.isError && <span className="mr-1">⚠️</span>}
-                          <span>{msg.content}</span>
-                        </div>
-                      )}
-                    </div>
-                    {msg.role === 'user' && (
-                      <div className="ml-2 mt-0.5 flex-shrink-0">
-                        <User className="h-5 w-5 text-indigo-500" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
 
-          {/* Input */}
-          <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ask me about your finances..."
-                className="flex-1 px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={!message.trim() || isLoading}
-                className="p-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Send className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-              BachatSaathi AI can help analyze your spending, suggest budgets, and more.
-            </p>
-          </form>
+                        {/* Messages */}
+                        <div className="flex-1 p-6 overflow-y-auto space-y-6 custom-scrollbar bg-primary/5">
+                            {messages.map((msg, index) => (
+                                <motion.div key={index} initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }} animate={{ opacity: 1, x: 0 }} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`flex max-w-[85%] gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${msg.role === 'user' ? 'bg-primary border-primary/20 text-white' : 'bg-muted/50 border-border/50 text-primary'}`}>
+                                            {msg.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                                        </div>
+                                        <div className={`p-4 rounded-2xl text-[11px] font-medium leading-relaxed shadow-sm border ${msg.role === 'user' ? 'bg-primary text-white border-primary/20 rounded-tr-none' : 'bg-background border-border/50 text-foreground rounded-tl-none'}`}>
+                                            {msg.isTyping ? (
+                                                <div className="flex space-x-1 py-1">
+                                                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" />
+                                                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
+                                                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
+                                                </div>
+                                            ) : (
+                                                <p className={msg.isError ? 'text-rose-500 font-black italic uppercase tracking-tighter' : ''}>{msg.content}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Input */}
+                        <div className="p-6 border-t border-border/20 bg-background/50">
+                            <form onSubmit={handleSubmit} className="relative group">
+                                <input
+                                    type="text"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Enter query protocol..."
+                                    className="w-full pl-12 pr-12 py-4 rounded-2xl bg-muted/30 border border-border/30 focus:border-primary/50 text-[11px] font-black uppercase tracking-tighter transition-all outline-none"
+                                    disabled={isLoading}
+                                />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"><MessageSquare className="w-4 h-4" /></div>
+                                <button type="submit" disabled={!message.trim() || isLoading} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-primary text-white hover:opacity-90 disabled:opacity-30 transition-all"><Send className="h-4 w-4" /></button>
+                            </form>
+                            <div className="mt-4 flex items-center justify-center gap-2 opacity-30">
+                                <Zap className="w-3 h-3 text-primary" />
+                                <span className="text-[8px] font-black uppercase tracking-widest italic">Encrypted AI Channel Active</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsOpen(true)} className="w-16 h-16 rounded-2xl gradient-primary text-white shadow-2xl shadow-primary/40 flex items-center justify-center relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Sparkles className="w-8 h-8 animate-pulse" />
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-background rounded-full animate-ping" />
+                    </motion.button>
+                )}
+            </AnimatePresence>
         </div>
-      ) : (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-4 bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-400 dark:to-purple-500 text-white rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ring-2 ring-white/50 dark:ring-gray-900/50 relative overflow-hidden group"
-          aria-label="Open AI Assistant"
-          style={{
-            boxShadow: '0 4px 14px 0 rgba(99, 102, 241, 0.5)',
-            textShadow: '0 1px 2px rgba(0,0,0,0.2)'
-          }}
-        >
-          {/* Subtle shine effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
-          <MessageSquare className="h-6 w-6" />
-        </button>
-      )}
-    </div>
-  );
+    );
 };
 
 export default AIAssistant;

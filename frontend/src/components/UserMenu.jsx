@@ -35,7 +35,7 @@ function UserMenu() {
         onClick={() => navigate('/profile')}
         title="Go to Profile"
       >
-        <div className="w-7 h-7 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-7 h-7 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
           <span className="text-white font-semibold text-xs">
             {user.name?.charAt(0).toUpperCase()}
           </span>
@@ -47,7 +47,7 @@ function UserMenu() {
 
       {/* User Avatar Icon - For medium screens */}
       <div
-        className="lg:hidden w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 hover:scale-110 transition-all duration-300"
+        className="lg:hidden w-8 h-8 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 hover:scale-110 transition-all duration-300"
         onClick={() => navigate('/profile')}
         title="Go to Profile"
       >

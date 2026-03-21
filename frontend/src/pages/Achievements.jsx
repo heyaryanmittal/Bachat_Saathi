@@ -1,586 +1,217 @@
 import React, { useState, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
+import { motion, AnimatePresence } from 'framer-motion';
 import * as api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { Card, Button, LoadingSpinner, StatsCard } from '../components/ui';
+import { 
+  Trophy, Star, Target, Zap, 
+  Crown, ShieldCheck, Sparkles, 
+  History, ChevronRight, Lock, 
+  CheckCircle2, Flame, Award
+} from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
-// 3D Card Component for badge details
-const BadgeCard3D = ({ badge, onClose }) => {
-  const [props, set] = useSpring(() => ({
-    xys: [0, 0, 1],
-    config: { mass: 5, tension: 350, friction: 40 }
-  }));
-
-  const transform = (x, y, s) => 
-    `perspective(600px) rotateX(${x}deg) rotateY(${y}deg) scale(${s})`;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <animated.div
-        className="relative w-full max-w-md"
-        onMouseMove={({ clientX: x, clientY: y }) => {
-          const rect = event.currentTarget.getBoundingClientRect();
-          set({ xys: [(y - rect.top - rect.height / 2) / 20, (rect.left + rect.width / 2 - x) / 20, 1.05] });
-        }}
-        onMouseLeave={() => set({ xys: [0, 0, 1] })}
-        style={{
-          transform: props.xys.interpolate(transform),
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        <div className={`bg-gradient-to-br ${badge.color} p-8 rounded-2xl shadow-2xl text-center`}>
-          <div className="text-8xl mb-6">
-            {badge.icon}
-          </div>
-          <h3 className="text-2xl font-bold text-white mb-2">{badge.name}</h3>
-          <p className="text-white/90 mb-6">{badge.description}</p>
-          <div className="text-2xl font-bold text-white/80">
-            {badge.points ? `${badge.points.toLocaleString()} Points` : ''}
-          </div>
-          <button
-            onClick={onClose}
-            className="mt-6 px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-white font-medium transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </animated.div>
-    </div>
-  );
-};
-// Achievement Card Component
-const AchievementCard = ({ achievement, onClick }) => {
-  return (
-    <div 
-      className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300 cursor-pointer"
-      onClick={() => onClick(achievement)}
-    >
-      <div className="flex items-start space-x-4 group">
-        <div className={`p-3 rounded-lg transition-all duration-300 ${
-          achievement.earned 
-            ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900 transform group-hover:scale-110 shadow-lg'
-            : 'bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
-        }`}>
-          <span className="text-2xl">{achievement.icon || '🏆'}</span>
-        </div>
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <h3 className={`font-semibold ${
-              achievement.earned ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'
-            }`}>
-              {achievement.name}
-            </h3>
-            <div className="flex items-center space-x-2">
-              {achievement.earned ? (
-                <>
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full dark:bg-green-900/30 dark:text-green-300 flex items-center">
-                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Earned
-                  </span>
-                  {achievement.points > 0 && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full dark:bg-blue-900/30 dark:text-blue-300">
-                      +{achievement.points} pts
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full dark:bg-gray-700 dark:text-gray-400">
-                  Locked
-                </span>
-              )}
-            </div>
-          </div>
-          <p className={`text-sm mt-1 ${
-            achievement.earned ? 'text-gray-600 dark:text-gray-300' : 'text-gray-500 dark:text-gray-500'
-          }`}>
-            {achievement.description}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Badge Card Component
-const BadgeCard = ({ badge, onClick, isLocked = false }) => {
-  return (
-    <div 
-      className={`flex-shrink-0 w-full h-full rounded-xl p-4 border ${
-        isLocked 
-          ? 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 opacity-75' 
-          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] cursor-pointer flex flex-col'
-      }`}
-      onClick={!isLocked ? () => onClick(badge) : null}
-    >
-      <div className="flex flex-col items-center text-center h-full">
-        <div className={`p-2 rounded-full mb-3 relative shadow-md ${
-          isLocked 
-            ? 'bg-gray-200 dark:bg-gray-700' 
-            : `bg-gradient-to-br ${badge.color} ${badge.additionalGradient || ''} p-0.5`
-        }`}>
-          <div className={`p-3 rounded-full ${
-            isLocked ? 'bg-gray-100' : 'bg-white/90 dark:bg-gray-900/70'
-          }`}>
-            <span className={`text-2xl ${isLocked ? 'text-gray-400' : ''}`}>
-              {badge.icon}
-            </span>
-          </div>
-          {isLocked && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded-lg">
-              <span className="text-white text-2xl">🔒</span>
-            </div>
-          )}
-        </div>
-        <h4 className={`font-semibold ${
-          isLocked ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'
-        }`}>
-          {badge.name}
-        </h4>
-        <p className={`text-xs mt-1 line-clamp-2 ${
-          isLocked ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'
-        }`}>
-          {badge.description}
-        </p>
-        {isLocked ? (
-          <div className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-            Locked
-          </div>
-        ) : (
-          <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-            {badge.points} pts
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Main Achievements Component
 const Achievements = () => {
-  // State
-  const [achievements, setAchievements] = useState([]);
-  const [userPoints, setUserPoints] = useState(0);
-  const [pointsHistory, setPointsHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('achievements');
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  const { user } = useAuth();
-  
-  // Badge configuration
-  const badgeTiers = [
-    { 
-      name: 'Bronze Saver', 
-      points: 1000, 
-      icon: '🥉',
-      description: 'Earned for reaching 1,000 points',
-      color: 'from-amber-600',
-      additionalGradient: 'to-amber-400',
-    },
-    { 
-      name: 'Silver Saver', 
-      points: 5000, 
-      icon: '🥈',
-      description: 'Earned for reaching 5,000 points',
-      color: 'from-gray-300',
-      additionalGradient: 'via-gray-200 to-gray-100',
-    },
-    { 
-      name: 'Gold Saver', 
-      points: 10000, 
-      icon: '🥇',
-      description: 'Earned for reaching 10,000 points',
-      color: 'from-yellow-400',
-      additionalGradient: 'via-yellow-300 to-yellow-100',
-    },
-    { 
-      name: 'Platinum Saver', 
-      points: 25000, 
-      icon: '💎',
-      description: 'Earned for reaching 25,000 points',
-      color: 'from-cyan-300',
-      additionalGradient: 'via-blue-300 to-indigo-400',
-    },
-  ];
+    const { user } = useAuth();
+    const [achievements, setAchievements] = useState([]);
+    const [userPoints, setUserPoints] = useState(0);
+    const [pointsHistory, setPointsHistory] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('inventory');
+    const [selectedBadge, setSelectedBadge] = useState(null);
 
-  // Fetch data on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([
-          fetchAchievements(),
-          fetchUserPoints(),
-          fetchPointsHistory()
-        ]);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    const badgeTiers = [
+        { name: 'Bronze Authority', points: 1000, icon: <Award className="w-8 h-8"/>, color: 'from-amber-600 to-amber-400', desc: 'Financial initiate status achieved.' },
+        { name: 'Silver Guardian', points: 5000, icon: <ShieldCheck className="w-8 h-8"/>, color: 'from-slate-400 to-slate-200', desc: 'Stabilized financial foundation.' },
+        { name: 'Gold Sovereign', points: 10000, icon: <Crown className="w-8 h-8"/>, color: 'from-yellow-500 to-yellow-200', desc: 'Master of capital flow control.' },
+        { name: 'Platinum Architect', points: 25000, icon: <Zap className="w-8 h-8"/>, color: 'from-cyan-400 to-indigo-500', desc: 'Transcended standard monetary logic.' },
+    ];
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const [aRes, pRes, hRes] = await Promise.all([
+                    api.getUserAchievements(),
+                    api.getUserPoints(),
+                    api.getPointsHistory({ limit: 15 })
+                ]);
+                const map = aRes.data.data || {};
+                setAchievements([
+                    { id: 'budgetMaster', name: 'Budget Master', desc: 'Zero variance for 3 cycles.', icon: <Target/>, earned: map.budgetMaster?.earned, pts: 100 },
+                    { id: 'goalCrusher', name: 'Goal Crusher', desc: '5 objectives neutralized.', icon: <Trophy/>, earned: map.goalCrusher?.earned, pts: 150 },
+                    { id: 'consistentSaver', name: 'Infinite Stream', desc: '6 month survival streak.', icon: <Flame/>, earned: map.consistentSaver?.earned, pts: 150 },
+                ]);
+                setUserPoints(pRes.data?.data?.points || 0);
+                setPointsHistory(hRes.data.data || []);
+            } catch (e) { toast.error('Rewards matrix desync.'); }
+            finally { setIsLoading(false); }
+        };
+        fetchData();
+    }, [user]);
+
+    const getCurrentTier = () => {
+        if (userPoints >= 25000) return badgeTiers[3];
+        if (userPoints >= 10000) return badgeTiers[2];
+        if (userPoints >= 5000) return badgeTiers[1];
+        if (userPoints >= 1000) return badgeTiers[0];
+        return { name: 'Recruit', color: 'from-muted to-muted', desc: 'Initialize financial protocols.' };
     };
 
-    fetchData();
-  }, [user]);
+    if (isLoading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Visualizing triumphs..." /></div>;
 
-  // Fetch achievements from API
-  const fetchAchievements = async () => {
-    try {
-      const response = await api.getUserAchievements();
-      const backendAchievements = response.data.data || {};
-      
-      // Map backend achievements to frontend format
-      const mappedAchievements = [
-        {
-          id: 'budgetMaster',
-          name: 'Budget Master',
-          description: 'Stay under budget for 3 consecutive months',
-          icon: '🎯',
-          category: 'budget',
-          earned: backendAchievements.budgetMaster?.earned || false,
-          points: 100,
-        },
-        {
-          id: 'goalCrusher',
-          name: 'Goal Crusher',
-          description: 'Complete 5 saving goals',
-          icon: '🏆',
-          category: 'savings',
-          earned: backendAchievements.goalCrusher?.earned || false,
-          points: 150,
-        },
-        {
-          id: 'consistentSaver',
-          name: 'Consistent Saver',
-          description: 'Maintain saving streak for 6 months',
-          icon: '📈',
-          category: 'streak',
-          earned: backendAchievements.consistentSaver?.earned || false,
-          points: 150,
-        },
-      ];
+    const currentTier = getCurrentTier();
 
-      setAchievements(mappedAchievements);
-    } catch (error) {
-      console.error('Error fetching achievements:', error);
-      setAchievements([]);
-    }
-  };
-
-  // Fetch user points
-  const fetchUserPoints = async () => {
-    try {
-      const response = await api.getUserPoints();
-      setUserPoints(response.data?.data?.points || 0);
-    } catch (error) {
-      console.error('Error fetching user points:', error);
-      setUserPoints(0);
-    }
-  };
-
-  // Fetch points history
-  const fetchPointsHistory = async () => {
-    try {
-      const response = await api.getPointsHistory({ limit: 10 });
-      setPointsHistory(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching points history:', error);
-      setPointsHistory([]);
-    }
-  };
-
-  // Get current tier
-  const getCurrentTier = () => {
-    if (userPoints >= 10000) return 'Platinum';
-    if (userPoints >= 5000) return 'Gold';
-    if (userPoints >= 1000) return 'Silver';
-    return 'Bronze';
-  };
-
-  // Get next tier
-  const getNextTier = () => {
-    const tier = getCurrentTier();
-    const tiers = ['Bronze', 'Silver', 'Gold', 'Platinum'];
-    const currentIndex = tiers.indexOf(tier);
-    return currentIndex < tiers.length - 1 ? tiers[currentIndex + 1] : 'Max Level';
-  };
-
-  // Get unlocked badges
-  const getUnlockedBadges = () => {
-    return badgeTiers.filter(badge => userPoints >= badge.points);
-  };
-
-  // Get next badge to unlock
-  const getNextBadge = () => {
-    const unlockedBadges = getUnlockedBadges();
-    return badgeTiers.find(badge => !unlockedBadges.some(ub => ub.name === badge.name));
-  };
-
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Get user-friendly reason text
-  const getPointsReasonText = (entry) => {
-    const { reason, relatedModel, description } = entry;
-    
-    // If we have a description, use it as it's already formatted
-    if (description && description !== 'Points updated') {
-      return description;
-    }
-    
-    // Otherwise, create a user-friendly message based on the reason
-    switch(reason) {
-      case 'budget_under_limit':
-        return 'Stayed under budget';
-      case 'goal_completed':
-        return 'Goal completed';
-      case 'goal_savings':
-        return 'Savings goal progress';
-      case 'debt_payment':
-        return 'Debt payment';
-      case 'debt_completed':
-        return 'Debt fully paid off';
-      case 'weekly_login_streak':
-        return 'Login streak bonus';
-      case 'monthly_savings':
-        return 'Monthly savings';
-      default:
-        return 'Points updated';
-    }
-  };
-
-  // Get achievement icon
-  const getAchievementIcon = (type) => {
-    const icons = {
-      'savings': '💰',
-      'budget': '📊',
-      'debt': '🏦',
-      'streak': '🔥',
-      'general': '🏆'
-    };
-    return icons[type] || '🏅';
-  };
-
-  // Categorize achievements
-  const categorizedAchievements = achievements.reduce((acc, achievement) => {
-    const category = achievement.category || 'other';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(achievement);
-    return acc;
-  }, {});
-
-  // Category names
-  const categoryNames = {
-    'savings': 'Savings Goals',
-    'budget': 'Budget Mastery',
-    'debt': 'Debt Management',
-    'streak': 'Consistency',
-    'general': 'General',
-    'other': 'Other Achievements'
-  };
-
-  // Loading state
-  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent mb-3">
-          Your Achievements
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-lg">
-          Track your progress and earn rewards
-        </p>
-      </div>
-
-      {/* Points Summary */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="text-center md:text-left mb-6 md:mb-0">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Points</h2>
-            <div className="flex items-center space-x-4 mt-2">
-              <p className="text-gray-600 dark:text-gray-400">
-                Tier: <span className="font-medium">{getCurrentTier()}</span>
-              </p>
-              <p className="text-gray-600 dark:text-gray-400">
-                Next: <span className="font-medium">{getNextTier()}</span>
-              </p>
+        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl font-black tracking-tighter mb-2">Rewards <span className="text-gradient">Vault</span></h1>
+                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Your financial evolution captured in digital assets.</p>
+                </div>
+                <div className="flex items-center gap-4 bg-muted/30 p-2 rounded-2xl border border-border/50">
+                   <div className="px-6 py-2">
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest text-center">Protocol Energy</p>
+                        <p className="text-3xl font-black tracking-tighter text-primary">{userPoints.toLocaleString()}</p>
+                   </div>
+                </div>
             </div>
-          </div>
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-4xl font-bold py-4 px-8 rounded-xl shadow-lg">
-            {userPoints.toLocaleString()}
-            <span className="text-lg ml-2 font-normal">points</span>
-          </div>
+
+            {/* Current Status Card */}
+            <Card variant="glass" className="saas-card p-8 overflow-hidden relative group">
+                <div className="absolute top-0 right-0 w-64 h-64 gradient-primary opacity-10 blur-3xl -mr-32 -mt-32 group-hover:opacity-20 transition-opacity"></div>
+                <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                    <div className={`w-32 h-32 rounded-3xl bg-gradient-to-br ${currentTier.color} flex items-center justify-center text-white shadow-2xl shadow-primary/20 animate-float`}>
+                        {currentTier.icon || <Award className="w-12 h-12" />}
+                    </div>
+                    <div className="flex-1 text-center md:text-left">
+                        <h2 className="text-3xl font-black tracking-tighter mb-1 uppercase">{currentTier.name}</h2>
+                        <p className="text-sm font-black text-muted-foreground uppercase tracking-widest italic mb-6">{currentTier.desc}</p>
+                        <div className="space-y-2 max-w-md mx-auto md:mx-0">
+                            <div className="flex justify-between text-[10px] font-black uppercase opacity-70">
+                                <span>Efficiency Progress</span>
+                                <span>{Math.min(Math.round((userPoints / 25000) * 100), 100)}%</span>
+                            </div>
+                            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                                <motion.div initial={{ width: 0 }} animate={{ width: `${(userPoints / 25000) * 100}%` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-primary"></motion.div>
+                            </div>
+                        </div>
+                    </div>
+                    <Button variant="secondary" size="lg" className="hidden lg:flex" onClick={() => navigate('/leaderboard')}>Global Matrix <ChevronRight className="ml-2 w-4 h-4"/></Button>
+                </div>
+            </Card>
+
+            {/* Tabs */}
+            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
+                {['inventory', 'history'].map(t => (
+                    <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t}</button>
+                ))}
+            </div>
+
+            {/* Content */}
+            <AnimatePresence mode="wait">
+                {activeTab === 'inventory' ? (
+                    <motion.div key="inv" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12">
+                        {/* Badges Matrix */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                            {badgeTiers.map((b, i) => {
+                                const locked = userPoints < b.points;
+                                return (
+                                    <Card key={i} variant="glass" className={`saas-card p-6 flex flex-col items-center text-center group cursor-pointer ${locked ? 'opacity-50 grayscale' : ''}`} onClick={() => !locked && setSelectedBadge(b)}>
+                                        <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${b.color} flex items-center justify-center text-white mb-6 shadow-xl relative group-hover:scale-110 transition-transform duration-500`}>
+                                            {b.icon}
+                                            {locked && <div className="absolute -top-2 -right-2 w-8 h-8 bg-background border border-border rounded-full flex items-center justify-center text-muted-foreground shadow-lg"><Lock className="w-4 h-4" /></div>}
+                                        </div>
+                                        <h4 className="font-black text-xs uppercase tracking-widest mb-2">{b.name}</h4>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase opacity-70 mb-4">{locked ? `Unlocks at ${b.points.toLocaleString()} PTS` : 'Asset Unlocked'}</p>
+                                        {!locked && <div className="mt-auto px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[9px] font-black text-primary uppercase tracking-widest">Mastered</div>}
+                                    </Card>
+                                )
+                            })}
+                        </div>
+
+                        {/* Achievements Grid */}
+                        <div className="space-y-8">
+                            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><Sparkles className="w-4 h-4 mr-2 text-primary" /> Achievement Decryption</h3>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {achievements.map((a, i) => (
+                                    <Card key={i} variant="glass" className={`saas-card p-6 flex items-start gap-4 ${!a.earned ? 'opacity-40' : 'border-primary/30'}`}>
+                                        <div className={`p-4 rounded-xl ${a.earned ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-muted text-muted-foreground'}`}>
+                                            {a.icon}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-black text-sm uppercase tracking-tighter">{a.name}</h4>
+                                                {a.earned && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                                            </div>
+                                            <p className="text-xs text-muted-foreground italic font-medium">{a.desc}</p>
+                                            <div className="pt-2 flex items-center gap-2">
+                                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">+{a.pts} Matrix Energy</span>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div key="hist" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                        <Card variant="glass" className="saas-card overflow-hidden">
+                            <div className="p-8 border-b border-border/50 flex items-center justify-between">
+                                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><History className="w-4 h-4 mr-2" /> Energy Log</h3>
+                            </div>
+                            <div className="divide-y divide-border/50">
+                                {pointsHistory.length === 0 ? (
+                                    <div className="p-20 text-center text-muted-foreground font-black italic uppercase text-xs">No energy fluctuations recorded</div>
+                                ) : (
+                                    pointsHistory.map((h, i) => (
+                                        <div key={i} className="px-8 py-6 hover:bg-muted/20 transition-colors flex items-center justify-between group">
+                                            <div className="flex items-center gap-6">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${h.points > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}>
+                                                    {h.points > 0 ? <Zap className="w-5 h-5"/> : <Target className="w-5 h-5"/>}
+                                                </div>
+                                                <div>
+                                                    <p className="font-black text-sm uppercase tracking-tighter">{h.description || h.reason?.replace(/_/g, ' ')}</p>
+                                                    <p className="text-[10px] font-black text-muted-foreground uppercase italic">{format(new Date(h.createdAt), 'MMM dd, HH:mm')}</p>
+                                                </div>
+                                            </div>
+                                            <div className={`text-xl font-black tracking-tighter ${h.points > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                {h.points > 0 ? '+' : ''}{h.points}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </Card>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Badge Detail Modal */}
+            <AnimatePresence>
+                {selectedBadge && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-background/90 backdrop-blur-xl" onClick={() => setSelectedBadge(null)}>
+                        <motion.div initial={{ scale: 0.8, rotateY: 90 }} animate={{ scale: 1, rotateY: 0 }} exit={{ scale: 0.8, rotateY: -90 }} transition={{ type: "spring", damping: 15 }} className="w-full max-w-sm pointer-events-auto" onClick={e => e.stopPropagation()}>
+                            <Card variant="glass" className={`p-12 text-center bg-gradient-to-br ${selectedBadge.color} border-white/20 shadow-2xl relative overflow-hidden`}>
+                                <div className="absolute inset-0 bg-white/10 opacity-20 pointer-events-none"></div>
+                                <div className="w-32 h-32 mx-auto bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center text-white mb-8 shadow-inner animate-float">
+                                    {selectedBadge.icon}
+                                </div>
+                                <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-2">{selectedBadge.name}</h3>
+                                <p className="text-white/80 font-black text-[10px] uppercase tracking-widest italic mb-8">{selectedBadge.desc}</p>
+                                <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                                    <p className="text-white/60 text-[9px] font-black uppercase tracking-widest mb-1">Decryption Point</p>
+                                    <p className="text-2xl font-black text-white">{selectedBadge.points.toLocaleString()} PTS</p>
+                                </div>
+                                <Button variant="secondary" className="mt-8 w-full bg-white/20 hover:bg-white/30 border-white/20 text-white font-black uppercase text-[10px] tracking-widest" onClick={() => setSelectedBadge(null)}>Secure Archive</Button>
+                            </Card>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-xl mb-8">
-        {['achievements', 'points'].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === tab
-                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-            }`}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      <div className="mb-12">
-        {activeTab === 'achievements' ? (
-          <div className="space-y-8">
-            {/* Badges Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Badges</h2>
-              
-              {getUnlockedBadges().length > 0 ? (
-                <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                    {badgeTiers.map((badge) => {
-                      const isUnlocked = getUnlockedBadges().some(b => b.name === badge.name);
-                      return (
-                        <BadgeCard 
-                          key={badge.name}
-                          badge={badge}
-                          onClick={setSelectedBadge}
-                          isLocked={!isUnlocked}
-                        />
-                      );
-                    })}
-                  </div>
-                  
-                  <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-medium text-gray-700 dark:text-gray-300">Badge Progress</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {getUnlockedBadges().length} of {badgeTiers.length} badges earned
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                          {Math.round((getUnlockedBadges().length / badgeTiers.length) * 100)}%
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Complete</p>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🔐</div>
-                  <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    No Badges Earned Yet
-                  </h3>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    Complete more achievements to earn your first badge!
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Achievements Section - Horizontal Layout */}
-            <div className="space-y-6">
-              <div className="flex items-center space-x-3 mb-4">
-                <span className="text-2xl">🏆</span>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Your Achievements</h3>
-              </div>
-              <div className="flex flex-nowrap overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-                <div className="flex space-x-4">
-                  {achievements.map((achievement) => (
-                    <div key={achievement.id} className="w-64 flex-shrink-0">
-                      <AchievementCard 
-                        achievement={achievement}
-                        onClick={setSelectedBadge}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Points History</h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-                Last updated: {formatDate(new Date().toISOString())}
-              </p>
-            </div>
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {pointsHistory.length > 0 ? (
-                pointsHistory.map((entry, index) => (
-                  <div key={index} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${
-                          entry.points > 0 
-                            ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                        }`}>
-                          {entry.points > 0 ? '↑' : '↓'}
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900 dark:text-white">
-                            {getPointsReasonText(entry)}
-                          </h4>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {formatDate(entry.createdAt || new Date().toISOString())}
-                          </p>
-                        </div>
-                      </div>
-                      <span className={`font-medium ${
-                        entry.points > 0 
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}>
-                        {entry.points > 0 ? '+' : ''}{entry.points} pts
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 text-center">
-                  <p className="text-gray-500 dark:text-gray-400">No points history available</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Badge Detail Modal */}
-      {selectedBadge && (
-        <BadgeCard3D 
-          badge={selectedBadge}
-          onClose={() => setSelectedBadge(null)}
-        />
-      )}
-    </div>
-  );
+    );
 };
 
 export default Achievements;

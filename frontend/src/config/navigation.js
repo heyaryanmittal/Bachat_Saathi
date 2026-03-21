@@ -8,6 +8,7 @@ export const navigationItems = [
     children: [
       { path: '/wallets', name: 'Wallets', icon: 'Wallet' },
       { path: '/transactions', name: 'Transactions', icon: 'ArrowLeftRight' },
+      { path: '/transfers', name: 'Transfers', icon: 'ArrowLeftRight' },
       { path: '/budgets', name: 'Budgets', icon: 'TrendingUp' }
     ]
   },
@@ -20,7 +21,8 @@ export const navigationItems = [
     children: [
       { path: '/goals', name: 'Goals', icon: 'Target' },
       { path: '/achievements', name: 'Points', icon: 'Medal' },
-      { path: '/leaderboard', name: 'Leaderboard', icon: 'Crown' }
+      { path: '/leaderboard', name: 'Leaderboard', icon: 'Crown' },
+      { path: '/points-info', name: 'System Info', icon: 'Calculator' }
     ]
   }
 ];

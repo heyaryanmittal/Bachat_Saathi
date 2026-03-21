@@ -92,21 +92,32 @@ require("./cronJobs/budgetAlertMonitor")();
 require("./cronJobs/resetBudgetAlerts")();
 
 // ========================
-// Start Server
+// Start Server with Auto-Port Selection
 // ========================
-const PORT = process.env.PORT || 5001; // default to 5001 if not in .env
+const startServer = (port) => {
+  const server = app.listen(port, () => {
+    console.log(`🚀 Server running on http://localhost:${port}`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`⚠️ Port ${port} is busy, trying ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      console.error("❌ Server error:", err);
+    }
+  });
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
-
-// Graceful Shutdown
-process.on("SIGINT", () => {
-  console.log("\n🛑 Server shutting down...");
-  server.close(() => {
-    mongoose.connection.close(false, () => {
-      console.log("✅ MongoDB connection closed");
-      process.exit(0);
+  // Graceful Shutdown
+  process.on("SIGINT", () => {
+    console.log("\n🛑 Server shutting down...");
+    server.close(() => {
+      mongoose.connection.close(false, () => {
+        console.log("✅ MongoDB connection closed");
+        process.exit(0);
+      });
     });
   });
-});
+};
+
+const DEFAULT_PORT = process.env.PORT || 5001;
+startServer(Number(DEFAULT_PORT));
+

@@ -1,17 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Wallet } from 'lucide-react';
 
-function Logo() {
+function Logo({ isLight = false }) {
   return (
     <div className="flex items-center">
       <Link
         to="/"
         className="flex items-center space-x-2 group"
       >
-        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-          <span className="text-white font-bold text-lg">₹</span>
+        <div className="w-8 h-8 bg-primary rounded flex items-center justify-center transition-transform duration-500 group-hover:rotate-12 shadow-sm">
+          <Wallet className="text-white w-4.5 h-4.5 stroke-[2.5]" />
         </div>
-        <span className="text-2xl font-bold text-gradient">
+        <span className={`text-lg font-bold tracking-tighter uppercase whitespace-nowrap overflow-hidden transition-colors ${isLight ? 'text-white' : 'text-[#111827]'}`}>
           BachatSaathi
         </span>
       </Link>

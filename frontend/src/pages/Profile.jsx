@@ -7,7 +7,7 @@ import { Card, Button, Input } from '../components/ui';
 import {
   User, Settings, Shield, Bell, Key, Edit3, 
   Save, X, Camera, TrendingUp, Calendar, Mail, 
-  ChevronLeft, Smartphone, Globe, Lock
+  ChevronLeft, Smartphone, Globe, Lock, Star, CheckCircle
 } from 'lucide-react';
 
 const TABS = [
@@ -83,13 +83,9 @@ const Profile = () => {
     };
 
     return (
-        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
+        <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {/* SaaS Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter mb-2">Command <span className="text-gradient">Center</span></h1>
-                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Managing your digital identity and security parameters.</p>
-                </div>
+            <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
                 <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg"><ChevronLeft className="mr-2 w-5 h-5" />Back to Matrix</Button>
             </div>
 
@@ -142,7 +138,7 @@ const Profile = () => {
                                             </div>
                                             <div className="bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20 flex items-center">
                                                 <Star className="w-3.5 h-3.5 mr-2 text-primary" />
-                                                <span className="text-[10px] font-black uppercase text-primary">Premium Authority</span>
+                                                <span className="text-[10px] font-black uppercase text-primary">Premium User</span>
                                             </div>
                                         </div>
                                     </div>
@@ -159,12 +155,12 @@ const Profile = () => {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <Input label="Full Name" value={editedUser.name} onChange={e => setEditedUser({...editedUser, name: e.target.value})} readOnly={!isEditing} />
-                                    <Input label="Primary Sequence (Email)" value={editedUser.email} readOnly={true} className="opacity-50" />
-                                    <Input label="Phone Link" value={editedUser.phone} onChange={e => setEditedUser({...editedUser, phone: e.target.value})} readOnly={!isEditing} />
-                                    <Input label="Matrix Location" value={editedUser.location} onChange={e => setEditedUser({...editedUser, location: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Email" value={editedUser.email} readOnly={true} className="opacity-50" />
+                                    <Input label="Phone" value={editedUser.phone} onChange={e => setEditedUser({...editedUser, phone: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Location" value={editedUser.location} onChange={e => setEditedUser({...editedUser, location: e.target.value})} readOnly={!isEditing} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Bio Sequence</label>
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Bio</label>
                                     <textarea 
                                         rows={4} 
                                         value={editedUser.bio} 
@@ -175,7 +171,7 @@ const Profile = () => {
                                     />
                                 </div>
                                 {isEditing && (
-                                    <Button variant="primary" size="xl" className="w-full btn-saas-primary" onClick={handleSave} loading={isSaving}>Save Identity</Button>
+                                    <Button variant="primary" size="xl" className="w-full btn-saas-primary" onClick={handleSave} loading={isSaving}>Save Changes</Button>
                                 )}
                             </Card>
                         </>
@@ -192,8 +188,8 @@ const Profile = () => {
                                     <div className="flex items-center space-x-4">
                                         <div className="p-3 bg-primary/10 rounded-xl"><Bell className="w-6 h-6 text-primary" /></div>
                                         <div>
-                                            <p className="font-black text-lg tracking-tight">Email Telemetry</p>
-                                            <p className="text-xs text-muted-foreground italic font-medium">Receive monthly financial report streams.</p>
+                                            <p className="font-black text-lg tracking-tight">Email Notifications</p>
+                                            <p className="text-xs text-muted-foreground font-medium">Receive monthly financial reports via email.</p>
                                         </div>
                                     </div>
                                     <input type="checkbox" className="w-6 h-6 border-2 border-primary rounded accent-primary bg-transparent focus:ring-primary" checked={user?.emailNotificationsEnabled} readOnly />
@@ -224,11 +220,11 @@ const Profile = () => {
                                     <div className="flex items-center space-x-4">
                                          <div className="p-3 bg-rose-500/10 rounded-xl"><Key className="w-6 h-6 text-rose-500" /></div>
                                          <div>
-                                            <p className="font-black text-lg tracking-tight">Access Key</p>
-                                            <p className="text-xs text-muted-foreground italic font-medium">Reset your vault primary entry code.</p>
+                                            <p className="font-black text-lg tracking-tight">Password</p>
+                                            <p className="text-xs text-muted-foreground font-medium">Change your account password.</p>
                                          </div>
                                     </div>
-                                    <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>Rotate Key</Button>
+                                    <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>Change Password</Button>
                                 </div>
 
                                 <div className="p-6 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
@@ -236,7 +232,7 @@ const Profile = () => {
                                          <div className={`p-3 rounded-xl ${is2FAEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}><Smartphone className={`w-6 h-6 ${is2FAEnabled ? 'text-emerald-500' : 'text-muted-foreground'}`} /></div>
                                          <div>
                                             <p className="font-black text-lg tracking-tight">Two-Factor Authentication</p>
-                                            <p className="text-xs text-muted-foreground italic font-medium">Add a secondary verification layer for vault egress.</p>
+                                            <p className="text-xs text-muted-foreground font-medium">Add an extra layer of security to your account.</p>
                                          </div>
                                     </div>
                                     {is2FAEnabled ? (
@@ -260,8 +256,8 @@ const Profile = () => {
                         <p className="text-sm text-muted-foreground mb-8 italic">Enter the 6-digit binary sequence sent to <span className="text-foreground font-black">{user.email}</span>.</p>
                         <form onSubmit={e => { e.preventDefault(); handleVerifyOtp(); }}>
                             <Input label="Sequence Key" value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" maxLength={6} required autoFocus />
-                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8" loading={isLoading}>Authorize Setup</Button>
-                            <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShow2FAModal(false)}>Decline</Button>
+                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8" loading={isLoading}>Enable 2FA</Button>
+                            <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShow2FAModal(false)}>Cancel</Button>
                         </form>
                     </Card>
                 </div>

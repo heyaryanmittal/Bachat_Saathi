@@ -31,7 +31,7 @@ const Goals = () => {
                 ...g,
                 progress: Math.min(((g.savedAmount || 0) / (g.targetAmount || 1)) * 100, 100)
             })));
-        } catch (e) { toast.error('Sync failed.'); }
+        } catch (e) { toast.error('Failed to load goals.'); }
         finally { setIsLoading(false); }
     };
 
@@ -46,32 +46,32 @@ const Goals = () => {
         e.preventDefault();
         try {
             await api.createGoal(newGoal);
-            toast.success('Objective initialized.');
+            toast.success('Goal created.');
             setShowCreateModal(false);
             setNewGoal({ title: '', description: '', targetAmount: '', deadline: '', category: 'other' });
             fetchGoals(); fetchGoalStats();
-        } catch (e) { toast.error('Allocation error.'); }
+        } catch (e) { toast.error('Failed to create goal.'); }
     };
 
     const handleSavings = async (e) => {
         e.preventDefault();
         try {
             await api.addSavingsToGoal(selectedGoal._id, { amount: Number(savingsAmount) });
-            toast.success('Teleporting assets...');
+            toast.success('Savings added!');
             setShowSavingsModal(false);
             setSavingsAmount('');
             fetchGoals(); fetchGoalStats();
-        } catch (e) { toast.error('Transmission failed.'); }
+        } catch (e) { toast.error('Failed to add savings.'); }
     };
 
     const confirmDelete = async () => {
         try {
             setDeleteDialog(p => ({ ...p, isDeleting: true }));
             await api.deleteGoal(deleteDialog.id);
-            toast.success('Asset purged.');
+            toast.success('Goal deleted.');
             setDeleteDialog({ isOpen: false, id: null, isDeleting: false });
             fetchGoals(); fetchGoalStats();
-        } catch (e) { toast.error('Purge failure.'); }
+        } catch (e) { toast.error('Failed to delete.'); }
     };
 
     const getIcon = (cat) => {
@@ -86,26 +86,22 @@ const Goals = () => {
     });
 
     if (isLoading && !goals.length) {
-        return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Visualizing objectives..." /></div>;
+        return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading goals..." /></div>;
     }
 
     return (
-        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-            {/* SaaS Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter mb-2">Target <span className="text-gradient">Nodes</span></h1>
-                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Defining your future financial end-states.</p>
-                </div>
-                <Button onClick={() => setShowCreateModal(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />New Objective</Button>
-            </div>
-
+        <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {/* Stats Bar */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-                <StatsCard title="Total Objectives" value={stats.totalGoals || 0} variant="primary" icon={<Target />} />
-                <StatsCard title="Nodes Reached" value={stats.completedGoals || 0} variant="success" icon={<CheckCircle />} />
-                <StatsCard title="Total Reserves" value={stats.totalSavedAmount || 0} variant="gradient" icon={<Briefcase />} />
-                <StatsCard title="Asset Velocity" value={(stats.totalGoals > 0 ? Math.round((stats.completedGoals / stats.totalGoals) * 100) : 0) + '%'} variant="secondary" icon={<TrendingUp />} />
+                <StatsCard title="Total Goals" value={stats.totalGoals || 0} variant="primary" icon={<Target />} />
+                <StatsCard title="Completed" value={stats.completedGoals || 0} variant="success" icon={<CheckCircle />} />
+                <StatsCard title="Total Saved" value={stats.totalSavedAmount || 0} variant="gradient" icon={<Briefcase />} />
+                <StatsCard title="Success Rate" value={(stats.totalGoals > 0 ? Math.round((stats.completedGoals / stats.totalGoals) * 100) : 0) + '%'} variant="secondary" icon={<TrendingUp />} />
+            </div>
+
+            {/* SaaS Header (Actions) */}
+            <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
+                <Button onClick={() => setShowCreateModal(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />New Goal</Button>
             </div>
 
             {/* Main Tabs */}
@@ -120,9 +116,9 @@ const Goals = () => {
                 {filtered.length === 0 ? (
                     <div className="col-span-full py-20 text-center glass-card border-dashed p-10 border-2">
                         <Star className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-20" />
-                        <p className="text-xl font-bold text-muted-foreground">Zero Objective Density</p>
-                        <p className="text-sm text-muted-foreground italic mb-8 mt-2">Initialize your first financial target to see telemetry.</p>
-                        <Button onClick={() => setShowCreateModal(true)} variant="secondary">Start Mission</Button>
+                        <p className="text-xl font-bold text-muted-foreground">No Goals Found</p>
+                        <p className="text-sm text-muted-foreground italic mb-8 mt-2">Set your first financial goal to start tracking progress.</p>
+                        <Button onClick={() => setShowCreateModal(true)} variant="secondary">Create Goal</Button>
                     </div>
                 ) : (
                     filtered.map(g => (
@@ -140,11 +136,11 @@ const Goals = () => {
                                 <Button variant="secondary" size="sm" onClick={() => setDeleteDialog({ isOpen: true, id: g._id, isDeleting: false })}><Trash2 className="w-4 h-4 text-rose-500" /></Button>
                             </div>
 
-                            <p className="text-sm text-muted-foreground mb-8 flex-grow italic line-clamp-2">{g.description || 'No meta data defined for this objective.'}</p>
+                            <p className="text-sm text-muted-foreground mb-8 flex-grow italic line-clamp-2">{g.description || 'No description provided.'}</p>
 
                             <div className="space-y-4 mb-8">
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                                    <span className="text-muted-foreground">Target Velocity</span>
+                                    <span className="text-muted-foreground">Goal Progress</span>
                                     <span className={g.status === 'completed' ? 'text-emerald-500' : 'text-primary'}>{Math.round(g.progress)}%</span>
                                 </div>
                                 <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
@@ -152,7 +148,7 @@ const Goals = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-2xl">
                                     <div>
-                                        <p className="text-[9px] font-black uppercase text-muted-foreground">Staged</p>
+                                        <p className="text-[9px] font-black uppercase text-muted-foreground">Saved</p>
                                         <p className="text-sm font-black">₹{g.savedAmount.toLocaleString()}</p>
                                     </div>
                                     <div className="text-right">
@@ -168,7 +164,7 @@ const Goals = () => {
                                     {format(new Date(g.deadline), 'MMM yyyy')}
                                 </div>
                                 {g.status !== 'completed' && (
-                                    <Button size="sm" onClick={() => { setSelectedGoal(g); setShowSavingsModal(true); }} className="btn-saas-primary font-black text-[10px] tracking-widest uppercase"><Plus className="w-3 h-3 mr-1" />Inject Assets</Button>
+                                    <Button size="sm" onClick={() => { setSelectedGoal(g); setShowSavingsModal(true); }} className="btn-saas-primary font-black text-[10px] tracking-widest uppercase"><Plus className="w-3 h-3 mr-1" />Add Savings</Button>
                                 )}
                             </div>
                         </Card>
@@ -180,28 +176,28 @@ const Goals = () => {
             {showCreateModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
-                        <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">Construct New Node</h3>
+                        <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">Create New Goal</h3>
                         <form onSubmit={handleCreate} className="space-y-6">
-                            <Input label="Protocol Title" value={newGoal.title} onChange={e => setNewGoal({...newGoal, title: e.target.value})} placeholder="Emergency Fund..." required />
-                            <Input label="Meta Sequence" value={newGoal.description} onChange={e => setNewGoal({...newGoal, description: e.target.value})} placeholder="Allocated reserves for..." />
+                            <Input label="Goal Name" value={newGoal.title} onChange={e => setNewGoal({...newGoal, title: e.target.value})} placeholder="Emergency Fund..." required />
+                            <Input label="Description" value={newGoal.description} onChange={e => setNewGoal({...newGoal, description: e.target.value})} placeholder="What is this goal for?..." />
                             <div className="grid grid-cols-2 gap-4">
-                                <Input label="Target Value (₹)" type="number" value={newGoal.targetAmount} onChange={e => setNewGoal({...newGoal, targetAmount: e.target.value})} required />
-                                <Input label="Spatial Deadline" type="date" value={newGoal.deadline} onChange={e => setNewGoal({...newGoal, deadline: e.target.value})} required />
+                                <Input label="Target Amount (₹)" type="number" value={newGoal.targetAmount} onChange={e => setNewGoal({...newGoal, targetAmount: e.target.value})} required />
+                                <Input label="Target Date" type="date" value={newGoal.deadline} onChange={e => setNewGoal({...newGoal, deadline: e.target.value})} required />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Node Category</label>
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Category</label>
                                 <select value={newGoal.category} onChange={e => setNewGoal({...newGoal, category: e.target.value})} className="input-saas w-full">
                                     <option value="emergency">Emergency</option>
                                     <option value="vacation">Vacation</option>
                                     <option value="car">Vehicle</option>
                                     <option value="house">Real Estate</option>
-                                    <option value="education">Academics</option>
-                                    <option value="investment">Assets</option>
-                                    <option value="other">Miscellaneous</option>
+                                    <option value="education">Education</option>
+                                    <option value="investment">Investment</option>
+                                    <option value="other">Other</option>
                                 </select>
                             </div>
-                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-4">Initialize Assignment</Button>
-                            <Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowCreateModal(false)}>Abort Construction</Button>
+                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-4">Create Goal</Button>
+                            <Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowCreateModal(false)}>Cancel</Button>
                         </form>
                     </Card>
                 </div>
@@ -212,12 +208,12 @@ const Goals = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="xl">
                         <DollarSign className="w-12 h-12 text-primary mx-auto mb-6 animate-pulse" />
-                        <h3 className="text-2xl font-black mb-2 tracking-tighter uppercase tracking-widest">Inject Capital</h3>
-                        <p className="text-sm text-muted-foreground mb-8 italic">Transmitting assets to <span className="text-foreground font-black">{selectedGoal.title}</span> node.</p>
+                        <h3 className="text-2xl font-black mb-2 tracking-tighter uppercase tracking-widest">Add Savings</h3>
+                        <p className="text-sm text-muted-foreground mb-8 italic">Adding savings to <span className="text-foreground font-black">{selectedGoal.title}</span>.</p>
                         <form onSubmit={handleSavings}>
-                            <Input label="Capital Volume (₹)" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
-                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8">Execute Injection</Button>
-                            <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowSavingsModal(false)}>Cancel Stream</Button>
+                            <Input label="Amount (₹)" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
+                            <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8">Add to Goal</Button>
+                            <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowSavingsModal(false)}>Cancel</Button>
                         </form>
                     </Card>
                 </div>
@@ -228,11 +224,11 @@ const Goals = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
                         <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-6 animate-bounce" />
-                        <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Purge Goal?</h3>
-                        <p className="text-muted-foreground text-sm font-medium mb-8">This will irreversibly disconnect this financial node. Progress data will be lost.</p>
+                        <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Goal?</h3>
+                        <p className="text-muted-foreground text-sm font-medium mb-8">This action will permanently delete this goal and all its progress. This cannot be undone.</p>
                         <div className="grid grid-cols-2 gap-4">
-                            <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, id: null, isDeleting: false })}>Retain</Button>
-                            <Button variant="danger" loading={deleteDialog.isDeleting} onClick={confirmDelete}> Purge </Button>
+                            <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, id: null, isDeleting: false })}>Keep</Button>
+                            <Button variant="danger" loading={deleteDialog.isDeleting} onClick={confirmDelete}> Delete </Button>
                         </div>
                     </Card>
                 </div>

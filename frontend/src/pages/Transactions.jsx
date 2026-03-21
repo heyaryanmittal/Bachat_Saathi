@@ -28,7 +28,7 @@ const Transactions = () => {
     try {
       const response = await api.getWallets();
       setWallets(response.data.data.wallets || []);
-    } catch (e) { toast.error('Core sync failed.'); }
+    } catch (e) { toast.error('Failed to sync wallets.'); }
   };
 
   const fetchTransactions = async () => {
@@ -37,7 +37,7 @@ const Transactions = () => {
       const response = await api.getTransactions({ ...filters, page: currentPage, limit: 10 });
       setTransactions(response.data.data.transactions || []);
       setTotalPages(response.data.data.pagination.pages);
-    } catch (e) { toast.error('Stream failure.'); }
+    } catch (e) { toast.error('Failed to load transactions.'); }
     finally { setIsLoading(false); }
   };
 
@@ -53,24 +53,24 @@ const Transactions = () => {
       const payload = { ...data, notes: data.description || data.notes };
       if (isEdit) {
         await api.updateTransaction(editingTransaction._id, payload);
-        toast.success('Node synchronized.');
+        toast.success('Transaction updated.');
       } else {
         await api.createTransaction(payload);
-        toast.success('Node initialized.');
+        toast.success('Transaction added.');
       }
       setIsEditing(false); setIsCreating(false);
       fetchTransactions(); fetchAllStats();
-    } catch (e) { toast.error('Protocol error.'); }
+    } catch (e) { toast.error('Failed to save transaction.'); }
   };
 
   const confirmDelete = async () => {
     try {
       setDeleteDialog(p => ({ ...p, isDeleting: true }));
       await api.deleteTransaction(deleteDialog.transaction._id);
-      toast.success('Node purged.');
+      toast.success('Transaction deleted.');
       setDeleteDialog({ isOpen: false, transaction: null, isDeleting: false });
       fetchTransactions(); fetchAllStats();
-    } catch (e) { toast.error('Purge failed.'); }
+    } catch (e) { toast.error('Failed to delete.'); }
   };
 
   const stats = useMemo(() => {
@@ -80,67 +80,65 @@ const Transactions = () => {
   }, [allTransactions]);
 
   if (isLoading && !transactions.length) {
-    return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Streaming data..." /></div>;
+    return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading transactions..." /></div>;
   }
 
   return (
-    <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-      {/* SaaS Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter mb-2">Ledger <span className="text-gradient">Stream</span></h1>
-          <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Real-time financial telemetry and history.</p>
-        </div>
-        <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />New Entry</Button>
-      </div>
-
+    <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
       {/* Stats QuickView */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <StatsCard title="Inbound Flow" value={stats.income} variant="success" icon={<TrendingUp />} />
-        <StatsCard title="Outbound Flow" value={stats.expense} variant="error" icon={<TrendingDown />} />
-        <StatsCard title="Differential" value={stats.net} variant="gradient" icon={<Layers />} />
+        <StatsCard title="Total Income" value={stats.income} variant="success" icon={<TrendingUp />} />
+        <StatsCard title="Total Expense" value={stats.expense} variant="error" icon={<TrendingDown />} />
+        <StatsCard title="Net Balance" value={stats.net} variant="gradient" icon={<Layers />} />
       </div>
 
       {/* Main Content Area */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Sidebar Filters */}
-        <Card variant="glass" className="xl:col-span-1 h-fit sticky top-24">
-            <div className="flex items-center space-x-2 mb-6">
-                <Filter className="w-5 h-5 text-primary" />
-                <h3 className="font-black text-sm uppercase tracking-widest">Filter Protocol</h3>
-            </div>
-            <div className="space-y-6">
-                <select className="input-saas w-full" value={filters.walletId} onChange={e => setFilters({...filters, walletId: e.target.value})}>
-                    <option value="">All Nodes</option>
-                    {wallets.map(w => <option key={w._id} value={w._id}>{w.name}</option>)}
-                </select>
-                <select className="input-saas w-full" value={filters.type} onChange={e => setFilters({...filters, type: e.target.value})}>
-                    <option value="">All Types</option>
-                    <option value="Income">Income</option>
-                    <option value="Expense">Expense</option>
-                </select>
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase ml-2">Timeline Start</label>
-                    <input type="date" className="input-saas w-full" value={filters.startDate} onChange={e => setFilters({...filters, startDate: e.target.value})} />
+        <div className="xl:col-span-1 space-y-6">
+            <Card variant="glass" className="h-fit sticky top-24">
+                <div className="flex items-center space-x-2 mb-6">
+                    <Filter className="w-5 h-5 text-primary" />
+                    <h3 className="font-black text-sm uppercase tracking-widest">Filter Transactions</h3>
                 </div>
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase ml-2">Timeline End</label>
-                    <input type="date" className="input-saas w-full" value={filters.endDate} onChange={e => setFilters({...filters, endDate: e.target.value})} />
+                <div className="space-y-6">
+                    <select className="input-saas w-full" value={filters.walletId} onChange={e => setFilters({...filters, walletId: e.target.value})}>
+                        <option value="">All Wallets</option>
+                        {wallets.map(w => <option key={w._id} value={w._id}>{w.name}</option>)}
+                    </select>
+                    <select className="input-saas w-full" value={filters.type} onChange={e => setFilters({...filters, type: e.target.value})}>
+                        <option value="">All Types</option>
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-2">Timeline Start</label>
+                        <input type="date" className="input-saas w-full" value={filters.startDate} onChange={e => setFilters({...filters, startDate: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-2">Timeline End</label>
+                        <input type="date" className="input-saas w-full" value={filters.endDate} onChange={e => setFilters({...filters, endDate: e.target.value})} />
+                    </div>
+                    <Button variant="secondary" className="w-full font-black text-[10px] uppercase tracking-widest" onClick={() => setFilters({ walletId: '', type: '', category: '', startDate: '', endDate: '' })}>Reset Filters</Button>
                 </div>
-                <Button variant="secondary" className="w-full font-black text-[10px] uppercase tracking-widest" onClick={() => setFilters({ walletId: '', type: '', category: '', startDate: '', endDate: '' })}>Reset Filters</Button>
-            </div>
-        </Card>
+            </Card>
+        </div>
 
         {/* List Protocol */}
         <div className="xl:col-span-3 space-y-6">
+            {/* Header (Actions) - Moved inside to fix alignment */}
+            <div className="flex flex-col md:flex-row items-center justify-end gap-6 mb-2">
+                <Button onClick={() => setIsCreating(true)} className="btn-saas-primary shadow-lg shadow-primary/20" size="lg"><Plus className="mr-2 w-5 h-5" />New Transaction</Button>
+            </div>
+
             <Card className="p-0 overflow-hidden saas-card">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-muted/50 border-b border-border">
                             <tr>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Temporal Data</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Source/Category</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Value</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Wallet / Category</th>
+                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Amount</th>
                                 <th className="p-4 text-right text-[10px] font-black uppercase tracking-widest text-muted-foreground">Actions</th>
                             </tr>
                         </thead>
@@ -154,7 +152,7 @@ const Transactions = () => {
                                             </div>
                                             <div>
                                                 <p className="font-bold text-sm">{new Date(t.date).toLocaleDateString()}</p>
-                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-tighter">{t.notes || 'No meta data'}</p>
+                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-tighter">{t.notes || 'No notes'}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -200,7 +198,7 @@ const Transactions = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-2xl w-full animate-entrance" size="xl">
                   <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">
-                      {isEditing ? 'Modify Transaction Sequence' : 'Initialize New Transaction'}
+                      {isEditing ? 'Edit Transaction' : 'Add New Transaction'}
                   </h3>
                   <TransactionForm
                     onSubmit={data => handleAction(data, isEditing)}
@@ -208,7 +206,7 @@ const Transactions = () => {
                     initialData={isEditing ? { ...editingTransaction, description: editingTransaction.notes } : null}
                     isEditing={isEditing}
                   />
-                  <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingTransaction(null); }}>Abort Sequence</Button>
+                  <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingTransaction(null); }}>Cancel</Button>
               </Card>
           </div>
       )}
@@ -218,15 +216,15 @@ const Transactions = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
                   <Trash2 className="w-12 h-12 text-rose-500 mx-auto mb-6 animate-bounce" />
-                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Purge Link?</h3>
-                  <p className="text-muted-foreground text-sm font-medium mb-8 italic">Deleting this node will recalculate your entire financial telemetry. Proceed with caution.</p>
+                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Transaction?</h3>
+                  <p className="text-muted-foreground text-sm font-medium mb-8">Deleting this transaction will update your balances. This action cannot be undone.</p>
                   <div className="grid grid-cols-2 gap-4">
-                      <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, transaction: null, isDeleting: false })}>Retain</Button>
+                      <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, transaction: null, isDeleting: false })}>Keep</Button>
                       <Button 
                         variant="danger" 
                         loading={deleteDialog.isDeleting}
                         onClick={confirmDelete}
-                      > Purge Entry </Button>
+                      > Delete </Button>
                   </div>
               </Card>
           </div>

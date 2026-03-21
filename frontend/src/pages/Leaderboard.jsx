@@ -45,23 +45,10 @@ const Leaderboard = () => {
 
     const currentLeaderboard = activeTab === 'monthly' ? monthlyLeaderboard : lifetimeLeaderboard;
 
-    if (loading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Syncing global matrix..." /></div>;
+    if (loading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading leaderboard..." /></div>;
 
     return (
-        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-4">
-                <div className="text-center md:text-left">
-                    <h1 className="text-4xl font-black tracking-tighter mb-2">Global <span className="text-gradient">Arena</span></h1>
-                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Competitors optimizing their financial trajectory across the matrix.</p>
-                </div>
-                <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 w-full md:w-auto">
-                    {['monthly', 'lifetime'].map(t => (
-                        <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 md:px-8 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t === 'monthly' ? 'Cycle Peak' : 'Archival Peak'}</button>
-                    ))}
-                </div>
-            </div>
-
+        <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {/* Podium */}
             {currentLeaderboard.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end px-4">
@@ -71,9 +58,9 @@ const Leaderboard = () => {
                              <div className="flex flex-col items-center text-center">
                                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🥈</div>
                                 <h3 className="font-black text-xl tracking-tighter uppercase mb-1">{currentLeaderboard[1].username}</h3>
-                                <p className="text-[10px] font-black text-muted-foreground uppercase mb-6 tracking-widest">Rank #2 Authority</p>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase mb-6 tracking-widest">Rank #2</p>
                                 <div className="text-3xl font-black text-primary tracking-tighter mb-1">{(currentLeaderboard[1].monthlyPoints || currentLeaderboard[1].lifetimePoints).toLocaleString()}</div>
-                                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Energy Cycles</p>
+                                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Points</p>
                              </div>
                         </Card>
                     )}
@@ -86,9 +73,9 @@ const Leaderboard = () => {
                              <div className="flex flex-col items-center text-center relative z-10">
                                 <div className="text-6xl mb-6 animate-float">🥇</div>
                                 <h3 className="font-black text-3xl tracking-tighter uppercase mb-1">{currentLeaderboard[0].username}</h3>
-                                <p className="text-[11px] font-black text-yellow-500/70 uppercase mb-8 tracking-widest">Supreme Commander</p>
+                                <p className="text-[11px] font-black text-yellow-500/70 uppercase mb-8 tracking-widest">Saving Champion</p>
                                 <div className="text-5xl font-black text-primary tracking-tighter mb-2">{(currentLeaderboard[0].monthlyPoints || currentLeaderboard[0].lifetimePoints).toLocaleString()}</div>
-                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Energy Cycles</p>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Points</p>
                              </div>
                         </Card>
                     )}
@@ -98,14 +85,23 @@ const Leaderboard = () => {
                              <div className="flex flex-col items-center text-center">
                                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🥉</div>
                                 <h3 className="font-black text-xl tracking-tighter uppercase mb-1">{currentLeaderboard[2].username}</h3>
-                                <p className="text-[10px] font-black text-muted-foreground uppercase mb-6 tracking-widest">Rank #3 Authority</p>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase mb-6 tracking-widest">Rank #3</p>
                                 <div className="text-3xl font-black text-primary tracking-tighter mb-1">{(currentLeaderboard[2].monthlyPoints || currentLeaderboard[2].lifetimePoints).toLocaleString()}</div>
-                                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Energy Cycles</p>
+                                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Points</p>
                              </div>
                         </Card>
                     )}
                 </div>
             )}
+
+            {/* Header (Actions) */}
+            <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-4">
+                <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 w-full md:w-auto shadow-sm">
+                    {['monthly', 'lifetime'].map(t => (
+                        <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 md:px-8 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t === 'monthly' ? 'This Month' : 'All Time'}</button>
+                    ))}
+                </div>
+            </div>
 
             {/* Your Performance */}
             {userStats && (
@@ -115,22 +111,22 @@ const Leaderboard = () => {
                             <Activity className="w-32 h-32" />
                         </div>
                         <div className="relative z-10">
-                            <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-8 flex items-center"><Target className="w-4 h-4 mr-2" /> Personal Telemetry</h3>
+                            <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-8 flex items-center"><Target className="w-4 h-4 mr-2" /> Your Stats</h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                                 <div className="text-center">
-                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Cycle Rank</p>
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Monthly Rank</p>
                                     <p className="text-3xl font-black tracking-tighter">#{userStats.monthlyRank || '--'}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Cycle Energy</p>
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Monthly Points</p>
                                     <p className="text-3xl font-black tracking-tighter text-primary">{userStats.monthlyPoints.toLocaleString()}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Archival Rank</p>
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Lifetime Rank</p>
                                     <p className="text-3xl font-black tracking-tighter">#{userStats.lifetimeRank || '--'}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Gross Energy</p>
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total Points</p>
                                     <p className="text-3xl font-black tracking-tighter text-primary">{userStats.lifetimePoints.toLocaleString()}</p>
                                 </div>
                             </div>
@@ -157,12 +153,12 @@ const Leaderboard = () => {
                                             <p className="font-black text-lg tracking-tighter uppercase">{entry.username}</p>
                                             <span className="text-xl">{getBadgeIcon(entry.badges?.[0])}</span>
                                         </div>
-                                        <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>{rank <= 3 ? 'Elite Operative' : 'Sector Resident'}</p>
+                                        <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>{rank <= 3 ? 'Top Saver' : 'Member'}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
                                     <p className={`text-2xl font-black tracking-tighter ${isUser ? 'text-white' : 'text-primary'}`}>{points.toLocaleString()}</p>
-                                    <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Energy Units</p>
+                                    <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Points</p>
                                 </div>
                             </motion.div>
                         )
@@ -173,13 +169,13 @@ const Leaderboard = () => {
             {/* Information Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
                 <Card variant="glass" className="saas-card p-8">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-6 flex items-center"><Zap className="w-4 h-4 mr-2" /> Energy Generation</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-6 flex items-center"><Zap className="w-4 h-4 mr-2" /> How to Earn Points</h3>
                     <div className="space-y-4">
                         {[
-                            { label: 'Budget Precision', value: '+50 PT', icon: <Target className="w-4 h-4" /> },
-                            { label: 'Objective Neutralization', value: '+100 PT', icon: <Trophy className="w-4 h-4" /> },
-                            { label: 'Monthly Delta (per ₹1k)', value: '+5 PT', icon: <TrendingUp className="w-4 h-4" /> },
-                            { label: 'Liability Purge (per ₹1k)', value: '+10 PT', icon: <Activity className="w-4 h-4" /> },
+                            { label: 'Staying on Budget', value: '+50 PT', icon: <Target className="w-4 h-4" /> },
+                            { label: 'Completing Goals', value: '+100 PT', icon: <Trophy className="w-4 h-4" /> },
+                            { label: 'Monthly Savings (per ₹1k)', value: '+5 PT', icon: <TrendingUp className="w-4 h-4" /> },
+                            { label: 'Paying off Debt (per ₹1k)', value: '+10 PT', icon: <Activity className="w-4 h-4" /> },
                         ].map((item, i) => (
                             <div key={i} className="flex items-center justify-between p-4 bg-muted/20 rounded-xl border border-border/50 group hover:bg-muted/30 transition-colors">
                                 <div className="flex items-center gap-4">
@@ -192,12 +188,12 @@ const Leaderboard = () => {
                     </div>
                 </Card>
                 <Card variant="glass" className="saas-card p-8">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-purple-500 mb-6 flex items-center"><Award className="w-4 h-4 mr-2" /> Authority Badges</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-purple-500 mb-6 flex items-center"><Award className="w-4 h-4 mr-2" /> Special Badges</h3>
                     <div className="space-y-4">
                         {[
-                            { label: 'Commander-in-Chief', desc: 'Rank #1 Absolute', emoji: '👑' },
-                            { label: 'Sector Elite', desc: 'Top 3 Distribution', emoji: '⭐' },
-                            { label: 'Efficiency Expert', desc: 'Top 10 Resident', emoji: '✨' },
+                            { label: 'Saving Champion', desc: 'Rank #1 Overall', emoji: '👑' },
+                            { label: 'Silver Medalist', desc: 'Top 3 Distribution', emoji: '⭐' },
+                            { label: 'Rising Star', desc: 'Top 10 Savers', emoji: '✨' },
                         ].map((badge, i) => (
                             <div key={i} className="flex items-center gap-4 p-4 bg-muted/20 rounded-xl border border-border/50 group hover:bg-muted/30 transition-colors">
                                 <div className="text-3xl">{badge.emoji}</div>

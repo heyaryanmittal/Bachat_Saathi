@@ -52,19 +52,26 @@ const FeatureCard = ({ feature, index }) => {
   return (
     <div
       ref={ref}
-      className="group relative bg-card rounded-2xl p-7 border border-border/60 shadow-sm hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+      className="group relative bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 overflow-hidden"
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transform: visible ? 'translateY(0)' : 'translateY(24px)',
         filter: visible ? 'blur(0)' : 'blur(4px)',
-        transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${index * 80}ms`,
+        transition: `all 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${index * 100}ms`,
       }}
     >
-      <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/15 transition-colors">
-        <Icon size={26} className="text-primary" />
+      {/* Decorative Gradient Background */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+      
+      <div className="relative z-10">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-8 group-hover:from-primary group-hover:to-emerald-600 transition-all duration-500 shadow-inner">
+          <Icon size={30} className="text-primary group-hover:text-white transition-colors duration-500" />
+        </div>
+        <h3 className="font-display font-bold text-2xl text-foreground mb-4 tracking-tight leading-none">{feature.title}</h3>
+        <p className="text-muted-foreground text-base leading-relaxed font-medium opacity-80 group-hover:opacity-100 transition-opacity">{feature.description}</p>
       </div>
-      <h3 className="font-display font-semibold text-xl text-foreground mb-3">{feature.title}</h3>
-      <p className="text-muted-foreground text-base leading-relaxed">{feature.description}</p>
+
+      <div className="absolute bottom-6 left-10 w-12 h-1 bg-primary/20 rounded-full group-hover:w-24 group-hover:bg-primary transition-all duration-500"></div>
     </div>
   );
 };
@@ -83,10 +90,55 @@ const FeaturesSection = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, i) => (
-            <FeatureCard key={feature.title} feature={feature} index={i} />
-          ))}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => {
+            const ref = useRef(null);
+            const [visible, setVisible] = useState(false);
+
+            useEffect(() => {
+              const observer = new IntersectionObserver(
+                ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+                { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+              );
+              if (ref.current) observer.observe(ref.current);
+              return () => observer.disconnect();
+            }, []);
+
+            const Icon = feature.icon;
+            return (
+              <div
+                key={feature.title}
+                ref={ref}
+                className="group relative h-full"
+                style={{
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? 'translateY(0)' : 'translateY(32px)',
+                  transition: `all 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${index * 100}ms`,
+                }}
+              >
+                {/* Bold Green Card matching 'How It Works' */}
+                <div className="relative h-full bg-primary rounded-[2.5rem] p-8 flex flex-col items-start text-left shadow-2xl shadow-primary/20 group-hover:bg-emerald-700 transition-all duration-500 overflow-hidden">
+                  {/* Decorative Glow */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                  
+                  {/* White Icon in Box */}
+                  <div className="mb-6 w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <Icon size={28} className="text-white drop-shadow-md" />
+                  </div>
+
+                  {/* Golden Header & Content */}
+                  <div className="space-y-4">
+                    <h3 className="font-display font-bold text-xl text-[#fbbf24] tracking-tight leading-tight">
+                      {feature.title}
+                    </h3>
+                    <p className="text-white/80 text-base leading-relaxed font-medium">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

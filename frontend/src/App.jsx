@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Route, Routes, Navigate, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -48,11 +48,14 @@ if (import.meta.env.VITE_API_URL) {
   console.warn('Using default API URL. Set VITE_API_URL in .env for production.');
 }
 
+import Sidebar from './components/Sidebar';
+import ThemeToggle from './components/ThemeToggle';
+
 // App Layout Component
 function AppLayout({ children, showNavbar = true, showContainer = true }) {
-  const { user } = useAuth();
-  // Set auth token for axios if user is logged in
-  const { token } = useAuth();
+  const { user, token } = useAuth();
+  const location = useLocation();
+  const isPublicPage = ['/login', '/signup', '/'].includes(location.pathname);
 
   useEffect(() => {
     if (token) {
@@ -62,16 +65,66 @@ function AppLayout({ children, showNavbar = true, showContainer = true }) {
     }
   }, [token]);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 transition-all duration-500 relative">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-40" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-      }}></div>
+  const getPageContext = (path) => {
+    const contexts = {
+      '/dashboard': { title: 'Dashboard', desc: 'Monthly Snapshot & Analytics' },
+      '/wallets': { title: 'My Wallets', desc: 'Track and manage your money across all accounts.' },
+      '/transactions': { title: 'Transactions', desc: 'Detailed history of all your financial activity.' },
+      '/budgets': { title: 'Budget Planner', desc: 'Set and monitor spending limits for each category.' },
+      '/debts': { title: 'Debt Tracker', desc: 'Monitor and optimize your debt repayment progress.' },
+      '/goals': { title: 'Financial Goals', desc: 'Plan and track your long-term financial goals.' },
+      '/achievements': { title: 'Achievements', desc: 'Your progress and milestones on BachatSaathi.' },
+      '/leaderboard': { title: 'Leaderboard', desc: 'See how you compare with other savers globally.' },
+      '/reports': { title: 'Financial Reports', desc: 'Visual insights into your financial health.' },
+      '/profile': { title: 'Account Settings', desc: 'Manage your profile, preferences and security.' },
+      '/points-info': { title: 'Platform Guide', desc: 'Learn how to earn points effectively.' },
+      '/transfers': { title: 'Transfer History', desc: 'History of all account-to-account transfers.' }
+    };
+    return contexts[path] || { title: 'BachatSaathi', desc: 'Wealth Management Suite' };
+  };
 
+  // If user is logged in and not on a public page, show the SaaS Sidebar layout
+  if (user && !isPublicPage) {
+    const { title, desc } = getPageContext(location.pathname);
+    return (
+      <div className="flex min-h-screen bg-background transition-colors duration-500">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0 lg:ml-72">
+          {/* Top Header for SaaS Dashboard */}
+          <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
+            <div className="flex-1">
+               <h2 className="text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1">
+                 {title}
+               </h2>
+               <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest opacity-60 leading-none">
+                 {desc}
+               </p>
+            </div>
+            <div className="flex items-center space-x-6">
+              <ThemeToggle />
+              <div className="flex items-center space-x-4 text-[11px] font-black text-muted-foreground uppercase tracking-widest hidden sm:flex">
+                <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                <span className="w-1 h-1 bg-border rounded-full"></span>
+                <span className="text-emerald-500">Status: Active</span>
+              </div>
+            </div>
+          </header>
+
+          <main className={`flex-1 p-3 sm:p-5 lg:p-6 ${showContainer ? 'max-w-7xl mx-auto w-full' : ''}`}>
+             <AIAssistant />
+             {children}
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // Standard layout for public pages or if showNavbar is false
+  return (
+    <div className="min-h-screen bg-background relative selection:bg-primary/30">
+      {showNavbar && !isPublicPage && <Navbar />}
       <div className="relative z-10">
-        {showNavbar && <Navbar />}
-        {user && <AIAssistant />}
+        {user && !isPublicPage && <AIAssistant />}
         {showContainer ? (
           <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}

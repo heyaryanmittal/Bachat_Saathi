@@ -45,8 +45,12 @@ const CTASection = () => {
             Create Free Account
             <ArrowRight size={18} />
           </Button>
-          <Button variant="hero-outline" size="xl">
-            Talk to Us
+          <Button 
+            variant="hero-outline" 
+            size="xl"
+            onClick={() => navigate('/signup')}
+          >
+            Explore Plans
           </Button>
         </div>
       </div>

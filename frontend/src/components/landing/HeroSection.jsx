@@ -16,13 +16,6 @@ const HeroSection = () => {
       <div className="container mx-auto px-6 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="space-y-8">
-            <div
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-4 py-1.5 text-white/80 text-sm font-medium animate-fade-up"
-            >
-              <TrendingUp size={14} />
-              Smart savings for smarter Indians
-            </div>
-
             <h1
               className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight text-balance animate-fade-up"
               style={{ animationDelay: '100ms' }}
@@ -42,11 +35,19 @@ const HeroSection = () => {
               className="flex flex-col sm:flex-row gap-4 animate-fade-up"
               style={{ animationDelay: '300ms' }}
             >
-              <Button variant="hero" size="xl" onClick={() => navigate('/signup')}>
+              <Button 
+                variant="hero" 
+                size="xl" 
+                onClick={() => navigate('/signup')}
+              >
                 Start Saving Today
                 <ArrowRight size={18} />
               </Button>
-              <Button variant="hero-outline" size="xl">
+              <Button 
+                variant="hero-outline" 
+                size="xl"
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 See How It Works
               </Button>
             </div>
@@ -71,11 +72,11 @@ const HeroSection = () => {
             className="relative hidden lg:flex items-center justify-center animate-fade-up"
             style={{ animationDelay: '300ms' }}
           >
-            <div className="absolute w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
+            <div className="absolute w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-pulse" />
             <img
               src="/images/hero-illustration.png"
               alt="Financial growth illustration showing savings trends"
-              className="relative z-10 w-full max-w-lg drop-shadow-2xl"
+              className="relative z-10 w-full max-w-lg drop-shadow-2xl animate-float"
             />
           </div>
         </div>

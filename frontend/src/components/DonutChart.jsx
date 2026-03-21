@@ -2,41 +2,37 @@ import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 const COLORS = [
-  '#8B5CF6', // Purple
-  '#EC4899', // Pink
-  '#F59E0B', // Amber
   '#10B981', // Emerald
-  '#3B82F6', // Blue
-  '#EF4444', // Red
-  '#06B6D4', // Cyan
-  '#84CC16'  // Lime
+  '#059669', // Medium Emerald
+  '#047857', // Dark Emerald
+  '#34D399', // Light Emerald
+  '#6EE7B7', // Mint
+  '#14B8A6', // Teal
+  '#0D9488', // Dark Teal
+  '#5EEAD4'  // Light Teal
 ];
 
 function DonutChart({ data }) {
   const [hoveredSegment, setHoveredSegment] = useState(null);
   const hasData = Array.isArray(data) && data.length > 0 && data.some(d => d.value > 0);
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/98 dark:bg-gray-800/98 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-2xl transform scale-105 transition-all duration-200 z-[9999] relative">
-          <p className="font-semibold text-gray-900 dark:text-white mb-2">{payload[0].name}</p>
-          <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
+        <div className="bg-white/98 dark:bg-slate-800/98 backdrop-blur-md border border-border rounded-xl p-4 shadow-2xl z-[9999]">
+          <p className="font-black text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{payload[0].name}</p>
+          <p className="text-xl font-black text-primary">
             ₹{payload[0].value.toLocaleString()}
           </p>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-            <div
-              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(payload[0].value / Math.max(...data.map(d => d.value))) * 100}%` }}
-            ></div>
-          </div>
         </div>
       );
     }
     return null;
   };
 
-  const handleMouseEnter = (data, index) => {
+  const totals = data.reduce((sum, item) => sum + item.value, 0);
+
+  const handleMouseEnter = (_, index) => {
     setHoveredSegment(index);
   };
 
@@ -102,33 +98,15 @@ function DonutChart({ data }) {
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Enhanced Center Text with fade effect */}
+          {/* Clean Center Totals */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className={`text-center transition-all duration-300 ${
-              hoveredSegment !== null
-                ? 'opacity-30 scale-95 transform'
-                : 'opacity-100 scale-100 transform'
-            }`}>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Total Expenses</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">
-                ₹{data.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
+            <div className="text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Total</p>
+              <p className="text-3xl font-black text-foreground tracking-tighter">
+                ₹{totals.toLocaleString()}
               </p>
             </div>
           </div>
-
-          {/* Enhanced tooltip positioning when hovering */}
-          {hoveredSegment !== null && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
-              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-xl transform scale-110 transition-all duration-200">
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                  {data[hoveredSegment]?.name}
-                </p>
-                <p className="text-base font-bold text-purple-600 dark:text-purple-400">
-                  ₹{data[hoveredSegment]?.value.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          )}
         </>
       ) : (
         <div className="text-center">

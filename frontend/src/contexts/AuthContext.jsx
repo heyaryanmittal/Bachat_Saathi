@@ -239,9 +239,9 @@ export function AuthProvider({ children }) {
     setUser(null);
     setError(null);
 
-    // Don't navigate if we're already on the login page
-    if (location.pathname !== '/login') {
-      navigate('/login', { replace: true });
+    // Redirect to landing page
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
     }
 
     toast.success('You have been logged out.');
@@ -256,6 +256,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
+    token: localStorage.getItem('token'),
     error,
     loading,
     login,

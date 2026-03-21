@@ -8,14 +8,15 @@ const cardVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-sm",
-                gradient: "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/10 dark:to-indigo-900/10 border-blue-100/50 dark:border-blue-800/50 shadow-md",
+                default: "bg-white dark:bg-slate-900 border-border shadow-sm",
+                gradient: "bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/10 dark:to-teal-900/10 border-emerald-100/50 dark:border-emerald-800/50 shadow-md",
                 success: "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800",
                 warning: "bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800",
                 error: "bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-800",
                 glass: "glass-card backdrop-blur-xl border-white/20 dark:border-white/10"
             },
             size: {
+                none: "",
                 sm: "p-4",
                 md: "p-6",
                 lg: "p-8",

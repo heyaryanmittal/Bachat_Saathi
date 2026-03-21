@@ -60,16 +60,12 @@ const Reports = () => {
     useEffect(() => { fetchData(); }, [activeTab, dateRange]);
 
     const renderHeader = () => (
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-                <h1 className="text-4xl font-black tracking-tighter mb-2">Matrix <span className="text-gradient">Analytics</span></h1>
-                <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Real-time financial intelligence and pattern recognition.</p>
-            </div>
+        <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
             <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50">
                 <select value={dateRange} onChange={e => setDateRange(e.target.value)} className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4">
                     {DATE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>
-                <Button variant="secondary" onClick={() => toast.success('Exporting stream...')}><Download className="w-4 h-4 mr-2" />Extract</Button>
+                <Button variant="secondary" onClick={() => toast.success('Exporting report...')}><Download className="w-4 h-4 mr-2" />Download</Button>
             </div>
         </div>
     );
@@ -88,13 +84,15 @@ const Reports = () => {
         return (
             <div className="space-y-8 animate-entrance">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatsCard title="Gross Outbound" value={d.totalSpending || 0} variant="error" icon={<ArrowDownRight />} />
-                    <StatsCard title="Node Density" value={d.categories?.length || 0} variant="primary" icon={<Layers />} />
+                    <StatsCard title="Total Spending" value={d.totalSpending || 0} variant="error" icon={<ArrowDownRight />} />
+                    <StatsCard title="Categories" value={d.categories?.length || 0} variant="primary" icon={<Layers />} />
                     <StatsCard title="Daily Avg" value={(d.totalSpending || 0) / 30} variant="secondary" icon={<Activity />} />
                 </div>
+                {renderHeader()}
+                {renderTabs()}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <Card variant="glass" className="p-8 saas-card min-h-[400px]">
-                        <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center"><PieChart className="w-4 h-4 mr-2" /> Distribution Matrix</h3>
+                        <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center"><PieChart className="w-4 h-4 mr-2" /> Spending Distribution</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <RePie>
                                 <Pie data={chartData} innerRadius={80} outerRadius={110} paddingAngle={5} dataKey="value">
@@ -106,7 +104,7 @@ const Reports = () => {
                         </ResponsiveContainer>
                     </Card>
                     <Card variant="glass" className="p-8 saas-card overflow-y-auto max-h-[400px]">
-                         <h3 className="text-xs font-black uppercase tracking-widest mb-8">Classification Telemetry</h3>
+                         <h3 className="text-xs font-black uppercase tracking-widest mb-8">Category Breakdown</h3>
                          <div className="space-y-6">
                             {(d.categories || []).map((c, i) => (
                                 <div key={i} className="space-y-2">
@@ -132,12 +130,14 @@ const Reports = () => {
         return (
             <div className="space-y-8 animate-entrance">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatsCard title="Gross Inbound" value={d.totalIncome || 0} variant="success" icon={<ArrowUpRight />} />
-                    <StatsCard title="Source Nodes" value={d.sources?.length || 0} variant="primary" icon={<Layers />} />
-                    <StatsCard title="Daily Logic" value={(d.totalIncome || 0) / 30} variant="secondary" icon={<TrendingUp />} />
+                    <StatsCard title="Total Income" value={d.totalIncome || 0} variant="success" icon={<ArrowUpRight />} />
+                    <StatsCard title="Sources" value={d.sources?.length || 0} variant="primary" icon={<Layers />} />
+                    <StatsCard title="Daily Average" value={(d.totalIncome || 0) / 30} variant="secondary" icon={<TrendingUp />} />
                 </div>
+                {renderHeader()}
+                {renderTabs()}
                 <Card variant="glass" className="p-8 saas-card h-[400px]">
-                    <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center"><BarChart2 className="w-4 h-4 mr-2" /> Source Telemetry</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center"><BarChart2 className="w-4 h-4 mr-2" /> Income Breakdown</h3>
                     <ResponsiveContainer width="100%" height="100%">
                         <ReBar data={chartData} layout="vertical">
                             <XAxis type="number" hide />
@@ -157,10 +157,12 @@ const Reports = () => {
         return (
             <div className="space-y-8 animate-entrance">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatsCard title="Total Constraint" value={d.totalBudget || 0} variant="primary" icon={<Layers />} />
-                    <StatsCard title="Actual Consumption" value={d.totalSpent || 0} variant="error" icon={<ArrowDownRight />} />
-                    <StatsCard title="Residual Space" value={(d.totalBudget || 0) - (d.totalSpent || 0)} variant="success" icon={<ArrowUpRight />} />
+                    <StatsCard title="Total Budget" value={d.totalBudget || 0} variant="primary" icon={<Layers />} />
+                    <StatsCard title="Total Spent" value={d.totalSpent || 0} variant="error" icon={<ArrowDownRight />} />
+                    <StatsCard title="Remaining" value={(d.totalBudget || 0) - (d.totalSpent || 0)} variant="success" icon={<ArrowUpRight />} />
                 </div>
+                {renderHeader()}
+                {renderTabs()}
                 <div className="grid grid-cols-1 gap-6">
                     {list.map((c, i) => {
                         const prog = Math.min((c.spent / (c.budget || c.amount || 1)) * 100, 100);
@@ -193,11 +195,9 @@ const Reports = () => {
     };
 
     return (
-        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-            {renderHeader()}
-            {renderTabs()}
+        <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {isLoading ? (
-                <div className="h-[400px] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Computing matrix residuals..." /></div>
+                <div className="h-[400px] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading reports..." /></div>
             ) : (
                 <div className="space-y-8">
                     {activeTab === 'spending' && <SpendingView />}

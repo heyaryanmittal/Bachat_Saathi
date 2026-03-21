@@ -84,24 +84,20 @@ const Budgets = () => {
   }
 
   return (
-    <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-      {/* SaaS Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter mb-2">Spending <span className="text-gradient">Logic</span></h1>
-          <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Configuring your monthly financial constraints.</p>
-        </div>
-        <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50">
-             <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4" />
-             <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />Create Proxy</Button>
-        </div>
-      </div>
-
+    <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
       {/* Stats QuickView */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <StatsCard title="Budgeted Scope" value={stats.budgeted} variant="primary" icon={<Target />} />
-        <StatsCard title="Actual Consumption" value={stats.spent} variant="error" icon={<TrendingDown />} />
-        <StatsCard title="Residual Capacity" value={stats.remaining} variant="success" icon={<Layers />} />
+        <StatsCard title="Total Budgeted" value={stats.budgeted} variant="primary" icon={<Target />} />
+        <StatsCard title="Total Spent" value={stats.spent} variant="error" icon={<TrendingDown />} />
+        <StatsCard title="Remaining" value={stats.remaining} variant="success" icon={<Layers />} />
+      </div>
+
+      {/* SaaS Header (Actions) */}
+      <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
+        <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50 shadow-sm">
+             <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4" />
+             <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />New Budget</Button>
+        </div>
       </div>
 
       {/* Budget Grid */}
@@ -109,9 +105,9 @@ const Budgets = () => {
         {summary.length === 0 ? (
           <div className="col-span-full py-20 text-center glass-card border-dashed p-10 border-2">
              <Info className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-20" />
-             <p className="text-xl font-bold text-muted-foreground">No Budget Strategies Defined</p>
-             <p className="text-sm text-muted-foreground italic mb-8 mt-2">Initialize your first category limit to see telemetry.</p>
-             <Button onClick={() => setIsCreating(true)} variant="secondary">Start Strategy</Button>
+             <p className="text-xl font-bold text-muted-foreground">No Budgets Set</p>
+             <p className="text-sm text-muted-foreground italic mb-8 mt-2">Create your first budget to start tracking your spending.</p>
+             <Button onClick={() => setIsCreating(true)} variant="secondary">Create Budget</Button>
           </div>
         ) : (
           summary.map(item => {
@@ -161,8 +157,8 @@ const Budgets = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mt-auto">
-                    <Button variant="secondary" size="sm" onClick={() => { setEditingBudget(item); setIsEditing(true); }} className="font-black text-[10px] tracking-widest uppercase">Modify</Button>
-                    <Button variant="danger" size="sm" onClick={() => setDeleteDialog({ isOpen: true, id: item._id, category: item.category, isDeleting: false })} className="font-black text-[10px] tracking-widest uppercase">Purge</Button>
+                    <Button variant="secondary" size="sm" onClick={() => { setEditingBudget(item); setIsEditing(true); }} className="font-black text-[10px] tracking-widest uppercase">Edit</Button>
+                    <Button variant="danger" size="sm" onClick={() => setDeleteDialog({ isOpen: true, id: item._id, category: item.category, isDeleting: false })} className="font-black text-[10px] tracking-widest uppercase">Delete</Button>
                 </div>
               </Card>
             )
@@ -175,13 +171,13 @@ const Budgets = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
                   <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">
-                      {isEditing ? 'Sync Proxy Logic' : 'Initiate New Limit'}
+                      {isEditing ? 'Edit Budget' : 'Create New Budget'}
                   </h3>
                   <BudgetForm 
                     onSubmit={data => handleAction(data, isEditing)} 
                     initialData={isEditing ? { ...editingBudget, amount: editingBudget.budgeted } : null} 
                   />
-                  <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingBudget(null); }}>Abort Sequence</Button>
+                  <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingBudget(null); }}>Cancel</Button>
               </Card>
           </div>
       )}
@@ -191,15 +187,15 @@ const Budgets = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
                   <Trash2 className="w-12 h-12 text-rose-500 mx-auto mb-6 animate-bounce" />
-                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Proxy?</h3>
-                  <p className="text-muted-foreground text-sm font-medium mb-8">This will erase the tracking strategy for <span className="font-black text-foreground">{deleteDialog.category}</span>. History remains untethered.</p>
+                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Budget?</h3>
+                  <p className="text-muted-foreground text-sm font-medium mb-8">This will delete the budget limit for <span className="font-black text-foreground">{deleteDialog.category}</span>. Your transactions will not be affected.</p>
                   <div className="grid grid-cols-2 gap-4">
-                      <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, id: null, category: '', isDeleting: false })}>Retain</Button>
+                      <Button variant="secondary" onClick={() => setDeleteDialog({ isOpen: false, id: null, category: '', isDeleting: false })}>Cancel</Button>
                       <Button 
                         variant="danger" 
                         loading={deleteDialog.isDeleting}
                         onClick={confirmDelete}
-                      > Purge </Button>
+                      > Delete </Button>
                   </div>
               </Card>
           </div>

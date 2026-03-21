@@ -20,9 +20,9 @@ export const navigationItems = [
     type: 'dropdown',
     children: [
       { path: '/goals', name: 'Goals', icon: 'Target' },
-      { path: '/achievements', name: 'Points', icon: 'Medal' },
+      { path: '/achievements', name: 'Achievements', icon: 'Medal' },
       { path: '/leaderboard', name: 'Leaderboard', icon: 'Crown' },
-      { path: '/points-info', name: 'System Info', icon: 'Calculator' }
+      { path: '/points-info', name: 'Platform Guide', icon: 'Calculator' }
     ]
   }
 ];

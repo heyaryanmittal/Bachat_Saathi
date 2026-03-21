@@ -4,15 +4,30 @@ const Footer = () => {
   const columns = [
     {
       title: "Product",
-      links: ["Features", "Pricing", "Security", "Roadmap"],
+      links: [
+        { name: "Features", href: "#features" },
+        { name: "Pricing", href: "#pricing" },
+        { name: "How It Works", href: "#how-it-works" },
+        { name: "Security", href: "#features" }
+      ],
     },
     {
       title: "Company",
-      links: ["About Us", "Careers", "Blog", "Press"],
+      links: [
+        { name: "About Us", href: "/" },
+        { name: "Careers", href: "/" },
+        { name: "Blog", href: "/" },
+        { name: "Press", href: "/" }
+      ],
     },
     {
       title: "Support",
-      links: ["Help Center", "Contact", "Privacy Policy", "Terms"],
+      links: [
+        { name: "Help Center", href: "/signup" },
+        { name: "Contact", href: "/signup" },
+        { name: "Privacy Policy", href: "/" },
+        { name: "Terms", href: "/" }
+      ],
     },
   ];
 
@@ -21,7 +36,7 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-display font-bold text-sm">₹</span>
               </div>
@@ -37,9 +52,9 @@ const Footer = () => {
               <h4 className="font-display font-semibold text-white text-sm mb-4">{col.title}</h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm hover:text-white transition-colors">
-                      {link}
+                  <li key={link.name}>
+                    <a href={link.href} className="text-sm hover:text-white transition-colors">
+                      {link.name}
                     </a>
                   </li>
                 ))}

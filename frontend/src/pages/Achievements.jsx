@@ -21,10 +21,10 @@ const Achievements = () => {
     const [selectedBadge, setSelectedBadge] = useState(null);
 
     const badgeTiers = [
-        { name: 'Bronze Authority', points: 1000, icon: <Award className="w-8 h-8"/>, color: 'from-amber-600 to-amber-400', desc: 'Financial initiate status achieved.' },
-        { name: 'Silver Guardian', points: 5000, icon: <ShieldCheck className="w-8 h-8"/>, color: 'from-slate-400 to-slate-200', desc: 'Stabilized financial foundation.' },
-        { name: 'Gold Sovereign', points: 10000, icon: <Crown className="w-8 h-8"/>, color: 'from-yellow-500 to-yellow-200', desc: 'Master of capital flow control.' },
-        { name: 'Platinum Architect', points: 25000, icon: <Zap className="w-8 h-8"/>, color: 'from-cyan-400 to-indigo-500', desc: 'Transcended standard monetary logic.' },
+        { name: 'Bronze Saver', points: 1000, icon: <Award className="w-8 h-8"/>, color: 'from-amber-600 to-amber-400', desc: 'Congratulations on getting started!' },
+        { name: 'Silver Saver', points: 5000, icon: <ShieldCheck className="w-8 h-8"/>, color: 'from-slate-400 to-slate-200', desc: 'You are building a solid financial base.' },
+        { name: 'Gold Saver', points: 10000, icon: <Crown className="w-8 h-8"/>, color: 'from-yellow-500 to-yellow-200', desc: 'Expert at managing your expenses.' },
+        { name: 'Platinum Saver', points: 25000, icon: <Zap className="w-8 h-8"/>, color: 'from-cyan-400 to-indigo-500', desc: 'Master of personal financial planning.' },
     ];
 
     useEffect(() => {
@@ -38,9 +38,9 @@ const Achievements = () => {
                 ]);
                 const map = aRes.data.data || {};
                 setAchievements([
-                    { id: 'budgetMaster', name: 'Budget Master', desc: 'Zero variance for 3 cycles.', icon: <Target/>, earned: map.budgetMaster?.earned, pts: 100 },
-                    { id: 'goalCrusher', name: 'Goal Crusher', desc: '5 objectives neutralized.', icon: <Trophy/>, earned: map.goalCrusher?.earned, pts: 150 },
-                    { id: 'consistentSaver', name: 'Infinite Stream', desc: '6 month survival streak.', icon: <Flame/>, earned: map.consistentSaver?.earned, pts: 150 },
+                    { id: 'budgetMaster', name: 'Budget Master', desc: 'Stayed on budget for 3 consecutive months.', icon: <Target/>, earned: map.budgetMaster?.earned, pts: 100 },
+                    { id: 'goalCrusher', name: 'Goal Crusher', desc: 'Completed 5 financial goals.', icon: <Trophy/>, earned: map.goalCrusher?.earned, pts: 150 },
+                    { id: 'consistentSaver', name: 'Saving Streak', desc: 'Maintained a 6 month saving streak.', icon: <Flame/>, earned: map.consistentSaver?.earned, pts: 150 },
                 ]);
                 setUserPoints(pRes.data?.data?.points || 0);
                 setPointsHistory(hRes.data.data || []);
@@ -58,26 +58,12 @@ const Achievements = () => {
         return { name: 'Recruit', color: 'from-muted to-muted', desc: 'Initialize financial protocols.' };
     };
 
-    if (isLoading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Visualizing triumphs..." /></div>;
+    if (isLoading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading achievements..." /></div>;
 
     const currentTier = getCurrentTier();
 
     return (
-        <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter mb-2">Rewards <span className="text-gradient">Vault</span></h1>
-                    <p className="text-muted-foreground font-medium text-lg italic tracking-tight">Your financial evolution captured in digital assets.</p>
-                </div>
-                <div className="flex items-center gap-4 bg-muted/30 p-2 rounded-2xl border border-border/50">
-                   <div className="px-6 py-2">
-                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest text-center">Protocol Energy</p>
-                        <p className="text-3xl font-black tracking-tighter text-primary">{userPoints.toLocaleString()}</p>
-                   </div>
-                </div>
-            </div>
-
+        <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {/* Current Status Card */}
             <Card variant="glass" className="saas-card p-8 overflow-hidden relative group">
                 <div className="absolute top-0 right-0 w-64 h-64 gradient-primary opacity-10 blur-3xl -mr-32 -mt-32 group-hover:opacity-20 transition-opacity"></div>
@@ -90,7 +76,7 @@ const Achievements = () => {
                         <p className="text-sm font-black text-muted-foreground uppercase tracking-widest italic mb-6">{currentTier.desc}</p>
                         <div className="space-y-2 max-w-md mx-auto md:mx-0">
                             <div className="flex justify-between text-[10px] font-black uppercase opacity-70">
-                                <span>Efficiency Progress</span>
+                                <span>Progress to Next Tier</span>
                                 <span>{Math.min(Math.round((userPoints / 25000) * 100), 100)}%</span>
                             </div>
                             <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
@@ -98,9 +84,19 @@ const Achievements = () => {
                             </div>
                         </div>
                     </div>
-                    <Button variant="secondary" size="lg" className="hidden lg:flex" onClick={() => navigate('/leaderboard')}>Global Matrix <ChevronRight className="ml-2 w-4 h-4"/></Button>
+                    <Button variant="secondary" size="lg" className="hidden lg:flex" onClick={() => navigate('/leaderboard')}>View Leaderboard <ChevronRight className="ml-2 w-4 h-4"/></Button>
                 </div>
             </Card>
+
+            {/* Header (Actions/Points) */}
+            <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
+                <div className="flex items-center gap-4 bg-muted/30 p-2 rounded-2xl border border-border/50">
+                   <div className="px-6 py-2">
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest text-center">Current Points</p>
+                        <p className="text-3xl font-black tracking-tighter text-primary">{userPoints.toLocaleString()}</p>
+                   </div>
+                </div>
+            </div>
 
             {/* Tabs */}
             <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
@@ -124,7 +120,7 @@ const Achievements = () => {
                                             {locked && <div className="absolute -top-2 -right-2 w-8 h-8 bg-background border border-border rounded-full flex items-center justify-center text-muted-foreground shadow-lg"><Lock className="w-4 h-4" /></div>}
                                         </div>
                                         <h4 className="font-black text-xs uppercase tracking-widest mb-2">{b.name}</h4>
-                                        <p className="text-[10px] font-black text-muted-foreground uppercase opacity-70 mb-4">{locked ? `Unlocks at ${b.points.toLocaleString()} PTS` : 'Asset Unlocked'}</p>
+                                        <p className="text-[10px] font-black text-muted-foreground uppercase opacity-70 mb-4">{locked ? `Unlocks at ${b.points.toLocaleString()} Points` : 'Earned'}</p>
                                         {!locked && <div className="mt-auto px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[9px] font-black text-primary uppercase tracking-widest">Mastered</div>}
                                     </Card>
                                 )
@@ -133,7 +129,7 @@ const Achievements = () => {
 
                         {/* Achievements Grid */}
                         <div className="space-y-8">
-                            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><Sparkles className="w-4 h-4 mr-2 text-primary" /> Achievement Decryption</h3>
+                            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><Sparkles className="w-4 h-4 mr-2 text-primary" /> Unlocked Achievements</h3>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {achievements.map((a, i) => (
                                     <Card key={i} variant="glass" className={`saas-card p-6 flex items-start gap-4 ${!a.earned ? 'opacity-40' : 'border-primary/30'}`}>
@@ -147,7 +143,7 @@ const Achievements = () => {
                                             </div>
                                             <p className="text-xs text-muted-foreground italic font-medium">{a.desc}</p>
                                             <div className="pt-2 flex items-center gap-2">
-                                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">+{a.pts} Matrix Energy</span>
+                                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">+{a.pts} Points</span>
                                             </div>
                                         </div>
                                     </Card>
@@ -159,7 +155,7 @@ const Achievements = () => {
                     <motion.div key="hist" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                         <Card variant="glass" className="saas-card overflow-hidden">
                             <div className="p-8 border-b border-border/50 flex items-center justify-between">
-                                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><History className="w-4 h-4 mr-2" /> Energy Log</h3>
+                                <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><History className="w-4 h-4 mr-2" /> Points History</h3>
                             </div>
                             <div className="divide-y divide-border/50">
                                 {pointsHistory.length === 0 ? (
@@ -201,10 +197,10 @@ const Achievements = () => {
                                 <h3 className="text-3xl font-black text-white tracking-tighter uppercase mb-2">{selectedBadge.name}</h3>
                                 <p className="text-white/80 font-black text-[10px] uppercase tracking-widest italic mb-8">{selectedBadge.desc}</p>
                                 <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                                    <p className="text-white/60 text-[9px] font-black uppercase tracking-widest mb-1">Decryption Point</p>
+                                    <p className="text-white/60 text-[9px] font-black uppercase tracking-widest mb-1">Points Goal</p>
                                     <p className="text-2xl font-black text-white">{selectedBadge.points.toLocaleString()} PTS</p>
                                 </div>
-                                <Button variant="secondary" className="mt-8 w-full bg-white/20 hover:bg-white/30 border-white/20 text-white font-black uppercase text-[10px] tracking-widest" onClick={() => setSelectedBadge(null)}>Secure Archive</Button>
+                                <Button variant="secondary" className="mt-8 w-full bg-white/20 hover:bg-white/30 border-white/20 text-white font-black uppercase text-[10px] tracking-widest" onClick={() => setSelectedBadge(null)}>Close</Button>
                             </Card>
                         </motion.div>
                     </div>

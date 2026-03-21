@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import WalletCard from '../components/WalletCard';
-import { Card, Button, Input, LoadingSpinner, Modal } from '../components/ui';
+import { Card, Button, Input, LoadingSpinner, Modal, StatsCard } from '../components/ui';
 import { Link } from 'react-router-dom';
 import { Wallet, Banknote, CreditCard, ArrowRightLeft, Plus, RefreshCw, Layers, History, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -33,7 +33,7 @@ const Wallets = () => {
         setError('');
       }
     } catch (err) {
-      setError('Connection to node failed.');
+      setError('Failed to load wallets.');
     } finally {
       setIsLoading(false);
     }
@@ -91,27 +91,25 @@ const Wallets = () => {
   if (isLoading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <LoadingSpinner size="xl" variant="primary" text="Preparing your vault..." />
+        <LoadingSpinner size="xl" variant="primary" text="Loading wallets..." />
       </div>
     );
   }
 
   return (
-    <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden px-4">
-      {/* SaaS Wallets Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter mb-2">
-            My <span className="text-gradient">Wallets</span>
-          </h1>
-          <p className="text-muted-foreground font-medium text-lg italic tracking-tight">
-            Visualizing all your nodes in one SaaS ecosystem.
-          </p>
-        </div>
-        
+    <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
+      {/* Wallet Stats Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <StatsCard title="Total Wealth" value={wallets.reduce((acc, w) => acc + (w.balance || 0), 0)} variant="gradient" icon={<Wallet />} />
+        <StatsCard title="Active Wallets" value={wallets.length} variant="primary" icon={<Layers />} />
+        <StatsCard title="Accounts Count" value={wallets.filter(w => w.type !== 'Cash').length} variant="secondary" icon={<History />} />
+      </div>
+
+      {/* SaaS Wallets Header (Actions) */}
+      <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
         <div className="flex items-center space-x-3">
           <Link to="/transfers">
-            <Button variant="secondary" size="md"><History className="mr-2 w-4 h-4" />View Ledger</Button>
+            <Button variant="secondary" size="md"><History className="mr-2 w-4 h-4" />History</Button>
           </Link>
           <Button onClick={fetchWallets} variant="secondary" size="md"><RefreshCw className="mr-2 w-4 h-4" />Refresh</Button>
           <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />New Wallet</Button>
@@ -129,7 +127,7 @@ const Wallets = () => {
         {wallets.length === 0 ? (
           <div className="col-span-full py-20 text-center glass-card border-dashed p-10">
              <Layers className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-20" />
-             <p className="text-xl font-bold text-muted-foreground">Vault is Empty</p>
+             <p className="text-xl font-bold text-muted-foreground">No Wallets Found</p>
           </div>
         ) : (
           wallets.map(wallet => (
@@ -155,18 +153,18 @@ const Wallets = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
                   <h3 className="text-2xl font-black mb-6 tracking-tighter">
-                      {editingWallet ? 'Configure Wallet' : 'Node Creation'}
+                      {editingWallet ? 'Edit Wallet' : 'Create New Wallet'}
                   </h3>
                   <form onSubmit={handleWalletAction} className="space-y-6">
                       <Input
-                        label="Identity Label"
+                        label="Wallet Name"
                         value={editingWallet ? editingWallet.name : newWallet.name}
                         onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, name: e.target.value}) : setNewWallet({...newWallet, name: e.target.value})}
                         placeholder="Personal Bank"
                         required
                       />
                       <div>
-                          <label className="block text-sm font-black text-muted-foreground uppercase tracking-widest mb-2">Category Key</label>
+                          <label className="block text-sm font-black text-muted-foreground uppercase tracking-widest mb-2">Wallet Type</label>
                           <select 
                             className="input-saas w-full"
                             value={editingWallet ? editingWallet.type : newWallet.type}
@@ -187,7 +185,7 @@ const Wallets = () => {
                       />
                       <div className="flex items-center space-x-3 pt-4">
                           <Button variant="secondary" onClick={() => { setIsCreating(false); setEditingWallet(null); }} className="w-full">Cancel</Button>
-                          <Button type="submit" className="w-full btn-saas-primary">{editingWallet ? 'Sync Node' : 'Initialize Node'}</Button>
+                          <Button type="submit" className="w-full btn-saas-primary">{editingWallet ? 'Save Changes' : 'Create Wallet'}</Button>
                       </div>
                   </form>
               </Card>
@@ -198,10 +196,10 @@ const Wallets = () => {
       {showTransferModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
-                  <h3 className="text-2xl font-black mb-6 tracking-tighter">Secure Transfer</h3>
+                  <h3 className="text-2xl font-black mb-6 tracking-tighter">Transfer Funds</h3>
                   <form onSubmit={submitTransfer} className="space-y-6">
                       <div>
-                          <label className="block text-sm font-black text-muted-foreground uppercase tracking-widest mb-2 font-black">Target Node</label>
+                          <label className="block text-sm font-black text-muted-foreground uppercase tracking-widest mb-2 font-black">To Wallet</label>
                           <select 
                             className="input-saas w-full"
                             value={transferTo}
@@ -213,7 +211,7 @@ const Wallets = () => {
                           </select>
                       </div>
                       <Input
-                        label="Transmission Value"
+                        label="Amount"
                         type="number"
                         value={transferAmount}
                         onChange={(e) => setTransferAmount(e.target.value)}
@@ -221,14 +219,14 @@ const Wallets = () => {
                         required
                       />
                       <Input
-                        label="Meta Notes"
+                        label="Note"
                         value={transferNotes}
                         onChange={(e) => setTransferNotes(e.target.value)}
-                        placeholder="Why?"
+                        placeholder="Reason for transfer..."
                       />
                       <div className="flex items-center space-x-3 pt-4">
-                          <Button variant="secondary" onClick={() => setShowTransferModal(false)} className="w-full">Abort</Button>
-                          <Button type="submit" className="w-full btn-saas-primary" loading={isTransferring}>Initialize Transfer</Button>
+                          <Button variant="secondary" onClick={() => setShowTransferModal(false)} className="w-full">Cancel</Button>
+                          <Button type="submit" className="w-full btn-saas-primary" loading={isTransferring}>Confirm Transfer</Button>
                       </div>
                   </form>
               </Card>
@@ -240,8 +238,8 @@ const Wallets = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
                   <Trash2 className="w-12 h-12 text-rose-500 mx-auto mb-6 animate-bounce" />
-                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Sequence?</h3>
-                  <p className="text-muted-foreground text-sm font-medium mb-8">This action will permanently purge <span className="text-foreground font-black uppercase">{deleteModal.wallet?.name}</span> from your ecosystem. All data will be lost.</p>
+                  <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Delete Wallet?</h3>
+                  <p className="text-muted-foreground text-sm font-medium mb-8">This action will permanently delete <span className="text-foreground font-black uppercase">{deleteModal.wallet?.name}</span> and all its transaction history. This cannot be undone.</p>
                   <div className="grid grid-cols-2 gap-4">
                       <Button variant="secondary" onClick={() => setDeleteModal({ show: false, wallet: null })}>Keep</Button>
                       <Button 
@@ -251,10 +249,10 @@ const Wallets = () => {
                                 await api.deleteWallet(deleteModal.wallet._id);
                                 await fetchWallets();
                                 setDeleteModal({ show: false, wallet: null });
-                                toast.success('Node Purged.');
-                            } catch (e) { toast.error('Purge Failed.'); }
+                                toast.success('Wallet Deleted.');
+                            } catch (e) { toast.error('Failed to delete.'); }
                         }}
-                      > Purge </Button>
+                      > Delete </Button>
                   </div>
               </Card>
           </div>

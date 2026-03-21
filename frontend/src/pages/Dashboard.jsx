@@ -154,39 +154,9 @@ function Dashboard() {
   }
 
   return (
-    <div className="pt-24 space-y-12 animate-entrance pb-12 overflow-x-hidden">
-      {/* SaaS Dashboard Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-4">
-        <div>
-          <h1 className="text-4xl font-black tracking-tighter mb-2">
-            Insight <span className="text-gradient">Dashboard</span>
-          </h1>
-          <p className="text-muted-foreground font-medium text-lg flex items-center space-x-2">
-            <span>Welcome, {user?.name || 'Saver'}</span>
-            <span className="w-1.5 h-1.5 bg-primary/40 rounded-full"></span>
-            <span>Monthly Overview</span>
-          </p>
-        </div>
-        
-        <div className="flex items-center space-x-6 bg-muted/30 p-4 rounded-3xl border border-border/50">
-          <div className="text-right hidden sm:block">
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">Available Funds</p>
-            <p className="text-2xl font-black text-foreground">₹{(totalIncome - totalExpenses).toLocaleString('en-IN')}</p>
-          </div>
-          <div className="w-px h-10 bg-border/50 hidden sm:block mx-2"></div>
-          <div className="flex space-x-3">
-            <Button onClick={() => fetchTransactions()} variant="secondary" size="md" loading={isAutoRefreshing}>
-              Sync
-            </Button>
-            <Link to="/transactions">
-              <Button size="md" className="btn-saas-primary">New Entry</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
+    <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
       {/* Hero Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <StatsCard
           title="Income this Month"
           value={totalIncome}
@@ -211,8 +181,35 @@ function Dashboard() {
         />
       </div>
 
+      {/* SaaS Dashboard Header */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2">
+        <div>
+          <p className="text-muted-foreground font-medium text-sm flex items-center space-x-2">
+            <span>Welcome back, {user?.name || 'User'}</span>
+            <span className="w-1 h-1 bg-border rounded-full"></span>
+            <span className="text-primary/60">Live Analytics</span>
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-6 bg-muted/30 p-4 rounded-3xl border border-border/50">
+          <div className="text-right hidden sm:block">
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">Available Funds</p>
+            <p className="text-2xl font-black text-foreground">₹{(totalIncome - totalExpenses).toLocaleString('en-IN')}</p>
+          </div>
+          <div className="w-px h-10 bg-border/50 hidden sm:block mx-2"></div>
+          <div className="flex space-x-3">
+            <Button onClick={() => fetchTransactions()} variant="secondary" size="md" loading={isAutoRefreshing}>
+              Sync
+            </Button>
+            <Link to="/transactions">
+              <Button size="md" className="btn-saas-primary">New Entry</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Analytics Core */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch px-4">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
         <Card size="lg" className="xl:col-span-1 saas-card">
           <div className="flex items-center space-x-3 mb-10">
             <div className="p-3 gradient-primary rounded-2xl text-white shadow-lg shadow-primary/20">
@@ -223,7 +220,7 @@ function Dashboard() {
               <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Category Distribution</p>
             </div>
           </div>
-          <div className="h-[300px] flex items-center justify-center">
+          <div className="h-[320px] flex items-center justify-center">
             {expensesByCategory.length > 0 ? (
               <DonutChart data={expensesByCategory} />
             ) : (
@@ -255,7 +252,7 @@ function Dashboard() {
       </div>
 
       {/* Budgets Snapshot */}
-      <div className="px-4">
+      <div className="">
         <Card size="lg" className="saas-card">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <div className="flex items-center space-x-3">
@@ -273,7 +270,7 @@ function Dashboard() {
               </Button>
             </Link>
           </div>
-          <div className="h-[300px]">
+          <div className="h-[400px]">
              {budgetVsSpent.length > 0 ? (
                <BarChart data={budgetVsSpent} />
              ) : (

@@ -9,16 +9,21 @@
 @layer base {
   :root {
     /* Main Palette - Modern SaaS Green focal */
-    --primary: 161 94% 30%; /* Emerald Green */
+    --primary: 161 94% 30%;
+    /* Emerald Green */
     --primary-foreground: 210 40% 98%;
-    
-    --secondary: 161 20% 96.1%;
+
+    --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    
-    --accent: 38 85% 55%; /* Amber */
+
+    --accent: 38 85% 55%;
+    /* Amber */
     --accent-foreground: 30 50% 12%;
 
-    --background: 210 40% 99%;
+    --background: 210 40% 98%;
+    --sidebar: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -35,28 +40,25 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 161 94% 30%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Custom Gradients */
     --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --gradient-surface: linear-gradient(180deg, rgba(236, 253, 245, 0) 0%, rgba(236, 253, 245, 0.8) 100%);
-    
-    /* Landing Specific - Bachat Buddy Theme (Synced with Global Green) */
-    --landing-primary: 161 94% 30%;
-    --landing-primary-foreground: 150 20% 97%;
-    --landing-accent: 38 85% 55%;
-    --landing-accent-foreground: 30 50% 12%;
-    --surface-warm: 40 30% 96%;
-    --hero-gradient: linear-gradient(135deg, hsl(161 94% 30%) 0%, hsl(165 80% 22%) 50%, hsl(168 70% 18%) 100%);
-    
+    --gradient-sidebar: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    --hero-gradient: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    --hero-gradient-premium: radial-gradient(circle at top right, #065f46, #064e3b);
+
     font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+
+    --sidebar: 0 0% 0%;
+    --sidebar-foreground: 210 40% 98%;
 
     --card: 222.2 84% 6.9%;
     --card-foreground: 210 40% 98%;
@@ -81,15 +83,18 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-
-    /* Custom Gradients Dark */
-    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    --gradient-surface: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.8) 100%);
   }
 
   * {
     @apply border-border;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -108,7 +113,11 @@
 /* Enhanced Glassmorphism */
 .glass-saas {
   @apply bg-white/60 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl;
-  background-image: radial-gradient(circle at top left, rgba(255,255,255,0.2) 0%, transparent 40%);
+  background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.2) 0%, transparent 40%);
+}
+
+.glass-card {
+  @apply bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 shadow-xl relative overflow-hidden;
 }
 
 .glass-card-premium {
@@ -122,7 +131,11 @@
 
 /* Gradient Backgrounds */
 .gradient-primary {
-  @apply bg-gradient-to-br from-[#3b82f6] via-[#6366f1] to-[#8b5cf6];
+  @apply bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857];
+}
+
+.gradient-surface {
+  @apply bg-gradient-to-b from-white/50 to-white/10 dark:from-white/5 dark:to-transparent;
 }
 
 .gradient-success {
@@ -144,6 +157,24 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* SaaS Component Utilities */
+.saas-card {
+  @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-3xl overflow-hidden;
+}
+
+.btn-saas-primary {
+  @apply bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px] py-4 px-8 rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-95;
 }
 
 /* Animation Refinements */
@@ -168,35 +199,81 @@
 }
 
 @keyframes entrance {
-  0% { opacity: 0; transform: translateY(20px) scale(0.98); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 @keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 
 @keyframes fade-up {
-  0% { opacity: 0; transform: translateY(20px); filter: blur(4px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 @keyframes fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes scale-in {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .animate-fade-up {
@@ -205,6 +282,29 @@
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out forwards;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes reverse-spin-slow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+.animate-reverse-spin-slow {
+  animation: reverse-spin-slow 15s linear infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 3s;
 }
 
 .animate-scale-in {

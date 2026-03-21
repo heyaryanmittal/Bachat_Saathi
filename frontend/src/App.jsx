@@ -22,41 +22,29 @@ import Profile from './pages/Profile';
 import PointsInfoPage from './pages/PointsInfoPage';
 import TransferHistory from './pages/TransferHistory';
 import AIAssistant from './components/AIAssistant';
-
-// Create a custom history object to access navigation outside components
 const history = createBrowserHistory({ window });
-
-// Configure future flags for React Router v7
 const routerConfig = {
   future: {
     v7_startTransition: true,
     v7_relativeSplatPath: true
   }
 };
-
-// Protected Route Component
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
 }
-
-// Set API URL for axios
 if (import.meta.env.VITE_API_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 } else {
-  axios.defaults.baseURL = 'http://localhost:5001';
+  axios.defaults.baseURL = 'http://localhost:5001/api';
   console.warn('Using default API URL. Set VITE_API_URL in .env for production.');
 }
-
 import Sidebar from './components/Sidebar';
 import ThemeToggle from './components/ThemeToggle';
-
-// App Layout Component
 function AppLayout({ children, showNavbar = true, showContainer = true }) {
   const { user, token } = useAuth();
   const location = useLocation();
   const isPublicPage = ['/login', '/signup', '/'].includes(location.pathname);
-
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -64,7 +52,6 @@ function AppLayout({ children, showNavbar = true, showContainer = true }) {
       delete axios.defaults.headers.common['Authorization'];
     }
   }, [token]);
-
   const getPageContext = (path) => {
     const contexts = {
       '/dashboard': { title: 'Dashboard', desc: 'Monthly Snapshot & Analytics' },
@@ -82,15 +69,13 @@ function AppLayout({ children, showNavbar = true, showContainer = true }) {
     };
     return contexts[path] || { title: 'BachatSaathi', desc: 'Wealth Management Suite' };
   };
-
-  // If user is logged in and not on a public page, show the SaaS Sidebar layout
   if (user && !isPublicPage) {
     const { title, desc } = getPageContext(location.pathname);
     return (
       <div className="flex min-h-screen bg-background transition-colors duration-500">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 lg:ml-72">
-          {/* Top Header for SaaS Dashboard */}
+          {}
           <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
             <div className="flex-1">
                <h2 className="text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1">
@@ -109,7 +94,6 @@ function AppLayout({ children, showNavbar = true, showContainer = true }) {
               </div>
             </div>
           </header>
-
           <main className={`flex-1 p-3 sm:p-5 lg:p-6 ${showContainer ? 'max-w-7xl mx-auto w-full' : ''}`}>
              <AIAssistant />
              {children}
@@ -118,8 +102,6 @@ function AppLayout({ children, showNavbar = true, showContainer = true }) {
       </div>
     );
   }
-
-  // Standard layout for public pages or if showNavbar is false
   return (
     <div className="min-h-screen bg-background relative selection:bg-primary/30">
       {showNavbar && !isPublicPage && <Navbar />}
@@ -136,7 +118,6 @@ function AppLayout({ children, showNavbar = true, showContainer = true }) {
     </div>
   );
 }
-
 function App() {
   return (
     <HistoryRouter
@@ -150,7 +131,6 @@ function App() {
             gutter={12}
             toastOptions={{
               duration: 4500,
-              // Global style for toasts; each toast can still override
               style: {
                 borderRadius: '12px',
                 background: '#ffffff',
@@ -178,7 +158,7 @@ function App() {
             }}
           />
           <Routes>
-            {/* Public Routes */}
+            {}
             <Route
               path="/"
               element={
@@ -203,8 +183,7 @@ function App() {
                 </AppLayout>
               }
             />
-
-            {/* Protected Routes */}
+            {}
             <Route
               path="/dashboard"
               element={
@@ -245,7 +224,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/* Phase 2 Routes */}
+            {}
             <Route
               path="/debts"
               element={
@@ -332,5 +311,4 @@ function App() {
     </HistoryRouter>
   );
 }
-
 export default App;

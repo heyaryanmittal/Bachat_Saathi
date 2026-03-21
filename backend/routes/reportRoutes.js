@@ -3,31 +3,16 @@ const router = express.Router();
 const NetWorth = require('../models/NetWorth');
 const reportController = require('../controllers/reportController');
 const auth = require('../middleware/auth');
-
-// Apply auth middleware to all routes
 router.use(auth);
-
-// ================================
-// Report Analysis Endpoints
-// ================================
 router.get('/spending-analysis', reportController.getSpendingAnalysis);
 router.get('/income', reportController.getIncomeReport);
 router.get('/budget', reportController.getBudgetReport);
-
-// Net Worth API Endpoints
-// ================================
-
-// @route   GET /api/reports/net-worth/history
-// @desc    Get all net worth entries for user
-// @access  Private
 router.get('/net-worth/history', async (req, res) => {
   try {
     const userId = req.user.id;
     const { limit = 10 } = req.query;
-
     const netWorthHistory = await NetWorth.find({ userId })
       .sort({ date: -1 })
-
     res.json({
       status: 'success',
       data: netWorthHistory
@@ -40,17 +25,11 @@ router.get('/net-worth/history', async (req, res) => {
     });
   }
 });
-
-// @route   GET /api/reports/net-worth/current
-// @desc    Get current net worth
-// @access  Private
 router.get('/net-worth/current', async (req, res) => {
   try {
     const userId = req.user.id;
-
     const currentNetWorth = await NetWorth.findOne({ userId })
       .sort({ date: -1 });
-
     if (!currentNetWorth) {
       return res.json({
         status: 'success',
@@ -58,7 +37,6 @@ router.get('/net-worth/current', async (req, res) => {
         message: 'No net worth data found. Please add your assets and liabilities.'
       });
     }
-
     res.json({
       status: 'success',
       data: currentNetWorth
@@ -71,20 +49,13 @@ router.get('/net-worth/current', async (req, res) => {
     });
   }
 });
-
-// @route   POST /api/reports/net-worth
-// @desc    Create or update net worth entry
-// @access  Private
 router.post('/net-worth', async (req, res) => {
   try {
     const userId = req.user.id;
     const { date, assets, liabilities } = req.body;
-
-    // Calculate total assets and liabilities
     const totalAssets = Object.values(assets).reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
     const totalLiabilities = Object.values(liabilities).reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
     const netWorth = totalAssets - totalLiabilities;
-
     const netWorthEntry = await NetWorth.findOneAndUpdate(
       { userId, date },
       {
@@ -98,7 +69,6 @@ router.post('/net-worth', async (req, res) => {
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
-
     res.status(201).json({
       status: 'success',
       data: netWorthEntry
@@ -111,24 +81,17 @@ router.post('/net-worth', async (req, res) => {
     });
   }
 });
-
-// @route   DELETE /api/reports/net-worth/:id
-// @desc    Delete net worth entry
-// @access  Private
 router.delete('/net-worth/:id', async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
-
     const deletedEntry = await NetWorth.findOneAndDelete({ _id: id, userId });
-
     if (!deletedEntry) {
       return res.status(404).json({
         status: 'error',
         message: 'Net worth entry not found'
       });
     }
-
     res.json({
       status: 'success',
       message: 'Net worth entry deleted successfully'
@@ -141,29 +104,20 @@ router.delete('/net-worth/:id', async (req, res) => {
     });
   }
 });
-
-// @route   GET /api/reports/net-worth/trends
-// @desc    Get net worth trends (for charts)
-// @access  Private
 router.get('/net-worth/trends', async (req, res) => {
   try {
     const userId = req.user.id;
-    const { period = '6m' } = req.query; // Default to 6 months
-    
+    const { period = '6m' } = req.query; 
     let startDate = new Date();
-    
-    // Set start date based on period
     if (period === '1m') startDate.setMonth(startDate.getMonth() - 1);
     else if (period === '3m') startDate.setMonth(startDate.getMonth() - 3);
     else if (period === '6m') startDate.setMonth(startDate.getMonth() - 6);
     else if (period === '1y') startDate.setFullYear(startDate.getFullYear() - 1);
-    else if (period === 'all') startDate = new Date(0); // All time
-    
+    else if (period === 'all') startDate = new Date(0); 
     const trends = await NetWorth.find({
       userId,
       date: { $gte: startDate }
     }).sort({ date: 1 });
-    
     res.json({
       status: 'success',
       data: trends
@@ -176,37 +130,26 @@ router.get('/net-worth/trends', async (req, res) => {
     });
   }
 });
-
-// @route   POST /api/reports/net-worth/calculate
-// @desc    Auto-calculate net worth from wallet balances and debts
-// @access  Private
 router.post('/net-worth/calculate', async (req, res) => {
   try {
     const userId = req.user.id;
     const { date = new Date() } = req.body;
-    
-    // In a real implementation, you would fetch actual wallet balances and debts here
-    // This is a simplified example
-    const walletBalances = {}; // Fetch from wallet service
-    const debts = {}; // Fetch from debts service
-    
+    const walletBalances = {}; 
+    const debts = {}; 
     const assets = {
       cash: walletBalances.cash || 0,
       bank: walletBalances.bank || 0,
       investments: walletBalances.investments || 0,
-      otherAssets: 0 // Add other assets as needed
+      otherAssets: 0 
     };
-    
     const liabilities = {
       creditCards: debts.creditCards || 0,
       loans: debts.loans || 0,
-      otherLiabilities: 0 // Add other liabilities as needed
+      otherLiabilities: 0 
     };
-    
     const totalAssets = Object.values(assets).reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
     const totalLiabilities = Object.values(liabilities).reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
     const netWorth = totalAssets - totalLiabilities;
-    
     const netWorthEntry = await NetWorth.findOneAndUpdate(
       { userId, date },
       {
@@ -220,7 +163,6 @@ router.post('/net-worth/calculate', async (req, res) => {
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
-    
     res.status(201).json({
       status: 'success',
       data: netWorthEntry
@@ -233,6 +175,4 @@ router.post('/net-worth/calculate', async (req, res) => {
     });
   }
 });
-
-// Export the router
 module.exports = router;

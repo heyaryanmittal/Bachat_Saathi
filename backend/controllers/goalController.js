@@ -3,22 +3,15 @@ const User = require('../models/User');
 const PointsLog = require('../models/PointsLog');
 const { clearUserCache } = require('../middleware/cache');
 const mongoose = require('mongoose');
-
-// ================================
-// Create Goal
-// ================================
 exports.createGoal = async (req, res) => {
   try {
     const { title, description, targetAmount, deadline, category } = req.body;
-
-    // Validate required fields
     if (!title || !targetAmount || !deadline) {
       return res.status(400).json({
         status: 'error',
         message: 'Title, target amount, and deadline are required'
       });
     }
-
     const goal = new Goal({
       userId: req.user.id,
       title,
@@ -27,12 +20,8 @@ exports.createGoal = async (req, res) => {
       deadline: new Date(deadline),
       category: category || 'other'
     });
-
     await goal.save();
-
-    // Clear user cache
     clearUserCache(req.user.id);
-
     res.status(201).json({
       status: 'success',
       message: 'Goal created successfully',
@@ -46,28 +35,19 @@ exports.createGoal = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get User Goals
-// ================================
 exports.getGoals = async (req, res) => {
   try {
     const { status, category, page = 1, limit = 10 } = req.query;
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
-
     let filter = { userId: req.user.id };
-
     if (status) filter.status = status;
     if (category) filter.category = category;
-
     const goals = await Goal.find(filter)
       .sort({ deadline: 1, createdAt: -1 })
       .limit(limitNum * 1)
       .skip((pageNum - 1) * limitNum);
-
     const total = await Goal.countDocuments(filter);
-
     res.json({
       status: 'success',
       results: goals.length,
@@ -86,24 +66,18 @@ exports.getGoals = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get Single Goal
-// ================================
 exports.getGoal = async (req, res) => {
   try {
     const goal = await Goal.findOne({
       _id: req.params.id,
       userId: req.user.id
     });
-
     if (!goal) {
       return res.status(404).json({
         status: 'error',
         message: 'Goal not found'
       });
     }
-
     res.json({
       status: 'success',
       data: goal
@@ -116,39 +90,27 @@ exports.getGoal = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Update Goal
-// ================================
 exports.updateGoal = async (req, res) => {
   try {
     const { title, description, targetAmount, deadline, category, savedAmount } = req.body;
-
     const goal = await Goal.findOne({
       _id: req.params.id,
       userId: req.user.id
     });
-
     if (!goal) {
       return res.status(404).json({
         status: 'error',
         message: 'Goal not found'
       });
     }
-
-    // Update fields if provided
     if (title) goal.title = title;
     if (description !== undefined) goal.description = description;
     if (targetAmount) goal.targetAmount = Number(targetAmount);
     if (deadline) goal.deadline = new Date(deadline);
     if (category) goal.category = category;
     if (savedAmount !== undefined) goal.savedAmount = Number(savedAmount);
-
     await goal.save();
-
-    // Clear user cache
     clearUserCache(req.user.id);
-
     res.json({
       status: 'success',
       message: 'Goal updated successfully',
@@ -162,27 +124,19 @@ exports.updateGoal = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Delete Goal
-// ================================
 exports.deleteGoal = async (req, res) => {
   try {
     const goal = await Goal.findOneAndDelete({
       _id: req.params.id,
       userId: req.user.id
     });
-
     if (!goal) {
       return res.status(404).json({
         status: 'error',
         message: 'Goal not found'
       });
     }
-
-    // Clear user cache
     clearUserCache(req.user.id);
-
     res.json({
       status: 'success',
       message: 'Goal deleted successfully'
@@ -195,52 +149,38 @@ exports.deleteGoal = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Add Savings to Goal
-// ================================
 exports.addSavingsToGoal = async (req, res) => {
   try {
     const { amount } = req.body;
-
     if (!amount || amount <= 0) {
       return res.status(400).json({
         status: 'error',
         message: 'Savings amount must be greater than 0'
       });
     }
-
     const goal = await Goal.findOne({
       _id: req.params.id,
       userId: req.user.id
     });
-
     if (!goal) {
       return res.status(404).json({
         status: 'error',
         message: 'Goal not found'
       });
     }
-
     if (goal.status === 'completed') {
       return res.status(400).json({
         status: 'error',
         message: 'Goal is already completed'
       });
     }
-
     const previousSavedAmount = goal.savedAmount;
     await goal.addSavings(Number(amount));
-
-    // Award points for adding savings (5 points per 1000 INR)
     const savingsPoints = Math.floor(amount / 1000) * 5;
     let pointsEarned = savingsPoints;
-
-    // Award bonus points if goal is completed
     if (goal.status === 'completed') {
       const completionBonus = 100;
       pointsEarned += completionBonus;
-
       await PointsLog.create({
         userId: req.user.id,
         points: completionBonus,
@@ -250,8 +190,6 @@ exports.addSavingsToGoal = async (req, res) => {
         relatedModel: 'Goal'
       });
     }
-
-    // Log savings points if any
     if (savingsPoints > 0) {
       await PointsLog.create({
         userId: req.user.id,
@@ -262,18 +200,13 @@ exports.addSavingsToGoal = async (req, res) => {
         relatedModel: 'Goal'
       });
     }
-
-    // Update user points
     if (pointsEarned > 0) {
       await User.findByIdAndUpdate(
         req.user.id,
         { $inc: { points: pointsEarned } }
       );
     }
-
-    // Clear user cache
     clearUserCache(req.user.id);
-
     res.json({
       status: 'success',
       message: 'Savings added to goal successfully',
@@ -290,16 +223,10 @@ exports.addSavingsToGoal = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get Goal Stats
-// ================================
 exports.getGoalStats = async (req, res) => {
   try {
     const userId = req.user.id;
-
     const goals = await Goal.find({ userId });
-    
     let totalGoals = goals.length;
     let totalTargetAmount = 0;
     let totalSavedAmount = 0;
@@ -307,35 +234,25 @@ exports.getGoalStats = async (req, res) => {
     let inProgressGoals = 0;
     let overdueGoals = 0;
     let totalProgress = 0;
-
     goals.forEach(goal => {
       const target = parseFloat(goal.targetAmount) || 0;
       const saved = parseFloat(goal.savedAmount) || 0;
-      
       totalTargetAmount += target;
       totalSavedAmount += saved;
-      
-      // Calculate progress percentage for each goal
       const progress = target > 0 ? (saved / target) * 100 : 0;
       totalProgress += progress;
-      
-      // Consider a goal completed if saved amount >= target amount
       if (saved >= target) {
         completedGoals++;
       } else {
         inProgressGoals++;
-        // Check if goal is overdue
         if (goal.deadline && new Date(goal.deadline) < new Date()) {
           overdueGoals++;
         }
       }
     });
-
-    // Calculate average success rate based on progress
     const successRate = totalGoals > 0 
       ? Math.round((totalProgress / totalGoals) * 100) / 100 
       : 0;
-
     res.json({
       status: 'success',
       data: {

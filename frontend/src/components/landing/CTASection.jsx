@@ -2,12 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LandingButton as Button } from "./LandingButton";
 import { ArrowRight } from "lucide-react";
-
 const CTASection = () => {
   const navigate = useNavigate();
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setVisible(true); },
@@ -16,14 +14,12 @@ const CTASection = () => {
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
-
   return (
     <section id="pricing" className="py-24 lg:py-32 hero-gradient relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
         backgroundSize: '28px 28px',
       }} />
-
       <div
         className="container mx-auto px-6 text-center relative z-10"
         ref={ref}
@@ -57,5 +53,4 @@ const CTASection = () => {
     </section>
   );
 };
-
 export default CTASection;

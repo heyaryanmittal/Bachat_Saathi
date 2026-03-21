@@ -9,7 +9,6 @@ import {
   ShieldCheck, Activity, BarChart3
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
 const Leaderboard = () => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('monthly');
@@ -17,7 +16,6 @@ const Leaderboard = () => {
     const [lifetimeLeaderboard, setLifetimeLeaderboard] = useState([]);
     const [userStats, setUserStats] = useState(null);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const fetchAll = async () => {
             setLoading(true);
@@ -30,29 +28,25 @@ const Leaderboard = () => {
                 setMonthlyLeaderboard(mRes.data.data);
                 setLifetimeLeaderboard(lRes.data.data);
                 setUserStats(sRes.data.data);
-            } catch (e) { /* silent error */ }
+            } catch (e) {  }
             finally { setLoading(false); }
         };
         fetchAll();
     }, []);
-
     const getBadgeIcon = (badge) => {
         if (badge?.includes('king')) return '👑';
         if (badge?.includes('top')) return '⭐';
         if (badge?.includes('smart')) return '✨';
         return '🏆';
     };
-
     const currentLeaderboard = activeTab === 'monthly' ? monthlyLeaderboard : lifetimeLeaderboard;
-
     if (loading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading leaderboard..." /></div>;
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-            {/* Podium */}
+            {}
             {currentLeaderboard.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end px-4">
-                    {/* Rank 2 */}
+                    {}
                     {currentLeaderboard[1] && (
                         <Card variant="glass" className="saas-card p-8 h-fit order-2 md:order-1 border-slate-400/30 bg-slate-400/5 group hover:scale-105 transition-transform duration-500">
                              <div className="flex flex-col items-center text-center">
@@ -64,7 +58,7 @@ const Leaderboard = () => {
                              </div>
                         </Card>
                     )}
-                    {/* Rank 1 */}
+                    {}
                     {currentLeaderboard[0] && (
                         <Card variant="glass" className="saas-card p-12 order-1 md:order-2 border-yellow-500/30 bg-yellow-500/5 relative overflow-hidden group hover:scale-110 transition-transform duration-500">
                              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
@@ -79,7 +73,7 @@ const Leaderboard = () => {
                              </div>
                         </Card>
                     )}
-                    {/* Rank 3 */}
+                    {}
                     {currentLeaderboard[2] && (
                         <Card variant="glass" className="saas-card p-8 h-fit order-3 border-amber-600/30 bg-amber-600/5 group hover:scale-105 transition-transform duration-500">
                              <div className="flex flex-col items-center text-center">
@@ -93,8 +87,7 @@ const Leaderboard = () => {
                     )}
                 </div>
             )}
-
-            {/* Header (Actions) */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-4">
                 <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 w-full md:w-auto shadow-sm">
                     {['monthly', 'lifetime'].map(t => (
@@ -102,8 +95,7 @@ const Leaderboard = () => {
                     ))}
                 </div>
             </div>
-
-            {/* Your Performance */}
+            {}
             {userStats && (
                 <div className="px-4">
                     <Card variant="glass" className="saas-card p-8 bg-primary/5 border-primary/20 relative overflow-hidden">
@@ -134,8 +126,7 @@ const Leaderboard = () => {
                     </Card>
                 </div>
             )}
-
-            {/* List */}
+            {}
             <div className="space-y-4 px-4">
                 <AnimatePresence mode="wait">
                     {currentLeaderboard.map((entry, idx) => {
@@ -165,8 +156,7 @@ const Leaderboard = () => {
                     })}
                 </AnimatePresence>
             </div>
-
-            {/* Information Grid */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
                 <Card variant="glass" className="saas-card p-8">
                     <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-6 flex items-center"><Zap className="w-4 h-4 mr-2" /> How to Earn Points</h3>
@@ -209,5 +199,4 @@ const Leaderboard = () => {
         </div>
     );
 };
-
 export default Leaderboard;

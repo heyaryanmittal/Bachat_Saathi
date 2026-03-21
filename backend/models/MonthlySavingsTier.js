@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const monthlySavingsTierSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -9,7 +8,7 @@ const monthlySavingsTierSchema = new mongoose.Schema({
   },
   month: {
     type: String,
-    required: true, // Format: "YYYY-MM"
+    required: true, 
     index: true
   },
   year: {
@@ -62,11 +61,6 @@ const monthlySavingsTierSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-// Compound index for unique user-month combination
 monthlySavingsTierSchema.index({ userId: 1, month: 1, year: 1 }, { unique: true });
-
-// Index for efficient queries by tier and date
 monthlySavingsTierSchema.index({ tier: 1, calculatedAt: -1 });
-
 module.exports = mongoose.model('MonthlySavingsTier', monthlySavingsTierSchema);

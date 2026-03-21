@@ -3,7 +3,6 @@ import { X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../config';
-
 function PointsInfoModal({ isOpen, onClose }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('usage');
@@ -18,13 +17,11 @@ function PointsInfoModal({ isOpen, onClose }) {
     joinedDate: null
   });
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     if (isOpen && user) {
       fetchUsageStats();
     }
   }, [isOpen, user]);
-
   const fetchUsageStats = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -42,20 +39,17 @@ function PointsInfoModal({ isOpen, onClose }) {
       setLoading(false);
     }
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 z-[9999] overflow-y-auto">
       <div className="flex items-start justify-center min-h-screen pt-20 px-4 pb-20 text-center sm:block sm:p-0">
-        {/* Background overlay */}
+        {}
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity" 
           aria-hidden="true" 
           onClick={onClose}
         ></div>
-
-        {/* Modal content */}
+        {}
         <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-xl px-6 pt-6 pb-6 text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full sm:p-8 relative z-[9999] mx-auto">
           <button
             onClick={onClose}
@@ -63,14 +57,12 @@ function PointsInfoModal({ isOpen, onClose }) {
           >
             <X className="h-6 w-6" />
           </button>
-          
           <div>
             <div className="mt-3 text-center sm:mt-0 sm:text-left">
               <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
                 Points System, Policies & Usage Analytics
               </h3>
-              
-              {/* Tab Navigation */}
+              {}
               <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
                 <button
                   onClick={() => setActiveTab('points')}
@@ -103,9 +95,8 @@ function PointsInfoModal({ isOpen, onClose }) {
                   Usage Analytics
                 </button>
               </div>
-              
               <div className="mt-2 space-y-6">
-                {/* Points Tab */}
+                {}
                 {activeTab === 'points' && (
                   <>
                     <div>
@@ -119,7 +110,6 @@ function PointsInfoModal({ isOpen, onClose }) {
                         <li>7-day login streak: <span className="font-medium">+100 points</span></li>
                       </ul>
                     </div>
-
                     <div>
                       <h4 className="text-md font-medium text-blue-600 dark:text-blue-400 mb-2">🏆 Points Tiers</h4>
                       <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300 text-sm">
@@ -131,8 +121,7 @@ function PointsInfoModal({ isOpen, onClose }) {
                     </div>
                   </>
                 )}
-
-                {/* Policies Tab */}
+                {}
                 {activeTab === 'policies' && (
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <h4 className="text-md font-medium text-red-600 dark:text-red-400 mb-2">📝 Debt Deletion Policy</h4>
@@ -145,8 +134,7 @@ function PointsInfoModal({ isOpen, onClose }) {
                     </ul>
                   </div>
                 )}
-
-                {/* Usage Analytics Tab */}
+                {}
                 {activeTab === 'usage' && (
                   <div className="space-y-4">
                     {loading ? (
@@ -181,7 +169,6 @@ function PointsInfoModal({ isOpen, onClose }) {
                             <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">{usageStats.totalWallets || 0}</p>
                           </div>
                         </div>
-                        
                         <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 border border-gray-200 dark:border-gray-600 mt-4">
                           <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">📊 Website Usage Tips</h4>
                           <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300 text-sm">
@@ -202,7 +189,6 @@ function PointsInfoModal({ isOpen, onClose }) {
               </div>
             </div>
           </div>
-          
           <div className="mt-5 sm:mt-6">
             <button
               type="button"
@@ -217,5 +203,4 @@ function PointsInfoModal({ isOpen, onClose }) {
     </div>
   );
 }
-
 export default PointsInfoModal;

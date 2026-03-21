@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-
-// Custom hook for detecting screen size
 export const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState(() => {
-    // Default to 'md' for SSR compatibility
     if (typeof window !== 'undefined') {
       const width = window.innerWidth;
       if (width >= 1280) return 'xl';
@@ -13,12 +10,10 @@ export const useScreenSize = () => {
     }
     return 'md';
   });
-
   useEffect(() => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       let newSize;
-
       if (width >= 1280) {
         newSize = 'xl';
       } else if (width >= 1024) {
@@ -28,32 +23,22 @@ export const useScreenSize = () => {
       } else {
         newSize = 'sm';
       }
-
       if (newSize !== screenSize) {
         setScreenSize(newSize);
       }
     };
-
-    // Set initial size
     checkScreenSize();
-
-    // Add event listener with debounce for performance
     let timeoutId;
     const handleResize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(checkScreenSize, 150);
     };
-
     window.addEventListener('resize', handleResize);
-
-    // Cleanup
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', handleResize);
     };
   }, [screenSize]);
-
   return screenSize;
 };
-
 export default useScreenSize;

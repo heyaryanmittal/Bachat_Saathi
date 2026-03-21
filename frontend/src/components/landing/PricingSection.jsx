@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { LandingButton as Button } from "./LandingButton";
 import { useNavigate } from "react-router-dom";
-
 const plans = [
   {
     name: "Free",
@@ -63,12 +62,10 @@ const plans = [
     buttonAccent: "shadow-primary/40"
   }
 ];
-
 const PricingSection = () => {
   const navigate = useNavigate();
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setVisible(true); },
@@ -77,7 +74,6 @@ const PricingSection = () => {
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
-
   return (
     <section id="pricing" className="py-24 lg:py-32 bg-background relative" ref={ref}>
       <div className="container mx-auto px-6">
@@ -90,7 +86,6 @@ const PricingSection = () => {
             Choose the plan that fits your needs. No hidden charges, cancel anytime.
           </p>
         </div>
-
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
           {plans.map((plan, i) => (
             <div
@@ -102,12 +97,10 @@ const PricingSection = () => {
                 transition: `all 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`
               }}
             >
-              {/* Animated Glow on Hover */}
+              {}
               <div className={`absolute -inset-1 bg-gradient-to-r ${plan.glowColor} rounded-[2.5rem] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500`}></div>
-              
-              {/* Background Shine */}
+              {}
               <div className={`absolute top-0 right-0 w-40 h-40 ${plan.premium ? 'bg-primary/5' : 'bg-highlight/5'} rounded-full -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-500`}></div>
-
               <div className="relative z-10 space-y-8 flex-1 flex flex-col">
                 <div>
                   <h3 className={`text-xl font-black uppercase tracking-widest mb-2 transition-colors duration-500 ${plan.accentColor} group-hover:opacity-80`}>
@@ -121,7 +114,6 @@ const PricingSection = () => {
                     {plan.description}
                   </p>
                 </div>
-
                 <div className="space-y-4 flex-1">
                   {plan.features.map((feature) => (
                     <div key={feature} className="flex items-start gap-4 group/item">
@@ -132,7 +124,6 @@ const PricingSection = () => {
                     </div>
                   ))}
                 </div>
-
                 <Button 
                   variant={plan.variant} 
                   className={`w-full h-15 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg group-hover:scale-105 transition-all duration-500 mt-8 ${plan.buttonAccent}`}
@@ -144,7 +135,6 @@ const PricingSection = () => {
             </div>
           ))}
         </div>
-        
         <p className="text-center mt-12 text-sm text-muted-foreground font-medium uppercase tracking-widest animate-pulse">
            ✨ Current Default: All users start on Free Plan
         </p>
@@ -152,5 +142,4 @@ const PricingSection = () => {
     </section>
   );
 };
-
 export default PricingSection;

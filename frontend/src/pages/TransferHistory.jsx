@@ -7,12 +7,10 @@ import {
   ArrowUpRight, ArrowDownLeft, Search, Filter
 } from 'lucide-react';
 import { format } from 'date-fns';
-
 const TransferHistory = () => {
     const [transfers, setTransfers] = useState([]);
     const [wallets, setWallets] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
     useEffect(() => {
         const fetchAll = async () => {
             setIsLoading(true);
@@ -23,35 +21,30 @@ const TransferHistory = () => {
                 ]);
                 setWallets(wRes.data.data.wallets || []);
                 setTransfers(tRes.data.data.transactions || []);
-            } catch (e) { /* silent */ }
+            } catch (e) {  }
             finally { setIsLoading(false); }
         };
         fetchAll();
     }, []);
-
     const getWalletName = (id) => wallets.find(w => w._id === id)?.name || id;
-
     if (isLoading && !transfers.length) {
         return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading transfers..." /></div>;
     }
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-            {/* Stats Bar */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 px-4">
                 <StatsCard title="Total Transfers" value={transfers.length} variant="primary" icon={<ArrowRightLeft />} />
                 <StatsCard title="Total Amount" value={transfers.reduce((acc, t) => acc + t.amount, 0)} variant="gradient" icon={<History />} />
                 <StatsCard title="Active Wallets" value={wallets.length} variant="secondary" icon={<Wallet />} />
             </div>
-
-            {/* Header (Actions) */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-4">
                 <div className="flex items-center gap-4">
                     <Button variant="secondary" size="lg"><Calendar className="w-4 h-4 mr-2" />Filter by Date</Button>
                 </div>
             </div>
-
-            {/* Table */}
+            {}
             <div className="px-4">
                 <Card variant="glass" className="saas-card overflow-hidden">
                     <div className="p-8 border-b border-border/50 flex items-center justify-between bg-muted/10">
@@ -113,8 +106,7 @@ const TransferHistory = () => {
                     </div>
                 </Card>
             </div>
-
-            {/* Protocol Notice */}
+            {}
             <div className="px-4">
                 <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl flex items-center gap-4 text-primary max-w-2xl mx-auto">
                     <Info className="w-8 h-8 opacity-50 flex-shrink-0" />
@@ -124,5 +116,4 @@ const TransferHistory = () => {
         </div>
     );
 };
-
 export default TransferHistory;

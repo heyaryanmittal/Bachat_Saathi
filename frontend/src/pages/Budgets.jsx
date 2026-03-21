@@ -7,7 +7,6 @@ import {
   Plus, Trash2, Calendar, PieChart, Layers, Info
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 const Budgets = () => {
   const [budgets, setBudgets] = useState([]);
   const [summary, setSummary] = useState([]);
@@ -20,9 +19,7 @@ const Budgets = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null, category: '', isDeleting: false });
-
   useEffect(() => { fetchBudgets(); }, [currentMonth]);
-
   const fetchBudgets = async () => {
     try {
       setIsLoading(true);
@@ -31,23 +28,19 @@ const Budgets = () => {
         api.getBudgets({ month, year }),
         api.getTransactions({ month, year, limit: 1000 })
       ]);
-
       const bList = budgetsRes.data.data?.budgets || [];
       const tList = transRes.data.data?.transactions || [];
-
       const sum = bList.map(b => {
         const spent = tList
           .filter(t => t.category === b.category && t.type?.toLowerCase() === 'expense')
           .reduce((s, t) => s + Number(t.amount || 0), 0);
         return { ...b, budgeted: Number(b.amount), spent };
       });
-
       setBudgets(bList);
       setSummary(sum);
     } catch (e) { toast.error('Sync failed.'); }
     finally { setIsLoading(false); }
   };
-
   const handleAction = async (data, isEdit) => {
     try {
       const [year, month] = currentMonth.split("-").map(Number);
@@ -62,7 +55,6 @@ const Budgets = () => {
       fetchBudgets();
     } catch (e) { toast.error('Command failed.'); }
   };
-
   const confirmDelete = async () => {
     try {
       setDeleteDialog(p => ({ ...p, isDeleting: true }));
@@ -72,35 +64,30 @@ const Budgets = () => {
       fetchBudgets();
     } catch (e) { toast.error('Purge error.'); }
   };
-
   const stats = useMemo(() => {
     const budgeted = summary.reduce((s, i) => s + i.budgeted, 0);
     const spent = summary.reduce((s, i) => s + i.spent, 0);
     return { budgeted, spent, remaining: budgeted - spent };
   }, [summary]);
-
   if (isLoading && !budgets.length) {
     return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Calculating limits..." /></div>;
   }
-
   return (
     <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-      {/* Stats QuickView */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatsCard title="Total Budgeted" value={stats.budgeted} variant="primary" icon={<Target />} />
         <StatsCard title="Total Spent" value={stats.spent} variant="error" icon={<TrendingDown />} />
         <StatsCard title="Remaining" value={stats.remaining} variant="success" icon={<Layers />} />
       </div>
-
-      {/* SaaS Header (Actions) */}
+      {}
       <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
         <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50 shadow-sm">
              <input type="month" value={currentMonth} onChange={e => setCurrentMonth(e.target.value)} className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4" />
              <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />New Budget</Button>
         </div>
       </div>
-
-      {/* Budget Grid */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {summary.length === 0 ? (
           <div className="col-span-full py-20 text-center glass-card border-dashed p-10 border-2">
@@ -114,7 +101,6 @@ const Budgets = () => {
             const progress = item.budgeted > 0 ? (item.spent / item.budgeted) * 100 : 0;
             const isCritical = progress >= 90;
             const isWarning = progress >= 75 && progress < 90;
-
             return (
               <Card key={item.category} variant="glass" className="saas-card group p-6 h-full flex flex-col">
                 <div className="flex justify-between items-start mb-6">
@@ -132,7 +118,6 @@ const Budgets = () => {
                       <p className={`text-xl font-black tracking-tighter ${isCritical ? 'text-rose-500' : 'text-foreground'}`}>₹{item.spent.toLocaleString()}</p>
                    </div>
                 </div>
-
                 <div className="space-y-3 mb-8 flex-grow">
                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       <span>Consumption</span>
@@ -155,7 +140,6 @@ const Budgets = () => {
                       </div>
                    </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3 mt-auto">
                     <Button variant="secondary" size="sm" onClick={() => { setEditingBudget(item); setIsEditing(true); }} className="font-black text-[10px] tracking-widest uppercase">Edit</Button>
                     <Button variant="danger" size="sm" onClick={() => setDeleteDialog({ isOpen: true, id: item._id, category: item.category, isDeleting: false })} className="font-black text-[10px] tracking-widest uppercase">Delete</Button>
@@ -165,8 +149,7 @@ const Budgets = () => {
           })
         )}
       </div>
-
-      {/* Creation/Edit Modal */}
+      {}
       {(isCreating || isEditing) && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
@@ -181,8 +164,7 @@ const Budgets = () => {
               </Card>
           </div>
       )}
-
-      {/* Delete Modal */}
+      {}
       {deleteDialog.isOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
@@ -203,5 +185,4 @@ const Budgets = () => {
     </div>
   );
 };
-
 export default Budgets;

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const walletSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -30,14 +29,6 @@ const walletSchema = new mongoose.Schema({
     default: Date.now
   }
 }, { timestamps: true });
-
-// ===============================
-// Database Indexes for Performance
-// ===============================
-// Index for user-specific wallet queries
 walletSchema.index({ userId: 1 });
-
-// Index for wallet type queries
 walletSchema.index({ userId: 1, type: 1 });
-
 module.exports = mongoose.model('Wallet', walletSchema);

@@ -1,5 +1,4 @@
 export const getToken = () => localStorage.getItem('token');
-
 export const setToken = (token) => {
   if (token) {
     localStorage.setItem('token', token);
@@ -7,7 +6,6 @@ export const setToken = (token) => {
     localStorage.removeItem('token');
   }
 };
-
 export const isAuthenticated = () => {
   return !!getToken();
 };

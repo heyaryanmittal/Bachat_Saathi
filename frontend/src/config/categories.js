@@ -14,7 +14,6 @@ export const expenseCategories = [
   { name: 'Subscriptions', icon: '📱' },
   { name: 'Others', icon: '📊' }
 ];
-
 export const incomeCategories = [
   { name: 'Salary', icon: '💰' },
   { name: 'Freelance', icon: '💼' },
@@ -25,8 +24,6 @@ export const incomeCategories = [
   { name: 'Side Hustle', icon: '💡' },
   { name: 'Other Income', icon: '💵' }
 ];
-
-// Combined categories for budgets (includes both expense and income categories)
 export const allCategories = [
   ...expenseCategories.map(cat => ({ ...cat, type: 'expense' })),
   ...incomeCategories.map(cat => ({ ...cat, type: 'income' }))

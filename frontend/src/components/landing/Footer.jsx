@@ -1,5 +1,4 @@
 import React from 'react';
-
 const Footer = () => {
   const columns = [
     {
@@ -30,7 +29,6 @@ const Footer = () => {
       ],
     },
   ];
-
   return (
     <footer className="bg-foreground text-white/70 py-16">
       <div className="container mx-auto px-6">
@@ -46,7 +44,6 @@ const Footer = () => {
               India's friendliest personal finance companion. Built to help you save more, spend wisely, and stress less about money.
             </p>
           </div>
-
           {columns.map((col) => (
             <div key={col.title}>
               <h4 className="font-display font-semibold text-white text-sm mb-4">{col.title}</h4>
@@ -62,7 +59,6 @@ const Footer = () => {
             </div>
           ))}
         </div>
-
         <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm">
           © {new Date().getFullYear()} Bachat Saathi. Made with ❤️ in India.
         </div>
@@ -70,5 +66,4 @@ const Footer = () => {
     </footer>
   );
 };
-
 export default Footer;

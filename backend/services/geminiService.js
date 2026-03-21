@@ -14,7 +14,6 @@ async function generateGeminiContent(messages) {
     throw error;
   }
 }
-
 module.exports = {
   generateGeminiContent,
 };

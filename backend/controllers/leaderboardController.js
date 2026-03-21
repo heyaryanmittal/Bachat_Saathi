@@ -1,14 +1,9 @@
 const LeaderboardService = require('../services/leaderboardService');
 const Leaderboard = require('../models/Leaderboard');
-
-// ================================
-// Get Monthly Leaderboard
-// ================================
 exports.getMonthlyLeaderboard = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const leaderboard = await LeaderboardService.getMonthlyLeaderboard(limit);
-
     res.json({
       status: 'success',
       data: leaderboard.map((entry, index) => ({
@@ -26,15 +21,10 @@ exports.getMonthlyLeaderboard = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get Lifetime Leaderboard
-// ================================
 exports.getLifetimeLeaderboard = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const leaderboard = await LeaderboardService.getLifetimeLeaderboard(limit);
-
     res.json({
       status: 'success',
       data: leaderboard.map((entry, index) => ({
@@ -52,22 +42,16 @@ exports.getLifetimeLeaderboard = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get User Stats
-// ================================
 exports.getUserStats = async (req, res) => {
   try {
     const userId = req.user.id;
     const stats = await LeaderboardService.getUserStats(userId);
-
     if (!stats) {
       return res.status(404).json({
         status: 'error',
         message: 'User not found in leaderboard'
       });
     }
-
     res.json({
       status: 'success',
       data: {
@@ -87,25 +71,18 @@ exports.getUserStats = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get User Rank Context
-// ================================
 exports.getUserRankContext = async (req, res) => {
   try {
     const userId = req.user.id;
     const type = req.query.type || 'monthly';
     const range = parseInt(req.query.range) || 2;
-
     const context = await LeaderboardService.getUserRankContext(userId, type, range);
-
     if (!context) {
       return res.status(404).json({
         status: 'error',
         message: 'User rank context not found'
       });
     }
-
     res.json({
       status: 'success',
       data: context
@@ -118,20 +95,14 @@ exports.getUserRankContext = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get Full Leaderboard with Pagination
-// ================================
 exports.getFullLeaderboard = async (req, res) => {
   try {
     const type = req.query.type || 'monthly';
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-
     const pointsField = type === 'monthly' ? 'monthlyPoints' : 'lifetimePoints';
     const rankField = type === 'monthly' ? 'monthlyRank' : 'lifetimeRank';
-
     const total = await Leaderboard.countDocuments();
     const leaderboard = await Leaderboard.find()
       .sort({ [pointsField]: -1 })
@@ -139,7 +110,6 @@ exports.getFullLeaderboard = async (req, res) => {
       .limit(limit)
       .select(`username ${pointsField} ${rankField} badges`)
       .exec();
-
     res.json({
       status: 'success',
       pagination: {
@@ -157,10 +127,6 @@ exports.getFullLeaderboard = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Manually Trigger Rank Calculation (Admin/Dev only)
-// ================================
 exports.recalculateRanks = async (req, res) => {
   try {
     await LeaderboardService.calculateRanks();
@@ -176,10 +142,6 @@ exports.recalculateRanks = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Recalculate Monthly Points (Admin/Dev only)
-// ================================
 exports.recalculateMonthlyPoints = async (req, res) => {
   try {
     const success = await LeaderboardService.recalculateMonthlyPoints();
@@ -203,10 +165,6 @@ exports.recalculateMonthlyPoints = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get Top 3 Users (For Dashboard Widget)
-// ================================
 exports.getTopThree = async (req, res) => {
   try {
     const topThree = await Leaderboard.find()
@@ -214,14 +172,12 @@ exports.getTopThree = async (req, res) => {
       .limit(3)
       .select('username monthlyPoints monthlyRank badges')
       .exec();
-
     const formattedData = topThree.map((entry, index) => ({
       position: index + 1,
       username: entry.username,
       points: entry.monthlyPoints,
       badge: ['🥇', '🥈', '🥉'][index] || ''
     }));
-
     res.json({
       status: 'success',
       data: formattedData

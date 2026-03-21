@@ -1,9 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 function Footer() {
   const currentYear = new Date().getFullYear();
-
   const footerLinks = {
     product: [
       { name: 'Features', href: '#features' },
@@ -30,7 +28,6 @@ function Footer() {
       { name: 'GDPR', href: '#gdpr' }
     ]
   };
-
   const socialLinks = [
     { name: 'Twitter', icon: '🐦', href: '#twitter' },
     { name: 'Facebook', icon: '📘', href: '#facebook' },
@@ -38,13 +35,12 @@ function Footer() {
     { name: 'Instagram', icon: '📸', href: '#instagram' },
     { name: 'YouTube', icon: '📺', href: '#youtube' }
   ];
-
   return (
     <footer className="bg-gray-900 text-white">
-      {/* Main Footer Content */}
+      {}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand Section */}
+          {}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -71,8 +67,7 @@ function Footer() {
               ))}
             </div>
           </div>
-
-          {/* Product Links */}
+          {}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white">Product</h3>
             <ul className="space-y-3">
@@ -88,8 +83,7 @@ function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Company Links */}
+          {}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white">Company</h3>
             <ul className="space-y-3">
@@ -105,8 +99,7 @@ function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Support Links */}
+          {}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white">Support</h3>
             <ul className="space-y-3">
@@ -122,8 +115,7 @@ function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Legal Links */}
+          {}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white">Legal</h3>
             <ul className="space-y-3">
@@ -140,8 +132,7 @@ function Footer() {
             </ul>
           </div>
         </div>
-
-        {/* Newsletter Subscription */}
+        {}
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
@@ -163,8 +154,7 @@ function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Bottom Bar */}
+      {}
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
@@ -181,8 +171,7 @@ function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Back to Top Button */}
+      {}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-large hover:shadow-xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-xl z-50"
@@ -193,5 +182,4 @@ function Footer() {
     </footer>
   );
 }
-
 export default Footer;

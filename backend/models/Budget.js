@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const budgetSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -46,50 +45,31 @@ const budgetSchema = new mongoose.Schema({
     default: false
   }
 }, { timestamps: true });
-
-// ===============================
-// Database Indexes for Performance
-// ===============================
-// Index for user-specific budget queries
 budgetSchema.index({ userId: 1, month: 1, year: 1 });
-
-// Index for category-based budget queries
 budgetSchema.index({ userId: 1, category: 1 });
-
-// Static method to check if user stayed within budget for a month
 budgetSchema.statics.checkMonthlyCompliance = async function(userId, year, month) {
   const budgets = await this.find({
     userId,
     year,
     month,
-    $expr: { $gt: ['$spent', '$amount'] } // Find budgets where spent > amount
+    $expr: { $gt: ['$spent', '$amount'] } 
   });
-  
-  return budgets.length === 0; // Return true if all budgets are within limit
+  return budgets.length === 0; 
 };
-
-// Middleware to update user's firstBudgetDate and check compliance
 budgetSchema.pre('save', async function(next) {
   try {
-    // Update firstBudgetDate if not set
     const user = await mongoose.model('User').findById(this.userId);
     if (!user.firstBudgetDate) {
       user.firstBudgetDate = new Date();
       await user.save();
     }
-    
-    // Check if this is a new budget for the current month
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1; // JavaScript months are 0-indexed
-    
+    const currentMonth = now.getMonth() + 1; 
     if (this.year === currentYear && this.month === currentMonth) {
       const isCompliant = await this.constructor.checkMonthlyCompliance(this.userId, currentYear, currentMonth);
-      
       if (isCompliant) {
         const monthStart = new Date(currentYear, currentMonth - 1, 1);
-        
-        // Add to compliance months if not already added
         if (!user.budgetComplianceMonths.some(d => 
           d.getMonth() === monthStart.getMonth() && 
           d.getFullYear() === monthStart.getFullYear()
@@ -102,8 +82,6 @@ budgetSchema.pre('save', async function(next) {
   } catch (error) {
     console.error('Error in budget pre-save hook:', error);
   }
-  
   next();
 });
-
 module.exports = mongoose.model('Budget', budgetSchema);

@@ -8,24 +8,19 @@ import MobileMenu from './MobileMenu';
 import { useAuth } from '../contexts/AuthContext';
 import { Menu, X, Bell } from 'lucide-react';
 import { Button } from './ui';
-
 function Navbar() {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   const isLandingPage = location.pathname === '/';
-  
-  if (isLandingPage && !user) return null; // Use Landing page's own nav
-
+  if (isLandingPage && !user) return null; 
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -43,10 +38,8 @@ function Navbar() {
             </nav>
           )}
         </div>
-
         <div className="flex items-center space-x-4">
           <ThemeToggle />
-          
           {user ? (
             <div className="flex items-center space-x-4">
               <button className="p-2 rounded-xl bg-gray-50 text-[#6B7280] hover:text-[#111827] transition-all">
@@ -70,7 +63,6 @@ function Navbar() {
           )}
         </div>
       </div>
-
       {user && (
         <MobileMenu
           isOpen={isMobileMenuOpen}
@@ -80,5 +72,4 @@ function Navbar() {
     </header>
   );
 }
-
 export default Navbar;

@@ -1,14 +1,11 @@
 const app = require('../app');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-
 dotenv.config();
-
 const connectDB = async () => {
     if (mongoose.connection.readyState >= 1) {
         return;
     }
-
     try {
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
@@ -20,7 +17,6 @@ const connectDB = async () => {
         throw error;
     }
 };
-
 module.exports = async (req, res) => {
     try {
         await connectDB();

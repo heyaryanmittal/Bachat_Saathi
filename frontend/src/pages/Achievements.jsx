@@ -10,7 +10,6 @@ import {
   CheckCircle2, Flame, Award
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 const Achievements = () => {
     const { user } = useAuth();
     const [achievements, setAchievements] = useState([]);
@@ -19,14 +18,12 @@ const Achievements = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('inventory');
     const [selectedBadge, setSelectedBadge] = useState(null);
-
     const badgeTiers = [
         { name: 'Bronze Saver', points: 1000, icon: <Award className="w-8 h-8"/>, color: 'from-amber-600 to-amber-400', desc: 'Congratulations on getting started!' },
         { name: 'Silver Saver', points: 5000, icon: <ShieldCheck className="w-8 h-8"/>, color: 'from-slate-400 to-slate-200', desc: 'You are building a solid financial base.' },
         { name: 'Gold Saver', points: 10000, icon: <Crown className="w-8 h-8"/>, color: 'from-yellow-500 to-yellow-200', desc: 'Expert at managing your expenses.' },
         { name: 'Platinum Saver', points: 25000, icon: <Zap className="w-8 h-8"/>, color: 'from-cyan-400 to-indigo-500', desc: 'Master of personal financial planning.' },
     ];
-
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
@@ -49,7 +46,6 @@ const Achievements = () => {
         };
         fetchData();
     }, [user]);
-
     const getCurrentTier = () => {
         if (userPoints >= 25000) return badgeTiers[3];
         if (userPoints >= 10000) return badgeTiers[2];
@@ -57,14 +53,11 @@ const Achievements = () => {
         if (userPoints >= 1000) return badgeTiers[0];
         return { name: 'Recruit', color: 'from-muted to-muted', desc: 'Initialize financial protocols.' };
     };
-
     if (isLoading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading achievements..." /></div>;
-
     const currentTier = getCurrentTier();
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-            {/* Current Status Card */}
+            {}
             <Card variant="glass" className="saas-card p-8 overflow-hidden relative group">
                 <div className="absolute top-0 right-0 w-64 h-64 gradient-primary opacity-10 blur-3xl -mr-32 -mt-32 group-hover:opacity-20 transition-opacity"></div>
                 <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
@@ -87,8 +80,7 @@ const Achievements = () => {
                     <Button variant="secondary" size="lg" className="hidden lg:flex" onClick={() => navigate('/leaderboard')}>View Leaderboard <ChevronRight className="ml-2 w-4 h-4"/></Button>
                 </div>
             </Card>
-
-            {/* Header (Actions/Points) */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
                 <div className="flex items-center gap-4 bg-muted/30 p-2 rounded-2xl border border-border/50">
                    <div className="px-6 py-2">
@@ -97,19 +89,17 @@ const Achievements = () => {
                    </div>
                 </div>
             </div>
-
-            {/* Tabs */}
+            {}
             <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
                 {['inventory', 'history'].map(t => (
                     <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t}</button>
                 ))}
             </div>
-
-            {/* Content */}
+            {}
             <AnimatePresence mode="wait">
                 {activeTab === 'inventory' ? (
                     <motion.div key="inv" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-12">
-                        {/* Badges Matrix */}
+                        {}
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                             {badgeTiers.map((b, i) => {
                                 const locked = userPoints < b.points;
@@ -126,8 +116,7 @@ const Achievements = () => {
                                 )
                             })}
                         </div>
-
-                        {/* Achievements Grid */}
+                        {}
                         <div className="space-y-8">
                             <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><Sparkles className="w-4 h-4 mr-2 text-primary" /> Unlocked Achievements</h3>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -183,8 +172,7 @@ const Achievements = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Badge Detail Modal */}
+            {}
             <AnimatePresence>
                 {selectedBadge && (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-background/90 backdrop-blur-xl" onClick={() => setSelectedBadge(null)}>
@@ -209,5 +197,4 @@ const Achievements = () => {
         </div>
     );
 };
-
 export default Achievements;

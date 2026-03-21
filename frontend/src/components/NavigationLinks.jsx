@@ -16,7 +16,6 @@ import {
   MoreHorizontal,
   ChevronDown
 } from 'lucide-react';
-
 const iconMap = {
   LayoutDashboard,
   CreditCard,
@@ -31,22 +30,17 @@ const iconMap = {
   MoreHorizontal,
   ChevronDown
 };
-
 function IconRenderer({ iconName, className = "h-5 w-5" }) {
   const IconComponent = iconMap[iconName];
   return IconComponent ? <IconComponent className={className} /> : null;
 }
-
 function NavigationLinks() {
   const location = useLocation();
   const [openDropdown, setOpenDropdown] = useState(null);
   const screenSize = useScreenSize();
-
   const isActive = (path) => {
     return location.pathname === path;
   };
-
-  // Check if a dropdown item or its children are active
   const isDropdownActive = (item) => {
     if (item.path && isActive(item.path)) return true;
     if (item.children) {
@@ -54,46 +48,36 @@ function NavigationLinks() {
     }
     return false;
   };
-
-  // Handle dropdown toggle
   const handleDropdownToggle = (itemName, e) => {
     e.preventDefault();
     setOpenDropdown(openDropdown === itemName ? null : itemName);
   };
-
-  // Handle dropdown item click
   const handleDropdownItemClick = () => {
     setOpenDropdown(null);
   };
-
-  // Get visible items based on screen size
   const getVisibleItems = () => {
     switch (screenSize) {
       case 'xl':
         return navigationItems;
       case 'lg':
-        return navigationItems.slice(0, 4); // Dashboard + Transactions dropdown + Debts + Reports
+        return navigationItems.slice(0, 4); 
       case 'md':
-        return navigationItems.slice(0, 3); // Dashboard + Transactions dropdown + Debts
+        return navigationItems.slice(0, 3); 
       default:
-        return navigationItems.slice(0, 2); // Dashboard + Transactions dropdown
+        return navigationItems.slice(0, 2); 
     }
   };
-
   const getHiddenItems = () => {
     const visible = getVisibleItems();
     return navigationItems.slice(visible.length);
   };
-
   const visibleItems = getVisibleItems();
   const hiddenItems = getHiddenItems();
-
   return (
     <div className="hidden md:flex items-center">
-      {/* Primary Navigation */}
+      {}
       <div className="flex items-center space-x-1 mr-3">
         {visibleItems.map((item) => {
-          // Render dropdown items
           if (item.type === 'dropdown') {
             return (
               <div key={item.name} className="relative">
@@ -112,17 +96,15 @@ function NavigationLinks() {
                   <span className="lg:hidden text-xs font-bold">{item.name.split(' ')[0]}</span>
                   <IconRenderer iconName="ChevronDown" className={`h-4 w-4 transition-transform duration-300 ${openDropdown === item.name ? 'rotate-180' : ''}`} />
                 </button>
-
-                {/* Dropdown Menu */}
+                {}
                 {openDropdown === item.name && (
                   <>
-                    {/* Backdrop */}
+                    {}
                     <div
                       className="fixed inset-0 z-40"
                       onClick={() => setOpenDropdown(null)}
                     />
-
-                    {/* Dropdown Content */}
+                    {}
                     <div className="absolute left-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-large border border-gray-200 dark:border-gray-700 z-50">
                       <div className="py-2">
                         <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
@@ -150,8 +132,6 @@ function NavigationLinks() {
               </div>
             );
           }
-
-          // Render regular navigation items
           return (
             <Link
               key={item.path}
@@ -171,8 +151,7 @@ function NavigationLinks() {
           );
         })}
       </div>
-
-      {/* More Menu - if there are hidden items */}
+      {}
       {hiddenItems.length > 0 && (
         <div className="relative">
           <button
@@ -182,17 +161,15 @@ function NavigationLinks() {
             <IconRenderer iconName="MoreHorizontal" className="h-5 w-5" />
             <span className="hidden lg:inline text-sm font-medium">More</span>
           </button>
-
-          {/* More Dropdown Menu */}
+          {}
           {openDropdown === 'more' && (
             <>
-              {/* Backdrop */}
+              {}
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setOpenDropdown(null)}
               />
-
-              {/* Dropdown Content */}
+              {}
               <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-large border border-gray-200 dark:border-gray-700 z-50">
                 <div className="py-2">
                   {hiddenItems.map((item) => {
@@ -220,7 +197,6 @@ function NavigationLinks() {
                         </div>
                       );
                     }
-
                     return (
                       <Link
                         key={item.path}
@@ -246,5 +222,4 @@ function NavigationLinks() {
     </div>
   );
 }
-
 export default NavigationLinks;

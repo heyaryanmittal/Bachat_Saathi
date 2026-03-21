@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui';
-
 function Dashboard() {
   const {
     transactions,
@@ -32,39 +31,30 @@ function Dashboard() {
     shouldRefresh,
     clearAllData,
   } = useFinanceStore();
-
   const { user } = useAuth();
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(false);
-
-  // Memoized data
   const { totalIncome, totalExpenses, incomeTrend, expenseTrend } = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-
     const currentMonthTransactions = transactions.filter(t => {
       const date = new Date(t.date || t.createdAt);
       return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
     });
-
     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
     const prevMonthTransactions = transactions.filter(t => {
       const date = new Date(t.date || t.createdAt);
       return date.getMonth() === prevMonth && date.getFullYear() === prevYear;
     });
-
     const calculateTotal = (txs, type) => txs
       .filter(t => String(t.type || '').toLowerCase().trim() === type)
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-
     const currentIncome = calculateTotal(currentMonthTransactions, 'income');
     const currentExpenses = calculateTotal(currentMonthTransactions, 'expense');
     const prevIncome = calculateTotal(prevMonthTransactions, 'income');
     const prevExpenses = calculateTotal(prevMonthTransactions, 'expense');
-
     const getTrend = (curr, prev) => prev > 0 ? ((curr - prev) / prev) * 100 : 0;
-
     return {
       totalIncome: currentIncome,
       totalExpenses: currentExpenses,
@@ -72,7 +62,6 @@ function Dashboard() {
       expenseTrend: getTrend(currentExpenses, prevExpenses).toFixed(1)
     };
   }, [transactions]);
-
   const expensesByCategory = useMemo(() => {
     const expenses = {};
     transactions
@@ -83,7 +72,6 @@ function Dashboard() {
       });
     return Object.entries(expenses).map(([name, value]) => ({ name, value }));
   }, [transactions]);
-
   const budgetVsSpent = useMemo(() => {
     const spentByCategory = {};
     transactions
@@ -92,14 +80,12 @@ function Dashboard() {
         const cat = t.category?.name || t.category || "Uncategorized";
         spentByCategory[cat] = (spentByCategory[cat] || 0) + Math.abs(Number(t.amount || 0));
       });
-
     return budgets.map(b => ({
       name: b.category || b.name,
       budget: Number(b.budgeted || 0),
       spent: spentByCategory[b.category || b.name] || Number(b.spent || 0)
     }));
   }, [budgets, transactions]);
-
   const incomeVsExpenseTrend = useMemo(() => {
     const daily = {};
     transactions.forEach(t => {
@@ -112,7 +98,6 @@ function Dashboard() {
     });
     return Object.values(daily).sort((a,b) => new Date(a.date) - new Date(b.date));
   }, [transactions]);
-
   useEffect(() => {
     const loadData = async () => {
       setIsAutoRefreshing(true);
@@ -123,9 +108,7 @@ function Dashboard() {
     const interval = setInterval(loadData, 60000);
     return () => clearInterval(interval);
   }, [fetchTransactions, fetchBudgets, shouldRefresh]);
-
   const hasData = transactions.length > 0 || budgets.length > 0;
-
   if (isLoading && transactions.length === 0) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
@@ -133,13 +116,11 @@ function Dashboard() {
       </div>
     );
   }
-
   if (!hasData) {
     return (
       <div className="h-[calc(100vh-140px)] flex flex-col justify-center animate-entrance selection:bg-primary/20 overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative px-6">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
-          
           <h2 className="text-4xl sm:text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
             Your <span className="text-primary italic">Financial Legacy</span> <br />
             Starts Right Here
@@ -147,7 +128,6 @@ function Dashboard() {
           <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 max-w-xl mx-auto leading-relaxed font-medium">
             Welcome, {user?.name || 'Saver'}. Start tracking your earnings and spending to unlock powerful AI insights and build wealth.
           </p>
-          
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             <Link to="/transactions" className="group relative p-6 rounded-[2rem] bg-white dark:bg-transparent border border-slate-200 dark:border-slate-800 hover:border-primary hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 text-left overflow-hidden">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 transition-all">
@@ -156,7 +136,6 @@ function Dashboard() {
               <h4 className="font-black text-xl mb-1 text-slate-900 dark:text-white tracking-tight">Record Transaction</h4>
               <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest opacity-70">Log income or expense</p>
             </Link>
-            
             <Link to="/budgets" className="group relative p-6 rounded-[2rem] bg-white dark:bg-transparent border border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500 text-left overflow-hidden">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4 transition-all">
                 <Target className="w-6 h-6 text-emerald-500" />
@@ -165,7 +144,6 @@ function Dashboard() {
               <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest opacity-70">Plan your monthly limits</p>
             </Link>
           </div>
-          
           <div className="max-w-xl mx-auto py-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around">
             <div className="text-center">
               <div className="text-2xl font-black text-slate-900 dark:text-white">10k+</div>
@@ -184,10 +162,9 @@ function Dashboard() {
       </div>
     );
   }
-
   return (
     <div className="space-y-6 animate-entrance pb-6 overflow-x-hidden">
-      {/* Welcome & Global Actions */}
+      {}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-lg shadow-slate-200/20 dark:shadow-black/20">
         <div className="space-y-1">
           <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
@@ -202,7 +179,6 @@ function Dashboard() {
             </span>
           </div>
         </div>
-        
         <div className="flex items-center gap-4 w-full lg:w-auto">
           <div className="flex-1 lg:flex-none flex flex-col items-end pr-4 border-r border-slate-200 dark:border-slate-800 hidden sm:flex text-right">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Net Surplus</span>
@@ -222,8 +198,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Hero Performance Stats */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
           title="Current Earnings"
@@ -248,8 +223,7 @@ function Dashboard() {
           variant="gradient"
         />
       </div>
-
-      {/* Core Insights Grid */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-stretch">
         <Card size="md" className="xl:col-span-1 saas-card relative overflow-hidden group">
           <div className="flex items-center space-x-3 mb-6 relative z-10">
@@ -272,7 +246,6 @@ function Dashboard() {
             )}
           </div>
         </Card>
-
         <Card size="md" className="xl:col-span-2 saas-card group overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <div className="flex items-center space-x-3">
@@ -296,8 +269,7 @@ function Dashboard() {
           </div>
         </Card>
       </div>
-
-      {/* Actionable Allocation */}
+      {}
       <Card size="md" className="saas-card">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
@@ -328,5 +300,4 @@ function Dashboard() {
     </div>
   );
 }
-
 export default Dashboard;

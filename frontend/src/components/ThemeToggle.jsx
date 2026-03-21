@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
-
 function ThemeToggle() {
   const { darkMode, toggleDarkMode } = useTheme();
-
   return (
     <button
       onClick={toggleDarkMode}
@@ -18,5 +16,4 @@ function ThemeToggle() {
     </button>
   );
 }
-
 export default ThemeToggle;

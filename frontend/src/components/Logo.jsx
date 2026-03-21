@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Wallet } from 'lucide-react';
-
 function Logo({ isLight = true, className = "", to = "/" }) {
   return (
     <div className={`flex items-center ${className}`}>
@@ -19,5 +18,4 @@ function Logo({ isLight = true, className = "", to = "/" }) {
     </div>
   );
 }
-
 export default Logo;

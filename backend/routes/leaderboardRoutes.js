@@ -2,19 +2,12 @@ const express = require('express');
 const router = express.Router();
 const leaderboardController = require('../controllers/leaderboardController');
 const { protect } = require('../utils/authMiddleware');
-
-// Public routes (no auth required)
 router.get('/monthly', leaderboardController.getMonthlyLeaderboard);
 router.get('/lifetime', leaderboardController.getLifetimeLeaderboard);
 router.get('/full', leaderboardController.getFullLeaderboard);
 router.get('/top-three', leaderboardController.getTopThree);
-
-// Protected routes (auth required)
 router.get('/user/stats', protect, leaderboardController.getUserStats);
 router.get('/user/context', protect, leaderboardController.getUserRankContext);
-
-// Admin routes (for development/testing)
 router.post('/recalculate', protect, leaderboardController.recalculateRanks);
 router.post('/recalculate-monthly', protect, leaderboardController.recalculateMonthlyPoints);
-
 module.exports = router;

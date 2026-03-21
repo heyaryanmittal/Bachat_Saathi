@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
 const COLORS = [
-  '#10B981', // Emerald
-  '#059669', // Medium Emerald
-  '#047857', // Dark Emerald
-  '#34D399', // Light Emerald
-  '#6EE7B7', // Mint
-  '#14B8A6', // Teal
-  '#0D9488', // Dark Teal
-  '#5EEAD4'  // Light Teal
+  '#10B981', 
+  '#059669', 
+  '#047857', 
+  '#34D399', 
+  '#6EE7B7', 
+  '#14B8A6', 
+  '#0D9488', 
+  '#5EEAD4'  
 ];
-
 function DonutChart({ data }) {
   const [hoveredSegment, setHoveredSegment] = useState(null);
   const hasData = Array.isArray(data) && data.length > 0 && data.some(d => d.value > 0);
-
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
@@ -29,17 +26,13 @@ function DonutChart({ data }) {
     }
     return null;
   };
-
   const totals = data.reduce((sum, item) => sum + item.value, 0);
-
   const handleMouseEnter = (_, index) => {
     setHoveredSegment(index);
   };
-
   const handleMouseLeave = () => {
     setHoveredSegment(null);
   };
-
   return (
     <div className="h-80 w-full flex items-center justify-center relative">
       {hasData ? (
@@ -97,8 +90,7 @@ function DonutChart({ data }) {
               />
             </PieChart>
           </ResponsiveContainer>
-
-          {/* Clean Center Totals */}
+          {}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Total</p>
@@ -122,5 +114,4 @@ function DonutChart({ data }) {
     </div>
   );
 }
-
 export default DonutChart;

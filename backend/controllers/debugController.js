@@ -4,18 +4,14 @@ const User = require('../models/User');
 const Leaderboard = require('../models/Leaderboard');
 const PointsLog = require('../models/PointsLog');
 const LeaderboardService = require('../services/leaderboardService');
-
-// Development-only endpoint to trigger a test email and return result
 exports.sendTestEmail = async (req, res) => {
   if (process.env.NODE_ENV === 'production') {
     return res.status(403).json({ ok: false, error: 'Debug endpoint disabled in production' });
   }
-
   const to = req.query.to || process.env.SMTP_USER || process.env.EMAIL_USER;
   if (!to) {
     return res.status(400).json({ ok: false, error: 'Missing `to` query param and no default sender configured' });
   }
-
   try {
     const result = await emailService.sendTestEmail(to);
     return res.json({ ok: true, result });
@@ -24,14 +20,10 @@ exports.sendTestEmail = async (req, res) => {
     return res.status(500).json({ ok: false, error: err && err.message ? err.message : String(err) });
   }
 };
-
-// Development-only endpoint to verify SMTP credentials without restarting
 exports.verifySmtp = async (req, res) => {
   if (process.env.NODE_ENV === 'production') {
     return res.status(403).json({ ok: false, error: 'Debug endpoint disabled in production' });
   }
-
-  // Build transporter options from env (same logic as emailService)
   const nodemailer = require('nodemailer');
   const transporterOptions = {
     service: process.env.SMTP_SERVICE,
@@ -46,7 +38,6 @@ exports.verifySmtp = async (req, res) => {
       rejectUnauthorized: process.env.NODE_TLS_REJECT_UNAUTHORIZED === '1' ? true : false
     }
   };
-
   try {
     const tempTransporter = nodemailer.createTransport(transporterOptions);
     await tempTransporter.verify();
@@ -56,44 +47,28 @@ exports.verifySmtp = async (req, res) => {
     return res.status(500).json({ ok: false, error: err && err.message ? err.message : String(err), details: err });
   }
 };
-
-// ================================
-// Populate Leaderboard from Users
-// ================================
 exports.populateLeaderboard = async (req, res) => {
   try {
     console.log('🚀 Starting leaderboard population via API...\n');
-
-    // Fetch all users
     const users = await User.find({}).select('_id name email');
     console.log(`📊 Found ${users.length} users`);
-
     if (users.length === 0) {
       return res.status(400).json({
         status: 'error',
         message: 'No users found in database'
       });
     }
-
-    // Clear existing leaderboard entries
     const deleteResult = await Leaderboard.deleteMany({});
     console.log(`🗑️ Cleared ${deleteResult.deletedCount} existing leaderboard entries`);
-
-    // Process each user
     let processedCount = 0;
     const userStats = [];
-
     for (const user of users) {
       try {
-        // Calculate total points from PointsLog
         const pointsResult = await PointsLog.aggregate([
           { $match: { userId: user._id } },
           { $group: { _id: null, total: { $sum: '$points' } } }
         ]);
-
         const totalPoints = pointsResult.length > 0 ? pointsResult[0].total : 0;
-
-        // Create leaderboard entry
         const leaderboardEntry = new Leaderboard({
           userId: user._id,
           username: user.name,
@@ -105,33 +80,24 @@ exports.populateLeaderboard = async (req, res) => {
           lastUpdated: new Date(),
           lastMonthlyReset: new Date()
         });
-
         await leaderboardEntry.save();
         userStats.push({
           username: user.name,
           lifetimePoints: totalPoints
         });
-
         processedCount++;
         console.log(`✅ [${processedCount}/${users.length}] ${user.name} - ${totalPoints} points`);
       } catch (error) {
         console.error(`❌ Error processing user ${user.name}:`, error.message);
       }
     }
-
     console.log(`✅ Created ${processedCount} leaderboard entries`);
-
-    // Calculate and assign ranks
     console.log('📈 Calculating ranks and assigning badges...');
     await LeaderboardService.calculateRanks();
-
-    // Fetch top 10
     const topUsers = await Leaderboard.find()
       .sort({ lifetimePoints: -1 })
       .limit(10)
       .select('username lifetimePoints lifetimeRank badges');
-
-    // Get statistics
     const avgPoints = await Leaderboard.aggregate([
       {
         $group: {
@@ -142,7 +108,6 @@ exports.populateLeaderboard = async (req, res) => {
         }
       }
     ]);
-
     res.json({
       status: 'success',
       message: 'Leaderboard populated successfully',
@@ -171,15 +136,10 @@ exports.populateLeaderboard = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Get Leaderboard Statistics
-// ================================
 exports.getLeaderboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalLeaderboardEntries = await Leaderboard.countDocuments();
-    
     const stats = await Leaderboard.aggregate([
       {
         $group: {
@@ -191,17 +151,13 @@ exports.getLeaderboardStats = async (req, res) => {
         }
       }
     ]);
-
     const topUser = await Leaderboard.findOne()
       .sort({ lifetimePoints: -1 })
       .select('username lifetimePoints');
-
     const bottomUser = await Leaderboard.findOne()
       .sort({ lifetimePoints: 1 })
       .select('username lifetimePoints');
-
     const usersWithBadges = await Leaderboard.countDocuments({ badges: { $exists: true, $ne: [] } });
-
     res.json({
       status: 'success',
       data: {
@@ -227,21 +183,14 @@ exports.getLeaderboardStats = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Recalculate Leaderboard Rankings
-// ================================
 exports.recalculateLeaderboard = async (req, res) => {
   try {
     console.log('🔄 Recalculating leaderboard rankings...');
-    
     await LeaderboardService.calculateRanks();
-
     const topUsers = await Leaderboard.find()
       .sort({ lifetimePoints: -1 })
       .limit(10)
       .select('username lifetimePoints lifetimeRank monthlyRank badges');
-
     res.json({
       status: 'success',
       message: 'Leaderboard recalculated successfully',
@@ -264,14 +213,9 @@ exports.recalculateLeaderboard = async (req, res) => {
     });
   }
 };
-
-// ================================
-// Reset Monthly Leaderboard
-// ================================
 exports.resetMonthlyLeaderboard = async (req, res) => {
   try {
     console.log('🔄 Resetting monthly leaderboard...');
-    
     const updated = await Leaderboard.updateMany(
       {},
       {
@@ -279,12 +223,8 @@ exports.resetMonthlyLeaderboard = async (req, res) => {
         lastMonthlyReset: new Date()
       }
     );
-
     console.log(`Updated ${updated.modifiedCount} entries`);
-
-    // Recalculate ranks
     await LeaderboardService.calculateRanks();
-
     res.json({
       status: 'success',
       message: 'Monthly leaderboard reset successfully',

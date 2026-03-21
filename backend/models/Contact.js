@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const contactSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -45,10 +44,7 @@ const contactSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-// Index for efficient querying
 contactSchema.index({ createdAt: -1 });
 contactSchema.index({ status: 1 });
 contactSchema.index({ isRead: 1 });
-
 module.exports = mongoose.model('Contact', contactSchema);

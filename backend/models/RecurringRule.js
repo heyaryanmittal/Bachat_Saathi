@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const recurringRuleSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -38,5 +37,4 @@ const recurringRuleSchema = new mongoose.Schema({
     type: Date
   }
 }, { timestamps: true });
-
 module.exports = mongoose.model('RecurringRule', recurringRuleSchema);

@@ -3,7 +3,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { expenseCategories } from "../config/categories";
 import { Button, Input } from "./ui";
 import { Tag, Calendar, Bell, DollarSign } from 'lucide-react';
-
 function BudgetForm({ onSubmit, initialData = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState: { errors }, setValue, control } = useForm({
@@ -14,9 +13,7 @@ function BudgetForm({ onSubmit, initialData = null }) {
       monthYear: initialData ? `${initialData.year}-${String(initialData.month).padStart(2, '0')}` : ''
     },
   });
-
   const watchAlertThreshold = useWatch({ control, name: 'alertThreshold', defaultValue: 80 });
-
   const handleFormSubmit = async (data) => {
     setIsLoading(true);
     try {
@@ -28,17 +25,15 @@ function BudgetForm({ onSubmit, initialData = null }) {
         month,
         year,
       });
-    } catch (e) { /* handled by parent */ }
+    } catch (e) {  }
     finally { setIsLoading(false); }
   };
-
   useEffect(() => {
     if (!initialData) {
       const today = new Date();
       setValue('monthYear', `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`);
     }
   }, [initialData, setValue]);
-
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,7 +51,6 @@ function BudgetForm({ onSubmit, initialData = null }) {
             </div>
             {errors.category && <p className="text-[10px] text-rose-500 font-bold ml-2 uppercase">{errors.category.message}</p>}
         </div>
-
         <Input
           label="Maximum Outbound (₹)"
           type="number"
@@ -64,14 +58,12 @@ function BudgetForm({ onSubmit, initialData = null }) {
           {...register("amount", { required: "Limit required", min: 0.01 })}
           error={errors.amount?.message}
         />
-
         <Input
           label="Strategy Period"
           type="month"
           {...register("monthYear", { required: "Period required" })}
           error={errors.monthYear?.message}
         />
-
         <div className="space-y-4">
             <div className="flex justify-between items-center px-2">
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Alert Threshold</label>
@@ -90,7 +82,6 @@ function BudgetForm({ onSubmit, initialData = null }) {
             <p className="text-[9px] text-muted-foreground font-medium px-2 italic">Receive telemetry alerts at {watchAlertThreshold}% consumption.</p>
         </div>
       </div>
-
       <Button
         type="submit"
         size="xl"
@@ -102,5 +93,4 @@ function BudgetForm({ onSubmit, initialData = null }) {
     </form>
   );
 }
-
 export default BudgetForm;

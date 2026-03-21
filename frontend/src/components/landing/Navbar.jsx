@@ -3,22 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { LandingButton as Button } from "./LandingButton";
 import { Menu, X } from "lucide-react";
 import Logo from "../Logo";
-
 const Navbar = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const links = [
     { label: "Features", href: "#features" },
     { label: "How It Works", href: "#how-it-works" },
     { label: "Pricing", href: "#pricing" },
   ];
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#EEA62B] shadow-2xl border-b border-white/5">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6 sm:px-8">
         <Logo variant="white" className="scale-110" />
-
         <div className="hidden md:flex items-center gap-2">
           {links.map((link) => (
             <a
@@ -30,7 +26,6 @@ const Navbar = () => {
             </a>
           ))}
         </div>
-
         <div className="hidden md:flex items-center gap-6">
           <button 
             onClick={() => navigate('/login')}
@@ -46,7 +41,6 @@ const Navbar = () => {
             Get Started
           </Button>
         </div>
-
         <button
           className="md:hidden text-foreground"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -54,7 +48,6 @@ const Navbar = () => {
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
-
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background px-6 py-4 space-y-3 animate-fade-up">
           {links.map((link) => (
@@ -76,5 +69,4 @@ const Navbar = () => {
     </nav>
   );
 };
-
 export default Navbar;

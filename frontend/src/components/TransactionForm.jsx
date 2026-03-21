@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { expenseCategories, incomeCategories } from '../config/categories';
 import { Button, Input } from './ui';
 import { Wallet, Tag, Calendar, PenTool, Hash } from 'lucide-react';
-
 const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({
@@ -12,9 +11,7 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
       date: new Date().toISOString().split('T')[0]
     }
   });
-
   const transactionType = watch('type');
-
   const onSubmitForm = async (data) => {
     try {
       setIsLoading(true);
@@ -30,12 +27,10 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
       if (typeof refreshWallets === 'function') await refreshWallets();
       if (!initialData) reset();
     } catch (error) {
-       // toast handled by parent
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -55,7 +50,6 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
              <input type="hidden" {...register('type')} />
           </div>
         </div>
-
         <Input
           label="Transmission Value (₹)"
           type="number"
@@ -63,7 +57,6 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
           {...register('amount', { required: "Value required", min: 0.01 })}
           error={errors.amount?.message}
         />
-
         <div className="space-y-2">
             <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Source Node</label>
             <div className="relative group">
@@ -78,7 +71,6 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
             </div>
             {errors.walletId && <p className="text-[10px] text-rose-500 font-bold ml-2 uppercase">{errors.walletId.message}</p>}
         </div>
-
         <div className="space-y-2">
             <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Classification</label>
             <div className="relative group">
@@ -95,21 +87,18 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
             </div>
             {errors.category && <p className="text-[10px] text-rose-500 font-bold ml-2 uppercase">{errors.category.message}</p>}
         </div>
-
         <Input
           label="Temporal Stamp"
           type="date"
           {...register('date', { required: "Date binary required" })}
           error={errors.date?.message}
         />
-
         <Input
           label="Meta Description"
           placeholder="Sync notes..."
           {...register('description')}
         />
       </div>
-
       <Button
         type="submit"
         size="xl"
@@ -121,5 +110,4 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
     </form>
   );
 };
-
 export default TransactionForm;

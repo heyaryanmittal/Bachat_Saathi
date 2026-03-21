@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-
 const stats = [
   { value: "2.4L+", label: "Active savers" },
   { value: "₹127Cr", label: "Tracked this month" },
   { value: "4.8★", label: "App Store rating" },
   { value: "18%", label: "Avg. savings increase" },
 ];
-
 const StatsSection = () => {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setVisible(true); },
@@ -19,7 +16,6 @@ const StatsSection = () => {
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
-
   return (
     <section className="py-20 bg-background" ref={ref}>
       <div className="container mx-auto px-6">
@@ -43,5 +39,4 @@ const StatsSection = () => {
     </section>
   );
 };
-
 export default StatsSection;

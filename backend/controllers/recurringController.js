@@ -1,8 +1,6 @@
 const RecurringRule = require('../models/RecurringRule');
 const Wallet = require('../models/Wallet');
 const { getNextRunDate } = require('../cronJobs/recurringTransactions');
-
-// Create recurring rule
 exports.createRecurringRule = async (req, res) => {
   try {
     const {
@@ -14,22 +12,17 @@ exports.createRecurringRule = async (req, res) => {
       startDate,
       endsAt
     } = req.body;
-
-    // Validate wallet
     const wallet = await Wallet.findOne({
       _id: walletId,
       userId: req.user.id
     });
-
     if (!wallet) {
       return res.status(404).json({
         status: 'error',
         message: 'Wallet not found'
       });
     }
-
     const nextRunAt = getNextRunDate(cadence, startDate ? new Date(startDate) : new Date());
-
     const recurringRule = await RecurringRule.create({
       userId: req.user.id,
       walletId,
@@ -40,7 +33,6 @@ exports.createRecurringRule = async (req, res) => {
       nextRunAt,
       endsAt: endsAt ? new Date(endsAt) : null
     });
-
     res.status(201).json({
       status: 'success',
       data: { recurringRule }
@@ -53,14 +45,11 @@ exports.createRecurringRule = async (req, res) => {
     });
   }
 };
-
-// Get all recurring rules for user
 exports.getRecurringRules = async (req, res) => {
   try {
     const rules = await RecurringRule.find({
       userId: req.user.id
     }).populate('walletId', 'name type');
-
     res.status(200).json({
       status: 'success',
       data: { rules }
@@ -73,22 +62,18 @@ exports.getRecurringRules = async (req, res) => {
     });
   }
 };
-
-// Get single recurring rule
 exports.getRecurringRule = async (req, res) => {
   try {
     const rule = await RecurringRule.findOne({
       _id: req.params.id,
       userId: req.user.id
     }).populate('walletId', 'name type');
-
     if (!rule) {
       return res.status(404).json({
         status: 'error',
         message: 'Recurring rule not found'
       });
     }
-
     res.status(200).json({
       status: 'success',
       data: { rule }
@@ -101,8 +86,6 @@ exports.getRecurringRule = async (req, res) => {
     });
   }
 };
-
-// Update recurring rule
 exports.updateRecurringRule = async (req, res) => {
   try {
     const {
@@ -111,32 +94,26 @@ exports.updateRecurringRule = async (req, res) => {
       cadence,
       endsAt
     } = req.body;
-
     const updates = {
       amount,
       category,
       cadence,
       endsAt: endsAt ? new Date(endsAt) : null
     };
-
-    // If cadence is updated, recalculate next run date
     if (cadence) {
       updates.nextRunAt = getNextRunDate(cadence);
     }
-
     const rule = await RecurringRule.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       updates,
       { new: true, runValidators: true }
     ).populate('walletId', 'name type');
-
     if (!rule) {
       return res.status(404).json({
         status: 'error',
         message: 'Recurring rule not found'
       });
     }
-
     res.status(200).json({
       status: 'success',
       data: { rule }
@@ -149,22 +126,18 @@ exports.updateRecurringRule = async (req, res) => {
     });
   }
 };
-
-// Delete recurring rule
 exports.deleteRecurringRule = async (req, res) => {
   try {
     const rule = await RecurringRule.findOneAndDelete({
       _id: req.params.id,
       userId: req.user.id
     });
-
     if (!rule) {
       return res.status(404).json({
         status: 'error',
         message: 'Recurring rule not found'
       });
     }
-
     res.status(200).json({
       status: 'success',
       message: 'Recurring rule deleted successfully'

@@ -13,23 +13,19 @@ import {
   BarChart as ReBar, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { toast } from 'react-hot-toast';
-
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
-
 const DATE_RANGES = [
   { value: 'week', label: 'Last 7 Days' },
   { value: 'month', label: 'This Month' },
   { value: 'quarter', label: 'Last 3 Months' },
   { value: 'year', label: 'Annual View' },
 ];
-
 const Reports = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('spending');
     const [dateRange, setDateRange] = useState('month');
     const [isLoading, setIsLoading] = useState(true);
     const [reportData, setReportData] = useState({ spending: null, income: null, budget: null });
-
     const getDateParams = useMemo(() => {
         const now = new Date();
         switch (dateRange) {
@@ -40,7 +36,6 @@ const Reports = () => {
             default: return {};
         }
     }, [dateRange]);
-
     const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -56,9 +51,7 @@ const Reports = () => {
         } catch (e) { toast.error('Telemetry timeout.'); }
         finally { setIsLoading(false); }
     };
-
     useEffect(() => { fetchData(); }, [activeTab, dateRange]);
-
     const renderHeader = () => (
         <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
             <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50">
@@ -69,7 +62,6 @@ const Reports = () => {
             </div>
         </div>
     );
-
     const renderTabs = () => (
         <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
             {['spending', 'income', 'budget'].map(t => (
@@ -77,7 +69,6 @@ const Reports = () => {
             ))}
         </div>
     );
-
     const SpendingView = () => {
         const d = reportData.spending || { categories: [] };
         const chartData = (d.categories || []).map(c => ({ name: c._id, value: c.total }));
@@ -123,7 +114,6 @@ const Reports = () => {
             </div>
         );
     };
-
     const IncomeView = () => {
         const d = reportData.income || { sources: [] };
         const chartData = (d.sources || []).map(s => ({ name: s._id, value: s.total }));
@@ -150,7 +140,6 @@ const Reports = () => {
             </div>
         );
     };
-
     const BudgetView = () => {
         const d = reportData.budget || { budgets: [], categories: [] };
         const list = d.budgets || d.categories || [];
@@ -193,7 +182,6 @@ const Reports = () => {
             </div>
         );
     };
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {isLoading ? (
@@ -208,5 +196,4 @@ const Reports = () => {
         </div>
     );
 };
-
 export default Reports;

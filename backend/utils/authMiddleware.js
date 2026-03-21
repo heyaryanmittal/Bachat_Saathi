@@ -1,15 +1,11 @@
-// backend/middleware/authMiddleware.js
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const logger = require('./logger');
 const { JWT_SECRET } = require('./jwt');
-
-// Protect routes middleware
 const protect = async (req, res, next) => {
   try {
-    // Get token from header
     const authHeader = req.headers.authorization;
-    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         status: 'error',
@@ -17,9 +13,7 @@ const protect = async (req, res, next) => {
         code: 'NO_TOKEN'
       });
     }
-
     const token = authHeader.split(' ')[1];
-    
     if (!token) {
       return res.status(401).json({
         status: 'error',
@@ -27,14 +21,9 @@ const protect = async (req, res, next) => {
         code: 'INVALID_TOKEN_FORMAT'
       });
     }
-
     try {
-      // Verify token
       const decoded = jwt.verify(token, JWT_SECRET);
-      
-      // Get user from the token
       const user = await User.findById(decoded.id).select('-passwordHash');
-      
       if (!user) {
         return res.status(401).json({
           status: 'error',
@@ -42,13 +31,10 @@ const protect = async (req, res, next) => {
           code: 'USER_NOT_FOUND'
         });
       }
-
-      // Add user to request object
       req.user = user;
       next();
     } catch (error) {
       logger.error('Token verification failed:', error);
-      
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({
           status: 'error',
@@ -56,7 +42,6 @@ const protect = async (req, res, next) => {
           code: 'TOKEN_EXPIRED'
         });
       }
-      
       return res.status(401).json({
         status: 'error',
         message: 'Invalid token',
@@ -73,8 +58,6 @@ const protect = async (req, res, next) => {
     });
   }
 };
-
-// Admin middleware
 const admin = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     next();
@@ -86,5 +69,4 @@ const admin = (req, res, next) => {
     });
   }
 };
-
 module.exports = { protect, admin };

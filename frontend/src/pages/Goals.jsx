@@ -8,7 +8,6 @@ import {
   DollarSign, Briefcase, Zap, Star
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 const Goals = () => {
     const [goals, setGoals] = useState([]);
     const [stats, setStats] = useState({});
@@ -20,9 +19,7 @@ const Goals = () => {
     const [newGoal, setNewGoal] = useState({ title: '', description: '', targetAmount: '', deadline: '', category: 'other' });
     const [savingsAmount, setSavingsAmount] = useState('');
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null, isDeleting: false });
-
     useEffect(() => { fetchGoals(); fetchGoalStats(); }, []);
-
     const fetchGoals = async () => {
         try {
             setIsLoading(true);
@@ -34,14 +31,12 @@ const Goals = () => {
         } catch (e) { toast.error('Failed to load goals.'); }
         finally { setIsLoading(false); }
     };
-
     const fetchGoalStats = async () => {
         try {
             const res = await api.getGoalStats();
             setStats(res.data.data);
-        } catch (e) { /* silent */ }
+        } catch (e) {  }
     };
-
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
@@ -52,7 +47,6 @@ const Goals = () => {
             fetchGoals(); fetchGoalStats();
         } catch (e) { toast.error('Failed to create goal.'); }
     };
-
     const handleSavings = async (e) => {
         e.preventDefault();
         try {
@@ -63,7 +57,6 @@ const Goals = () => {
             fetchGoals(); fetchGoalStats();
         } catch (e) { toast.error('Failed to add savings.'); }
     };
-
     const confirmDelete = async () => {
         try {
             setDeleteDialog(p => ({ ...p, isDeleting: true }));
@@ -73,45 +66,38 @@ const Goals = () => {
             fetchGoals(); fetchGoalStats();
         } catch (e) { toast.error('Failed to delete.'); }
     };
-
     const getIcon = (cat) => {
         const map = { emergency: Zap, vacation: Plane, car: Car, house: Home, education: GraduationCap, investment: TrendingUp, other: Star };
         const Icon = map[cat] || Star;
         return <Icon className="w-6 h-6" />;
     };
-
     const filtered = goals.filter(g => {
         if (activeTab === 'all') return true;
         return g.status === activeTab;
     });
-
     if (isLoading && !goals.length) {
         return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading goals..." /></div>;
     }
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-            {/* Stats Bar */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                 <StatsCard title="Total Goals" value={stats.totalGoals || 0} variant="primary" icon={<Target />} />
                 <StatsCard title="Completed" value={stats.completedGoals || 0} variant="success" icon={<CheckCircle />} />
                 <StatsCard title="Total Saved" value={stats.totalSavedAmount || 0} variant="gradient" icon={<Briefcase />} />
                 <StatsCard title="Success Rate" value={(stats.totalGoals > 0 ? Math.round((stats.completedGoals / stats.totalGoals) * 100) : 0) + '%'} variant="secondary" icon={<TrendingUp />} />
             </div>
-
-            {/* SaaS Header (Actions) */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
                 <Button onClick={() => setShowCreateModal(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />New Goal</Button>
             </div>
-
-            {/* Main Tabs */}
+            {}
             <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
                 {['all', 'in-progress', 'completed'].map(t => (
                     <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t.replace('-', ' ')}</button>
                 ))}
             </div>
-
-            {/* Goals Grid */}
+            {}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filtered.length === 0 ? (
                     <div className="col-span-full py-20 text-center glass-card border-dashed p-10 border-2">
@@ -135,9 +121,7 @@ const Goals = () => {
                                 </div>
                                 <Button variant="secondary" size="sm" onClick={() => setDeleteDialog({ isOpen: true, id: g._id, isDeleting: false })}><Trash2 className="w-4 h-4 text-rose-500" /></Button>
                             </div>
-
                             <p className="text-sm text-muted-foreground mb-8 flex-grow italic line-clamp-2">{g.description || 'No description provided.'}</p>
-
                             <div className="space-y-4 mb-8">
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
                                     <span className="text-muted-foreground">Goal Progress</span>
@@ -157,7 +141,6 @@ const Goals = () => {
                                     </div>
                                 </div>
                             </div>
-
                             <div className="flex items-center justify-between mt-auto">
                                 <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center">
                                     <Calendar className="w-3.5 h-3.5 mr-1" />
@@ -171,8 +154,7 @@ const Goals = () => {
                     ))
                 )}
             </div>
-
-            {/* Create Goal Modal */}
+            {}
             {showCreateModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
@@ -202,8 +184,7 @@ const Goals = () => {
                     </Card>
                 </div>
             )}
-
-            {/* Savings Modal */}
+            {}
             {showSavingsModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="xl">
@@ -218,8 +199,7 @@ const Goals = () => {
                     </Card>
                 </div>
             )}
-
-            {/* Delete Modal */}
+            {}
             {deleteDialog.isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
@@ -236,5 +216,4 @@ const Goals = () => {
         </div>
     );
 };
-
 export default Goals;

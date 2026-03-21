@@ -9,13 +9,11 @@ import {
   Save, X, Camera, TrendingUp, Calendar, Mail, 
   ChevronLeft, Smartphone, Globe, Lock, Star, CheckCircle
 } from 'lucide-react';
-
 const TABS = [
   { id: 'overview', label: 'Identity', icon: User },
   { id: 'settings', label: 'Preferences', icon: Settings },
   { id: 'security', label: 'Vault', icon: Shield },
 ];
-
 const Profile = () => {
     const { user, updateUser } = useAuth();
     const navigate = useNavigate();
@@ -28,7 +26,6 @@ const Profile = () => {
     const [show2FAModal, setShow2FAModal] = useState(false);
     const [otp, setOtp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     useEffect(() => {
         if (user) {
             setEditedUser({
@@ -40,17 +37,15 @@ const Profile = () => {
             });
         }
     }, [user]);
-
     useEffect(() => {
         const fetch2FA = async () => {
             try {
                 const res = await api.get('/auth/2fa/status');
                 setIs2FAEnabled(res.data.is2FAEnabled);
-            } catch (e) { /* silent */ }
+            } catch (e) {  }
         };
         fetch2FA();
     }, []);
-
     const handleSave = async () => {
         try {
             setIsSaving(true);
@@ -60,7 +55,6 @@ const Profile = () => {
         } catch (e) { toast.error('Sync failed.'); }
         finally { setIsSaving(false); }
     };
-
     const handleEnable2FA = async () => {
         try {
             setIsLoading(true);
@@ -70,7 +64,6 @@ const Profile = () => {
         } catch (e) { toast.error('Stream error.'); }
         finally { setIsLoading(false); }
     };
-
     const handleVerifyOtp = async () => {
         try {
             setIsLoading(true);
@@ -81,16 +74,14 @@ const Profile = () => {
         } catch (e) { toast.error('Integrity failure.'); }
         finally { setIsLoading(false); }
     };
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-            {/* SaaS Header */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
                 <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg"><ChevronLeft className="mr-2 w-5 h-5" />Back to Matrix</Button>
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Sidebar Navigation */}
+                {}
                 <Card variant="glass" className="lg:col-span-1 h-fit sticky top-24 p-2">
                     <div className="space-y-1">
                         {TABS.map(tab => {
@@ -108,8 +99,7 @@ const Profile = () => {
                         })}
                     </div>
                 </Card>
-
-                {/* Main Content Area */}
+                {}
                 <div className="lg:col-span-3 space-y-8">
                     {activeTab === 'overview' && (
                         <>
@@ -147,7 +137,6 @@ const Profile = () => {
                                     </Button>
                                 </div>
                             </Card>
-
                             <Card variant="glass" className="saas-card p-8 space-y-8">
                                 <div className="flex items-center space-x-2 text-primary">
                                     <Smartphone className="w-5 h-5" />
@@ -176,7 +165,6 @@ const Profile = () => {
                             </Card>
                         </>
                     )}
-
                     {activeTab === 'settings' && (
                         <Card variant="glass" className="saas-card p-8 space-y-8">
                              <div className="flex items-center space-x-2 text-primary">
@@ -194,7 +182,6 @@ const Profile = () => {
                                     </div>
                                     <input type="checkbox" className="w-6 h-6 border-2 border-primary rounded accent-primary bg-transparent focus:ring-primary" checked={user?.emailNotificationsEnabled} readOnly />
                                 </div>
-
                                 <div className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-2xl hover:bg-muted/30 transition-colors">
                                     <div className="flex items-center space-x-4">
                                         <div className="p-3 bg-amber-500/10 rounded-xl"><Lock className="w-6 h-6 text-amber-500" /></div>
@@ -208,7 +195,6 @@ const Profile = () => {
                             </div>
                         </Card>
                     )}
-
                     {activeTab === 'security' && (
                         <Card variant="glass" className="saas-card p-8 space-y-8">
                              <div className="flex items-center space-x-2 text-rose-500">
@@ -226,7 +212,6 @@ const Profile = () => {
                                     </div>
                                     <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>Change Password</Button>
                                 </div>
-
                                 <div className="p-6 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
                                     <div className="flex items-center space-x-4">
                                          <div className={`p-3 rounded-xl ${is2FAEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}><Smartphone className={`w-6 h-6 ${is2FAEnabled ? 'text-emerald-500' : 'text-muted-foreground'}`} /></div>
@@ -246,8 +231,7 @@ const Profile = () => {
                     )}
                 </div>
             </div>
-
-            {/* 2FA Modal */}
+            {}
             {show2FAModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="xl">
@@ -265,5 +249,4 @@ const Profile = () => {
         </div>
     );
 };
-
 export default Profile;

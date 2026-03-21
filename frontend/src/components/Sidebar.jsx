@@ -22,7 +22,6 @@ import {
   Menu,
   X
 } from 'lucide-react';
-
 const iconMap = {
   LayoutDashboard,
   CreditCard,
@@ -37,21 +36,17 @@ const iconMap = {
   Crown,
   ChevronDown
 };
-
 function IconRenderer({ iconName, className = "h-5 w-5" }) {
   const IconComponent = iconMap[iconName];
   return IconComponent ? <IconComponent className={className} /> : null;
 }
-
 function Sidebar() {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { darkMode } = useTheme();
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
   const isActive = (path) => location.pathname === path;
-
   const isDropdownActive = (item) => {
     if (item.path && isActive(item.path)) return true;
     if (item.children) {
@@ -59,16 +54,13 @@ function Sidebar() {
     }
     return false;
   };
-
   const toggleDropdown = (name) => {
     setOpenDropdown(openDropdown === name ? null : name);
   };
-
   const NavItem = ({ item, isChild = false }) => {
     const active = isActive(item.path);
     const hasChildren = item.type === 'dropdown';
     const dropdownOpen = openDropdown === item.name || isDropdownActive(item);
-
     if (hasChildren) {
       return (
         <div className="space-y-1">
@@ -85,7 +77,6 @@ function Sidebar() {
             </div>
             <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${openDropdown === item.name ? 'rotate-180' : ''}`} />
           </button>
-          
           {(openDropdown === item.name || isDropdownActive(item)) && (
             <div className="pl-12 space-y-1 animate-scale-in origin-top">
               {item.children.map((child) => (
@@ -107,7 +98,6 @@ function Sidebar() {
         </div>
       );
     }
-
     return (
       <Link
         to={item.path}
@@ -122,32 +112,28 @@ function Sidebar() {
       </Link>
     );
   };
-
   return (
     <>
-      {/* Mobile Toggle */}
+      {}
       <button 
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="lg:hidden fixed bottom-6 right-6 z-50 p-4 bg-primary text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all"
       >
         {isMobileOpen ? <X /> : <Menu />}
       </button>
-
-      {/* Backdrop */}
+      {}
       {isMobileOpen && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
-
-      {/* Sidebar Sidebar Container */}
+      {}
       <aside className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/50 z-40 transition-transform duration-500 lg:translate-x-0 
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        
-        {/* Sidebar Content */}
+        {}
         <div className="flex flex-col h-full p-6">
-          {/* Logo Section */}
+          {}
           <div className="mb-10 px-2 group">
             <Logo 
               to="/dashboard" 
@@ -155,15 +141,13 @@ function Sidebar() {
               isLight={darkMode} 
             />
           </div>
-
-          {/* Navigation Items */}
+          {}
           <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2">
             {navigationItems.map((item) => (
               <NavItem key={item.name} item={item} />
             ))}
           </nav>
-
-          {/* User Profile / Logout */}
+          {}
           <div className="mt-auto pt-6 border-t border-slate-800/50 space-y-4">
             <Link 
               to="/profile" 
@@ -181,7 +165,6 @@ function Sidebar() {
                 </div>
               </div>
             </Link>
-
             <button 
               onClick={logout}
               className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 group"
@@ -195,5 +178,4 @@ function Sidebar() {
     </>
   );
 }
-
 export default Sidebar;

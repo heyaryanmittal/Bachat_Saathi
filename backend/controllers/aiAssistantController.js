@@ -1,5 +1,4 @@
 const { generateGeminiContent } = require('../services/geminiService');
-
 const getGeminiResponse = async (req, res) => {
   try {
     const prompt = req.body.prompt;
@@ -13,8 +12,6 @@ const getGeminiResponse = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 const Transaction = require('../models/Transaction');
 const Wallet = require('../models/Wallet');
 const Budget = require('../models/Budget');
@@ -27,33 +24,21 @@ const RecurringRule = require('../models/RecurringRule');
 const Leaderboard = require('../models/Leaderboard');
 const axios = require('axios');
 require('dotenv').config();
-
-// System message to set the context for the AI assistant
 const SYSTEM_MESSAGE = `You are a helpful financial assistant for BachatSaathi, a personal finance app. 
 You help users understand their spending, savings, and financial habits.
 Only provide information based on the user's transaction data and financial context.
 Be concise, helpful, and professional in your responses.`;
-
-
-
-// Get comprehensive financial context for the AI assistant
 const getFinancialContext = async (userId, period = '6 months') => {
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-  // Fetch recent transactions first
   let transactions = await Transaction.find({ userId, date: { $gte: sixMonthsAgo } }).sort({ date: -1 }).limit(50);
-  // If no recent transactions, fetch all transactions for the user (fallback)
   if (!transactions || transactions.length === 0) {
     transactions = await Transaction.find({ userId }).sort({ date: -1 }).limit(50);
   }
-  // Debug: Log all fetched transactions and their types
   console.log('DEBUG: Transactions fetched for user', userId);
   transactions.forEach(t => {
     console.log(`  - Date: ${t.date}, Type: '${t.type}', Amount: ${t.amount}, Category: '${t.category}'`);
   });
-
-  // Fetch all user-related data
   const [
     wallets,
     budgets,
@@ -75,36 +60,17 @@ const getFinancialContext = async (userId, period = '6 months') => {
     RecurringRule.find({ userId }),
     Leaderboard.findOne({ userId })
   ]);
-
-  // Calculate basic financial metrics
   const income = transactions.filter(t => (t.type || '').trim().toLowerCase() === 'income').reduce((sum, t) => sum + t.amount, 0);
   const expenses = transactions.filter(t => (t.type || '').trim().toLowerCase() === 'expense').reduce((sum, t) => sum + t.amount, 0);
-
-  // Summarize wallets
   const walletSummary = wallets.map(w => `${w.name} (${w.type}): ₹${w.currentBalance}`).join('; ');
-
-  // Summarize budgets
   const budgetSummary = budgets.map(b => `${b.category}: ₹${b.spent}/₹${b.amount} (${b.month}/${b.year})`).join('; ');
-
-  // Summarize goals
   const goalSummary = goals.map(g => `${g.title}: ₹${g.savedAmount}/₹${g.targetAmount} (${g.status})`).join('; ');
-
-  // Summarize debts
   const debtSummary = debts.map(d => `${d.title}: ₹${d.remainingAmount}/₹${d.amount} (${d.status})`).join('; ');
-
-  // Net worth
   const netWorthValue = netWorth && netWorth.length > 0 ? netWorth[0].netWorth : null;
-
-  // Points
   const totalPoints = leaderboard ? leaderboard.lifetimePoints : 0;
   const monthlyPoints = leaderboard ? leaderboard.monthlyPoints : 0;
-
-  // Monthly savings
   const savingsSummary = monthlySavings.map(ms => `${ms.month}/${ms.year}: ₹${ms.netSavings} (${ms.tier})`).join('; ');
-
-  // Recurring rules
   const recurringSummary = recurringRules.map(r => `${r.type}: ₹${r.amount} (${r.category}, ${r.cadence})`).join('; ');
-
   return {
     income,
     expenses,
@@ -119,29 +85,20 @@ const getFinancialContext = async (userId, period = '6 months') => {
     savingsSummary,
     recurringSummary,
     period,
-    transactions // include the actual transactions for further analysis
+    transactions 
   };
 };
-
-
-
-// Chat with AI Assistant
 const chatWithAssistant = async (req, res) => {
   try {
     const { message } = req.body;
     const userId = req.user.id;
-
     if (!message) {
       return res.status(400).json({
         status: 'error',
         message: 'Message is required'
       });
     }
-
-    // Get financial context
     const financialContext = await getFinancialContext(userId);
-
-    // Build a rich context string for the AI
     let context = `User's Financial Summary:
 Income: ₹${financialContext.income}
 Expenses: ₹${financialContext.expenses}
@@ -154,13 +111,9 @@ Net Worth: ₹${financialContext.netWorth}
 Points: Lifetime ${financialContext.totalPoints}, Monthly ${financialContext.monthlyPoints}
 Monthly Savings: ${financialContext.savingsSummary}
 Recurring: ${financialContext.recurringSummary}`;
-
-    // If there are transactions, add a category breakdown for expenses (robust)
     if (financialContext.transactions && financialContext.transactions.length > 0) {
       const expenseTransactions = financialContext.transactions.filter(t => (t.type || '').trim().toLowerCase() === 'expense');
       const incomeTransactions = financialContext.transactions.filter(t => (t.type || '').trim().toLowerCase() === 'income');
-
-      // Breakdown for Expenses
       if (expenseTransactions.length > 0) {
         const categoryTotals = {};
         expenseTransactions.forEach(t => {
@@ -177,8 +130,6 @@ Recurring: ${financialContext.recurringSummary}`;
           });
         }
       }
-
-      // Breakdown for Income
       if (incomeTransactions.length > 0) {
         const incomeTotals = {};
         incomeTransactions.forEach(t => {
@@ -196,18 +147,10 @@ Recurring: ${financialContext.recurringSummary}`;
         }
       }
     }
-
-    // Compose prompt for Gemini 2.5 Flash
     const prompt = `${SYSTEM_MESSAGE}\n${context}\nUser: ${message}`;
-
-
-    // Gemini 2.5 Flash expects an array of messages
     const geminiMessages = [{ parts: [{ text: prompt }] }];
     const geminiResult = await generateGeminiContent(geminiMessages);
     let aiResponse = geminiResult?.candidates?.[0]?.content?.parts?.[0]?.text || null;
-
-    // AI Response is already generated above. We rely on the AI to answer the specific question.
-
     if (!aiResponse) {
       return res.status(502).json({
         status: 'error',
@@ -215,7 +158,6 @@ Recurring: ${financialContext.recurringSummary}`;
         error: 'Gemini API error.'
       });
     }
-
     return res.json({
       status: 'success',
       data: {
@@ -237,10 +179,6 @@ Recurring: ${financialContext.recurringSummary}`;
     });
   }
 };
-
-
-
-
 module.exports = {
   getGeminiResponse,
   chatWithAssistant

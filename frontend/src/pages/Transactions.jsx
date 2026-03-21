@@ -7,7 +7,6 @@ import {
   Calendar, CreditCard, Filter, ChevronLeft, ChevronRight, Layers
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [allTransactions, setAllTransactions] = useState([]);
@@ -20,17 +19,14 @@ const Transactions = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, transaction: null, isDeleting: false });
-
   useEffect(() => { fetchWallets(); }, []);
   useEffect(() => { fetchTransactions(); fetchAllStats(); }, [currentPage, filters]);
-
   const fetchWallets = async () => {
     try {
       const response = await api.getWallets();
       setWallets(response.data.data.wallets || []);
     } catch (e) { toast.error('Failed to sync wallets.'); }
   };
-
   const fetchTransactions = async () => {
     try {
       setIsLoading(true);
@@ -40,14 +36,12 @@ const Transactions = () => {
     } catch (e) { toast.error('Failed to load transactions.'); }
     finally { setIsLoading(false); }
   };
-
   const fetchAllStats = async () => {
     try {
       const response = await api.getTransactions({ ...filters, limit: 1000, page: 1 });
       setAllTransactions(response.data.data.transactions || []);
-    } catch (e) { /* silent fail */ }
+    } catch (e) {  }
   };
-
   const handleAction = async (data, isEdit) => {
     try {
       const payload = { ...data, notes: data.description || data.notes };
@@ -62,7 +56,6 @@ const Transactions = () => {
       fetchTransactions(); fetchAllStats();
     } catch (e) { toast.error('Failed to save transaction.'); }
   };
-
   const confirmDelete = async () => {
     try {
       setDeleteDialog(p => ({ ...p, isDeleting: true }));
@@ -72,29 +65,25 @@ const Transactions = () => {
       fetchTransactions(); fetchAllStats();
     } catch (e) { toast.error('Failed to delete.'); }
   };
-
   const stats = useMemo(() => {
     const income = allTransactions.filter(t => t.type?.toLowerCase() === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
     const expense = allTransactions.filter(t => t.type?.toLowerCase() === 'expense').reduce((s, t) => s + Number(t.amount || 0), 0);
     return { income, expense, net: income - expense };
   }, [allTransactions]);
-
   if (isLoading && !transactions.length) {
     return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading transactions..." /></div>;
   }
-
   return (
     <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-      {/* Stats QuickView */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatsCard title="Total Income" value={stats.income} variant="success" icon={<TrendingUp />} />
         <StatsCard title="Total Expense" value={stats.expense} variant="error" icon={<TrendingDown />} />
         <StatsCard title="Net Balance" value={stats.net} variant="gradient" icon={<Layers />} />
       </div>
-
-      {/* Main Content Area */}
+      {}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-        {/* Sidebar Filters */}
+        {}
         <div className="xl:col-span-1 space-y-6">
             <Card variant="glass" className="h-fit sticky top-24">
                 <div className="flex items-center space-x-2 mb-6">
@@ -123,14 +112,12 @@ const Transactions = () => {
                 </div>
             </Card>
         </div>
-
-        {/* List Protocol */}
+        {}
         <div className="xl:col-span-3 space-y-6">
-            {/* Header (Actions) - Moved inside to fix alignment */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 mb-2">
                 <Button onClick={() => setIsCreating(true)} className="btn-saas-primary shadow-lg shadow-primary/20" size="lg"><Plus className="mr-2 w-5 h-5" />New Transaction</Button>
             </div>
-
             <Card className="p-0 overflow-hidden saas-card">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
@@ -180,8 +167,7 @@ const Transactions = () => {
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination Protocol */}
+                {}
                 <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between">
                     <p className="text-xs font-bold text-muted-foreground">Page {currentPage} of {totalPages}</p>
                     <div className="flex items-center space-x-2">
@@ -192,8 +178,7 @@ const Transactions = () => {
             </Card>
         </div>
       </div>
-
-      {/* Creation/Edit Protocol Modal */}
+      {}
       {(isCreating || isEditing) && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-2xl w-full animate-entrance" size="xl">
@@ -210,8 +195,7 @@ const Transactions = () => {
               </Card>
           </div>
       )}
-
-      {/* Delete Protocol Modal */}
+      {}
       {deleteDialog.isOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
@@ -232,5 +216,4 @@ const Transactions = () => {
     </div>
   );
 };
-
 export default Transactions;

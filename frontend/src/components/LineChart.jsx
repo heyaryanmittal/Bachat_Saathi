@@ -11,16 +11,13 @@ import {
   Area,
   AreaChart
 } from 'recharts';
-
 function LineChartComponent({ data }) {
   const hasData = Array.isArray(data) && data.length > 0 && data.some(d => d.income > 0 || d.expense > 0);
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const incomeValue = payload.find(p => p.dataKey === 'income')?.value || 0;
       const expenseValue = payload.find(p => p.dataKey === 'expense')?.value || 0;
       const netFlow = incomeValue - expenseValue;
-      
       return (
         <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-2xl z-[9999] relative">
           <p className="font-semibold text-gray-900 dark:text-white mb-3">
@@ -59,12 +56,10 @@ function LineChartComponent({ data }) {
     }
     return null;
   };
-
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   };
-
   return (
     <div className="h-80 w-full flex items-center justify-center">
       {hasData ? (
@@ -175,5 +170,4 @@ function LineChartComponent({ data }) {
     </div>
   );
 }
-
 export default LineChartComponent;

@@ -3,29 +3,23 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Budget = require('../models/Budget');
 const User = require('../models/User');
-
 async function main() {
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {
     console.error('Missing MONGODB_URI in environment. Set it in .env or pass it in the environment.');
     process.exit(1);
   }
-
   await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
   const argv = require('minimist')(process.argv.slice(2));
   const month = argv.month || (new Date()).getMonth() + 1;
   const year = argv.year || (new Date()).getFullYear();
-  const category = argv.category; // optional
-  const userEmail = argv.userEmail; // optional
-  const minPercent = argv.minPercent ? Number(argv.minPercent) : 70; // default show budgets >=70%
-
+  const category = argv.category; 
+  const userEmail = argv.userEmail; 
+  const minPercent = argv.minPercent ? Number(argv.minPercent) : 70; 
   const query = { month: Number(month), year: Number(year) };
   if (category) query.category = category;
-
   try {
     let budgets = await Budget.find(query).lean();
-
     if (userEmail) {
       const user = await User.findOne({ email: userEmail }).lean();
       if (!user) {
@@ -34,7 +28,6 @@ async function main() {
       }
       budgets = budgets.filter(b => String(b.userId) === String(user._id));
     }
-
     const output = [];
     for (const b of budgets) {
       const percentUsed = (b.spent / (b.amount || 1)) * 100;
@@ -57,7 +50,6 @@ async function main() {
         userEmailNotificationsEnabled: !!user?.emailNotificationsEnabled
       });
     }
-
     if (output.length === 0) {
       console.log('No budgets matched the criteria.');
     } else {
@@ -70,5 +62,4 @@ async function main() {
     process.exit(0);
   }
 }
-
 main();

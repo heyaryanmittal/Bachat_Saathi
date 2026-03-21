@@ -3,7 +3,6 @@ import { MessageSquare, Send, X, Bot, User, Sparkles, Zap, Brain, Terminal } fro
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-
 const AIAssistant = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
@@ -16,31 +15,24 @@ const AIAssistant = () => {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const { user } = useAuth();
-
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-
     useEffect(() => {
         if (isOpen) scrollToBottom();
     }, [messages, isOpen]);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!message.trim() || isLoading) return;
-
         const userMessage = { role: 'user', content: message };
         setMessages((prev) => [...prev, userMessage]);
         setMessage('');
         setIsLoading(true);
-
         try {
             const typingMessage = { role: 'assistant', content: 'Processing...', isTyping: true };
             setMessages(prev => [...prev, typingMessage]);
-
             const response = await api.post('/insights/assistant/chat', { message }, { timeout: 30000 });
             setMessages(prev => prev.filter(msg => !msg.isTyping));
-
             if (response.data?.data?.response) {
                 setMessages(prev => [...prev, { role: 'assistant', content: response.data.data.response }]);
             } else {
@@ -53,13 +45,12 @@ const AIAssistant = () => {
             setIsLoading(false);
         }
     };
-
     return (
         <div className="fixed bottom-8 right-8 z-[1000]">
             <AnimatePresence>
                 {isOpen ? (
                     <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-background/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-[400px] h-[650px] flex flex-col border border-primary/20 overflow-hidden mb-4 relative">
-                        {/* Header */}
+                        {}
                         <div className="gradient-primary p-6 flex justify-between items-center relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-10 animate-pulse"><Brain className="w-16 h-16"/></div>
                             <div className="flex items-center gap-3 relative z-10">
@@ -71,8 +62,7 @@ const AIAssistant = () => {
                             </div>
                             <button onClick={() => setIsOpen(false)} className="p-2 rounded-xl hover:bg-white/20 transition-colors text-white relative z-10"><X className="h-5 w-5" /></button>
                         </div>
-
-                        {/* Messages */}
+                        {}
                         <div className="flex-1 p-6 overflow-y-auto space-y-6 custom-scrollbar bg-primary/5">
                             {messages.map((msg, index) => (
                                 <motion.div key={index} initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }} animate={{ opacity: 1, x: 0 }} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -96,8 +86,7 @@ const AIAssistant = () => {
                             ))}
                             <div ref={messagesEndRef} />
                         </div>
-
-                        {/* Input */}
+                        {}
                         <div className="p-6 border-t border-border/20 bg-background/50">
                             <form onSubmit={handleSubmit} className="relative group">
                                 <input
@@ -128,5 +117,4 @@ const AIAssistant = () => {
         </div>
     );
 };
-
 export default AIAssistant;

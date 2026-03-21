@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const leaderboardSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -48,10 +47,7 @@ const leaderboardSchema = new mongoose.Schema({
     default: Date.now
   }
 }, { timestamps: true });
-
-// Index for faster queries
 leaderboardSchema.index({ monthlyPoints: -1 });
 leaderboardSchema.index({ lifetimePoints: -1 });
 leaderboardSchema.index({ userId: 1 });
-
 module.exports = mongoose.model('Leaderboard', leaderboardSchema);

@@ -2,11 +2,9 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogOut } from 'lucide-react';
-
 function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
   if (!user) {
     return (
       <div className="flex items-center space-x-2 sm:space-x-3">
@@ -26,10 +24,9 @@ function UserMenu() {
       </div>
     );
   }
-
   return (
     <div className="flex items-center space-x-2 sm:space-x-3">
-      {/* User Avatar - Responsive */}
+      {}
       <div
         className="hidden lg:flex items-center space-x-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 max-w-32 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300"
         onClick={() => navigate('/profile')}
@@ -44,8 +41,7 @@ function UserMenu() {
           {user.name}
         </span>
       </div>
-
-      {/* User Avatar Icon - For medium screens */}
+      {}
       <div
         className="lg:hidden w-8 h-8 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center cursor-pointer flex-shrink-0 hover:scale-110 transition-all duration-300"
         onClick={() => navigate('/profile')}
@@ -55,8 +51,7 @@ function UserMenu() {
           {user.name?.charAt(0).toUpperCase()}
         </span>
       </div>
-
-      {/* Logout Button - Responsive */}
+      {}
       <button
         onClick={logout}
         className="btn-danger text-sm px-3 py-2 hidden sm:flex items-center space-x-2 flex-shrink-0"
@@ -65,8 +60,7 @@ function UserMenu() {
         <LogOut className="h-4 w-4" />
         <span className="hidden lg:inline">Logout</span>
       </button>
-
-      {/* Mobile Logout Icon */}
+      {}
       <button
         onClick={logout}
         className="sm:hidden p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex-shrink-0"
@@ -77,5 +71,4 @@ function UserMenu() {
     </div>
   );
 }
-
 export default UserMenu;

@@ -14,7 +14,6 @@ import {
   Medal,
   ChevronDown
 } from 'lucide-react';
-
 const iconMap = {
   LayoutDashboard,
   CreditCard,
@@ -27,21 +26,16 @@ const iconMap = {
   Target,
   Medal
 };
-
 function IconRenderer({ iconName, className = "h-5 w-5" }) {
   const IconComponent = iconMap[iconName];
   return IconComponent ? <IconComponent className={className} /> : null;
 }
-
 function MobileMenu({ isOpen, onClose }) {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState({});
-
   const isActive = (path) => {
     return location.pathname === path;
   };
-
-  // Check if a dropdown item or its children are active
   const isDropdownActive = (item) => {
     if (item.path && isActive(item.path)) return true;
     if (item.children) {
@@ -49,22 +43,17 @@ function MobileMenu({ isOpen, onClose }) {
     }
     return false;
   };
-
-  // Toggle dropdown expansion
   const toggleExpanded = (itemName) => {
     setExpandedItems(prev => ({
       ...prev,
       [itemName]: !prev[itemName]
     }));
   };
-
   if (!isOpen) return null;
-
   return (
     <div className="md:hidden py-4 animate-fadeInUp border-t border-gray-200 dark:border-gray-700">
       <div className="flex flex-col space-y-2">
         {navigationItems.map((item) => {
-          // Render dropdown items
           if (item.type === 'dropdown') {
             return (
               <div key={item.name}>
@@ -82,8 +71,7 @@ function MobileMenu({ isOpen, onClose }) {
                   </div>
                   <IconRenderer iconName="ChevronDown" className={`h-5 w-5 transition-transform duration-300 ${expandedItems[item.name] ? 'rotate-180' : ''}`} />
                 </button>
-
-                {/* Expanded dropdown items */}
+                {}
                 {expandedItems[item.name] && (
                   <div className="ml-6 mt-2 space-y-1">
                     {item.children.map((child) => (
@@ -106,8 +94,6 @@ function MobileMenu({ isOpen, onClose }) {
               </div>
             );
           }
-
-          // Render regular navigation items
           return (
             <Link
               key={item.path}
@@ -128,5 +114,4 @@ function MobileMenu({ isOpen, onClose }) {
     </div>
   );
 }
-
 export default MobileMenu;

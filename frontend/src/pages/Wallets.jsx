@@ -5,7 +5,6 @@ import { Card, Button, Input, LoadingSpinner, Modal, StatsCard } from '../compon
 import { Link } from 'react-router-dom';
 import { Wallet, Banknote, CreditCard, ArrowRightLeft, Plus, RefreshCw, Layers, History, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 const Wallets = () => {
   const [wallets, setWallets] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -21,9 +20,7 @@ const Wallets = () => {
   const [transferNotes, setTransferNotes] = useState('');
   const [isTransferring, setIsTransferring] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ show: false, wallet: null });
-
   useEffect(() => { fetchWallets(); }, []);
-
   const fetchWallets = async () => {
     try {
       setIsLoading(true);
@@ -38,7 +35,6 @@ const Wallets = () => {
       setIsLoading(false);
     }
   };
-
   const submitTransfer = async (e) => {
     e.preventDefault();
     if (!transferFrom || !transferTo || !transferAmount) {
@@ -64,14 +60,12 @@ const Wallets = () => {
       setIsTransferring(false);
     }
   };
-
   const handleWalletAction = async (e) => {
     e.preventDefault();
     try {
       const payload = editingWallet 
         ? { name: editingWallet.name, type: editingWallet.type, openingBalance: editingWallet.openingBalance }
         : { name: newWallet.name, type: newWallet.type, openingBalance: newWallet.openingBalance };
-      
       if (editingWallet) {
         await api.updateWallet(editingWallet._id, payload);
         toast.success('Wallet updated!');
@@ -87,7 +81,6 @@ const Wallets = () => {
         toast.error('Action failed.');
     }
   };
-
   if (isLoading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
@@ -95,17 +88,15 @@ const Wallets = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-      {/* Wallet Stats Bar */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatsCard title="Total Wealth" value={wallets.reduce((acc, w) => acc + (w.balance || 0), 0)} variant="gradient" icon={<Wallet />} />
         <StatsCard title="Active Wallets" value={wallets.length} variant="primary" icon={<Layers />} prefix={null} />
         <StatsCard title="Accounts Count" value={wallets.filter(w => w.type !== 'Cash').length} variant="secondary" icon={<History />} prefix={null} />
       </div>
-
-      {/* SaaS Wallets Header (Actions) */}
+      {}
       <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
         <div className="flex items-center space-x-3">
           <Link to="/transfers">
@@ -115,14 +106,12 @@ const Wallets = () => {
           <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />New Wallet</Button>
         </div>
       </div>
-
       {infoMessage && (
           <Card variant="warning" className="animate-float shadow-xl border-amber-500/30 p-4 border-2">
               <p className="font-bold text-amber-700">{infoMessage}</p>
           </Card>
       )}
-
-      {/* Wallet Grid */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {wallets.length === 0 ? (
           <div className="col-span-full py-20 text-center glass-card border-dashed p-10">
@@ -147,8 +136,7 @@ const Wallets = () => {
           ))
         )}
       </div>
-
-      {/* Create / Edit Modal */}
+      {}
       {(isCreating || editingWallet) && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
@@ -191,8 +179,7 @@ const Wallets = () => {
               </Card>
           </div>
       )}
-
-      {/* Transfer Modal */}
+      {}
       {showTransferModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
@@ -232,8 +219,7 @@ const Wallets = () => {
               </Card>
           </div>
       )}
-      
-      {/* Delete Confirmation Modal */}
+      {}
       {deleteModal.show && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
               <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="lg">
@@ -260,5 +246,4 @@ const Wallets = () => {
     </div>
   );
 };
-
 export default Wallets;

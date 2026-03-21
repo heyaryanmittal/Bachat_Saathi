@@ -1,21 +1,9 @@
 #!/usr/bin/env node
-
-/**
- * Leaderboard System Diagnostic Test Script
- * 
- * This script helps diagnose issues with the leaderboard system
- * Usage: node backend/scripts/testLeaderboard.js
- */
-
 const mongoose = require('mongoose');
 require('dotenv').config({ path: '.env' });
-
-// Import models
 const User = require('../models/User');
 const Leaderboard = require('../models/Leaderboard');
 const PointsLog = require('../models/PointsLog');
-
-// Colors for console output
 const colors = {
   reset: '\x1b[0m',
   green: '\x1b[32m',
@@ -24,7 +12,6 @@ const colors = {
   blue: '\x1b[34m',
   cyan: '\x1b[36m'
 };
-
 const log = {
   success: (msg) => console.log(`${colors.green}✓${colors.reset} ${msg}`),
   error: (msg) => console.log(`${colors.red}✗${colors.reset} ${msg}`),
@@ -32,31 +19,22 @@ const log = {
   warn: (msg) => console.log(`${colors.yellow}⚠${colors.reset} ${msg}`),
   header: (msg) => console.log(`\n${colors.blue}═══ ${msg} ═══${colors.reset}`)
 };
-
 async function runTests() {
   try {
-    // Connect to MongoDB
     log.info('Connecting to MongoDB...');
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bachat_saathi';
-    
+    const mongoUri = process.env.MONGODB_URI || 'mongodb:
     await mongoose.connect(mongoUri);
     log.success('Connected to MongoDB');
-
-    // Test 1: Check User count
     log.header('Test 1: Database Check');
     const userCount = await User.countDocuments();
     log.info(`Total Users in DB: ${userCount}`);
-    
     if (userCount === 0) {
       log.warn('No users found. Create some users first!');
       return;
     }
-
-    // Test 2: Check PointsLog
     log.header('Test 2: Points Log Check');
     const pointsLogCount = await PointsLog.countDocuments();
     log.info(`Total PointsLog entries: ${pointsLogCount}`);
-
     if (pointsLogCount > 0) {
       const pointsStats = await PointsLog.aggregate([
         {
@@ -69,7 +47,6 @@ async function runTests() {
           }
         }
       ]);
-
       if (pointsStats.length > 0) {
         const stats = pointsStats[0];
         log.info(`Total Points Awarded: ${stats.totalPoints}`);
@@ -80,12 +57,9 @@ async function runTests() {
     } else {
       log.warn('No PointsLog entries found. Users need to perform activities first!');
     }
-
-    // Test 3: Check Leaderboard Collection
     log.header('Test 3: Leaderboard Collection Check');
     const leaderboardCount = await Leaderboard.countDocuments();
     log.info(`Leaderboard Entries: ${leaderboardCount}`);
-
     if (leaderboardCount > 0) {
       const topUser = await Leaderboard.findOne().sort({ lifetimePoints: -1 });
       if (topUser) {
@@ -94,15 +68,11 @@ async function runTests() {
     } else {
       log.warn('No leaderboard entries. Run populate-leaderboard endpoint first!');
     }
-
-    // Test 4: Sample User Details
     log.header('Test 4: Sample User Details');
     const sampleUser = await User.findOne();
     if (sampleUser) {
       log.info(`Sample User: ${sampleUser.name || 'N/A'}`);
       log.info(`User ID: ${sampleUser._id}`);
-      
-      // Check if this user has leaderboard entry
       const leaderboardEntry = await Leaderboard.findOne({ userId: sampleUser._id });
       if (leaderboardEntry) {
         log.success('Leaderboard entry exists');
@@ -114,18 +84,13 @@ async function runTests() {
       } else {
         log.warn('No leaderboard entry for this user');
       }
-
-      // Check PointsLog for this user
       const userPointsLogs = await PointsLog.countDocuments({ userId: sampleUser._id });
       log.info(`PointsLog entries for user: ${userPointsLogs}`);
     }
-
-    // Test 5: Leaderboard Rankings
     log.header('Test 5: Top 10 Users');
     const topUsers = await Leaderboard.find()
       .sort({ lifetimePoints: -1 })
       .limit(10);
-
     if (topUsers.length > 0) {
       topUsers.forEach((user, index) => {
         const rank = index + 1;
@@ -137,18 +102,14 @@ async function runTests() {
     } else {
       log.error('No leaderboard data found!');
     }
-
-    // Test 6: Database Health
     log.header('Test 6: Database Health');
     log.info(`Users: ${userCount}`);
     log.info(`PointsLog entries: ${pointsLogCount}`);
     log.info(`Leaderboard entries: ${leaderboardCount}`);
-    
     const healthPercentage = leaderboardCount > 0 
       ? ((leaderboardCount / userCount) * 100).toFixed(1)
       : 0;
     log.info(`Coverage: ${healthPercentage}% (${leaderboardCount}/${userCount})`);
-
     if (leaderboardCount === userCount) {
       log.success('All users have leaderboard entries!');
     } else if (leaderboardCount > 0) {
@@ -156,14 +117,11 @@ async function runTests() {
     } else {
       log.error('No leaderboard data. Run populate-leaderboard first!');
     }
-
-    // Test 7: Recent Activity
     log.header('Test 7: Recent Activity');
     const recentActivity = await PointsLog.find()
       .sort({ createdAt: -1 })
       .limit(5)
       .populate('userId', 'name');
-
     if (recentActivity.length > 0) {
       recentActivity.forEach(entry => {
         const date = new Date(entry.createdAt).toLocaleString();
@@ -173,7 +131,6 @@ async function runTests() {
     } else {
       log.warn('No recent activity found');
     }
-
     log.header('Test Summary');
     const isHealthy = leaderboardCount > 0 && pointsLogCount > 0;
     if (isHealthy) {
@@ -189,7 +146,6 @@ async function runTests() {
       log.info('3. Or run: node backend/scripts/populateLeaderboard.js');
       log.info('4. Then create some transactions to earn points');
     }
-
   } catch (error) {
     log.error(`Test failed: ${error.message}`);
     console.error(error);
@@ -198,6 +154,4 @@ async function runTests() {
     log.info('Disconnected from MongoDB');
   }
 }
-
-// Run tests
 runTests();

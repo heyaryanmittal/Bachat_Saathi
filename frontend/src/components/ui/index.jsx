@@ -1,8 +1,6 @@
 import React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-
-// Modern Card component with variants and animations
 const cardVariants = cva(
     "rounded-2xl border transition-all duration-300",
     {
@@ -36,7 +34,6 @@ const cardVariants = cva(
         }
     }
 );
-
 export const Card = React.forwardRef(({
     className,
     variant,
@@ -53,10 +50,7 @@ export const Card = React.forwardRef(({
         {children}
     </div>
 ));
-
 Card.displayName = "Card";
-
-// Enhanced Stats Card with animated numbers and icons
 export const StatsCard = ({
     title,
     value,
@@ -70,9 +64,8 @@ export const StatsCard = ({
     ...props
 }) => (
     <Card variant={variant} size={size} className={cn("relative overflow-hidden group", className)} {...props}>
-        {/* Animated background gradient shine */}
+        {}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
-
         <div className="relative z-10 flex items-center justify-between">
             <div className="flex-1">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
@@ -100,7 +93,6 @@ export const StatsCard = ({
                     </div>
                 )}
             </div>
-
             {icon && (
                 <div className="flex-shrink-0 ml-4">
                     <div className="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
@@ -113,8 +105,6 @@ export const StatsCard = ({
         </div>
     </Card>
 );
-
-// Modern Button component with variants and loading states
 const buttonVariants = cva(
     "btn-saas inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 transform outline-none",
     {
@@ -140,13 +130,12 @@ const buttonVariants = cva(
         }
     }
 );
-
 export const Button = React.forwardRef(({
     className,
     variant,
     size,
     loading = false,
-    loadingText = "", // Keep it clean
+    loadingText = "", 
     children,
     ...props
 }, ref) => (
@@ -158,7 +147,7 @@ export const Button = React.forwardRef(({
     >
         {loading ? (
             <>
-                <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-5 w-5 text-current" xmlns="http:
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -167,12 +156,7 @@ export const Button = React.forwardRef(({
         ) : children}
     </button>
 ));
-
 Button.displayName = "Button";
-
-// Modal component omitted for brevity in replacement (not needed to change)
-
-// Input component with premium styling
 export const Input = React.forwardRef(({
     label,
     error,
@@ -211,10 +195,7 @@ export const Input = React.forwardRef(({
         )}
     </div>
 ));
-
 Input.displayName = "Input";
-
-// Select component
 export const Select = React.forwardRef(({
     label,
     options,
@@ -263,10 +244,7 @@ export const Select = React.forwardRef(({
         )}
     </div>
 ));
-
 Select.displayName = "Select";
-
-// Alert component for notifications
 export const Alert = ({
     type = "info",
     title,
@@ -281,14 +259,12 @@ export const Alert = ({
         warning: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200",
         error: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200"
     };
-
     const icons = {
         info: "ℹ️",
         success: "✅",
         warning: "⚠️",
         error: "❌"
     };
-
     return (
         <div
             className={cn(
@@ -318,8 +294,6 @@ export const Alert = ({
         </div>
     );
 };
-
-// Badge component for status indicators
 export const Badge = ({
     variant = "default",
     size = "md",
@@ -334,13 +308,11 @@ export const Badge = ({
         error: "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200",
         info: "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200"
     };
-
     const sizeClasses = {
         sm: "px-2 py-0.5 text-xs",
         md: "px-2.5 py-0.5 text-xs",
         lg: "px-3 py-1 text-sm"
     };
-
     return (
         <span
             className={cn(
@@ -355,8 +327,6 @@ export const Badge = ({
         </span>
     );
 };
-
-// Progress bar component
 export const ProgressBar = ({
     value,
     max = 100,
@@ -367,20 +337,17 @@ export const ProgressBar = ({
     ...props
 }) => {
     const percentage = Math.min((value / max) * 100, 100);
-
     const progressVariants = {
         primary: "bg-blue-500 dark:bg-blue-400",
         success: "bg-green-500 dark:bg-green-400",
         warning: "bg-yellow-500 dark:bg-yellow-400",
         error: "bg-red-500 dark:bg-red-400"
     };
-
     const sizeClasses = {
         sm: "h-1",
         md: "h-2",
         lg: "h-3"
     };
-
     return (
         <div className={cn("w-full", className)}>
             {showLabel && (
@@ -405,10 +372,6 @@ export const ProgressBar = ({
         </div>
     );
 };
-
-
-
-// Skeleton component for loading states
 export const Skeleton = ({
     className,
     variant = 'default',
@@ -423,7 +386,6 @@ export const Skeleton = ({
         circle: 'rounded-full',
         rectangle: 'rounded-xl',
     };
-
     return (
         <div
             className={cn(
@@ -436,8 +398,6 @@ export const Skeleton = ({
         />
     );
 };
-
-// LoadingSpinner component
 export const LoadingSpinner = ({ size = 'md', variant = 'primary', text = '' }) => {
     const sizeClasses = {
         sm: 'h-4 w-4 border-2',
@@ -445,7 +405,6 @@ export const LoadingSpinner = ({ size = 'md', variant = 'primary', text = '' }) 
         lg: 'h-12 w-12 border-4',
         xl: 'h-16 w-16 border-4'
     };
-
     const variantClasses = {
         primary: 'border-primary/20 border-t-primary',
         secondary: 'border-secondary/20 border-t-secondary',
@@ -453,7 +412,6 @@ export const LoadingSpinner = ({ size = 'md', variant = 'primary', text = '' }) 
         error: 'border-rose-200 border-t-rose-600',
         white: 'border-white/20 border-t-white'
     };
-
     return (
         <div className="flex flex-col items-center justify-center space-y-4">
             <div className={cn(
@@ -465,11 +423,8 @@ export const LoadingSpinner = ({ size = 'md', variant = 'primary', text = '' }) 
         </div>
     );
 };
-
-// Modal component
 export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
     if (!isOpen) return null;
-
     const sizeClasses = {
         sm: 'max-w-md',
         md: 'max-w-2xl',
@@ -477,7 +432,6 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
         xl: 'max-w-6xl',
         full: 'max-w-[95vw]'
     };
-
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             <div 
@@ -492,7 +446,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
                     sizeClasses[size]
                 )}
             >
-                {/* Header */}
+                {}
                 <div className="px-8 py-6 border-b border-border/50 flex items-center justify-between gradient-surface">
                     <h3 className="text-2xl font-black tracking-tighter uppercase tracking-widest leading-none">
                         {title}
@@ -506,8 +460,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
                         </svg>
                     </button>
                 </div>
-
-                {/* Content */}
+                {}
                 <div className="px-8 py-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
                     {children}
                 </div>

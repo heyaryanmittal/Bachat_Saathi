@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
-
 const DebtTracker = () => {
     const [debts, setDebts] = useState([]);
     const [stats, setStats] = useState({});
@@ -19,9 +18,7 @@ const DebtTracker = () => {
     const [paymentModal, setPaymentModal] = useState({ show: false, debt: null, amount: '' });
     const [deleteModal, setDeleteModal] = useState({ show: false, debt: null });
     const [newDebt, setNewDebt] = useState({ type: 'personal', title: '', amount: '', interestRate: '', dueDate: '', description: '' });
-
     useEffect(() => { fetchAll(); }, []);
-
     const fetchAll = async () => {
         setIsLoading(true);
         try {
@@ -31,7 +28,6 @@ const DebtTracker = () => {
         } catch (e) { toast.error('Debt sync failed.'); }
         finally { setIsLoading(false); }
     };
-
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
@@ -42,7 +38,6 @@ const DebtTracker = () => {
             fetchAll();
         } catch (e) { toast.error('Failed to add debt.'); }
     };
-
     const handlePayment = async (e) => {
         e.preventDefault();
         try {
@@ -52,7 +47,6 @@ const DebtTracker = () => {
             fetchAll();
         } catch (e) { toast.error('Payment failed.'); }
     };
-
     const confirmDelete = async () => {
         try {
             await api.deleteDebt(deleteModal.debt._id);
@@ -61,7 +55,6 @@ const DebtTracker = () => {
             fetchAll();
         } catch (e) { toast.error('Failed to delete.'); }
     };
-
     const handleInterest = async (debt) => {
         const monthlyRate = debt.interestRate / 100 / 12;
         const interest = debt.remainingAmount * monthlyRate;
@@ -71,13 +64,11 @@ const DebtTracker = () => {
             fetchAll();
         } catch (e) { toast.error('Accrual error.'); }
     };
-
     const getTypeIcon = (type) => {
         const map = { personal: DollarSign, creditCard: CreditCard, loan: Landmark, business: Briefcase, education: GraduationCap, vehicle: Car, other: ShoppingBag };
         const Icon = map[type] || ShoppingBag;
         return <Icon className="w-5 h-5" />;
     };
-
     const getStatusConfig = (debt) => {
         if (debt.status === 'closed') return { label: 'Paid Off', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20', icon: CheckCircle2 };
         const due = new Date(debt.dueDate);
@@ -86,32 +77,27 @@ const DebtTracker = () => {
         if (diff <= 3) return { label: 'Due Soon', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20', icon: AlertCircle };
         return { label: 'Active', color: 'bg-primary/10 text-primary border-primary/20', icon: History };
     };
-
     if (isLoading && !debts.length) {
         return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading debts..." /></div>;
     }
-
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
-            {/* Stats Bar */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                 <StatsCard title="Total Debt" value={stats.totalAmount || 0} variant="primary" icon={<DollarSign />} />
                 <StatsCard title="Remaining Balance" value={stats.totalRemaining || 0} variant="error" icon={<TrendingDown />} />
                 <StatsCard title="Active Debts" value={stats.activeDebts || 0} variant="secondary" icon={<History />} />
                 <StatsCard title="Paid Off" value={stats.totalDebts - stats.activeDebts || 0} variant="success" icon={<CheckCircle2 />} />
             </div>
-
-            {/* SaaS Header (Actions) */}
+            {}
             <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
                 <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />Add Debt</Button>
             </div>
-
             <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl flex items-center gap-4 text-primary max-w-2xl mx-auto">
                 <Info className="w-8 h-8 opacity-50 flex-shrink-0" />
                 <p className="text-sm font-black italic tracking-tight">Note: Only fully paid debts can be deleted from your records. Active debts must be paid off first.</p>
             </div>
-
-            {/* Liabilities Table */}
+            {}
             <Card variant="glass" className="saas-card overflow-hidden">
                 <div className="p-8 border-b border-border/50 flex items-center justify-between">
                     <h3 className="font-black text-xs uppercase tracking-widest text-muted-foreground flex items-center"><Landmark className="w-4 h-4 mr-2" /> Active Debts</h3>
@@ -187,8 +173,7 @@ const DebtTracker = () => {
                     </table>
                 </div>
             </Card>
-
-            {/* Create Liability Modal */}
+            {}
             {isCreating && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-2xl w-full animate-entrance" size="xl">
@@ -234,8 +219,7 @@ const DebtTracker = () => {
                     </Card>
                 </div>
             )}
-
-            {/* Payment Modal */}
+            {}
             {paymentModal.show && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="xl">
@@ -250,8 +234,7 @@ const DebtTracker = () => {
                     </Card>
                 </div>
             )}
-
-            {/* Purge Modal */}
+            {}
             {deleteModal.show && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-md w-full animate-entrance text-center" size="xl">
@@ -268,5 +251,4 @@ const DebtTracker = () => {
         </div>
     );
 };
-
 export default DebtTracker;

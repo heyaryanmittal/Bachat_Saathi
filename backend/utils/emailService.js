@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-
 const transporter = nodemailer.createTransport({
   service: process.env.SMTP_SERVICE || 'gmail',
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -11,10 +10,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS || process.env.SMTP_PASS
   }
 });
-
 const FROM_EMAIL = process.env.SMTP_USER || process.env.EMAIL_USER || 'no-reply@bachatsaathi.com';
 const FROM_NAME = process.env.EMAIL_FROM_NAME || 'BachatSaathi';
-
 exports.sendSignupOtpEmail = async (userEmail, { name, otp }) => {
   console.log('DEBUG: Sending signup OTP email to', userEmail, 'with OTP:', otp);
   try {
@@ -48,7 +45,6 @@ exports.sendSignupOtpEmail = async (userEmail, { name, otp }) => {
     return { ok: false, error: error.message };
   }
 };
-
 exports.sendWelcomeEmail = async (userEmail, { name, email, password }) => {
   try {
     await transporter.sendMail({
@@ -72,7 +68,7 @@ exports.sendWelcomeEmail = async (userEmail, { name, email, password }) => {
               <p style="margin: 0; color: #856404; font-size: 13px;">🔒 <strong>For security:</strong> We recommend changing your password after your first login.</p>
             </div>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000/login" style="display: inline-block; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 15px;">Go to Dashboard</a>
+              <a href="http://localhost:3000/dashboard" style="background-color: #4f46e5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block;">Go to Dashboard</a>
             </div>
             <p style="color: #999; font-size: 13px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
               If you didn't create this account, please contact our support team immediately.
@@ -87,7 +83,6 @@ exports.sendWelcomeEmail = async (userEmail, { name, email, password }) => {
     return { ok: false, error: error.message };
   }
 };
-
 exports.send2FAOtpEmail = async (userEmail, { name, otp }) => {
   console.log('DEBUG: Sending 2FA OTP email to', userEmail, 'with OTP:', otp);
   try {
@@ -124,8 +119,6 @@ exports.send2FAOtpEmail = async (userEmail, { name, otp }) => {
     return { ok: false, error: error.message };
   }
 };
-
-// Send password changed notification (includes new password when requested)
 exports.sendPasswordChanged = async (userEmail, { name, newPassword }) => {
   try {
     await transporter.sendMail({
@@ -163,19 +156,15 @@ exports.sendPasswordChanged = async (userEmail, { name, newPassword }) => {
     return { ok: false, error: error.message };
   }
 };
-
 exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmount, threshold }) => {
   try {
     const percentUsed = Math.round((spentAmount / budgetAmount) * 100);
     const remainingBudget = budgetAmount - spentAmount;
-    
     const alertColor = threshold === 100 ? '#f44336' : '#ff9800';
     const alertTitle = threshold === 100 ? '⚠️ Budget Exceeded!' : '🔔 Budget Alert (80%)';
-    
     const subject = threshold === 100 
       ? `BachatSaathi: Budget Exceeded for ${category}`
       : `BachatSaathi: Budget Alert for ${category}`;
-
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
@@ -187,7 +176,6 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
           </div>
           <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Your <strong>${category}</strong> budget ${threshold === 100 ? 'has been exceeded' : 'is running low'}.</p>
-            
             <div style="background-color: #f5f5f5; border-left: 4px solid ${alertColor}; padding: 20px; border-radius: 5px; margin: 25px 0;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
                 <div>
@@ -199,7 +187,6 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
                   <p style="margin: 5px 0 0 0; color: ${threshold === 100 ? '#f44336' : '#ff9800'}; font-size: 20px; font-weight: 700;">₹${spentAmount.toLocaleString('en-IN')}</p>
                 </div>
               </div>
-              
               <div style="background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                   <span style="font-size: 14px; color: #666;">Usage: <strong>${percentUsed}%</strong></span>
@@ -209,20 +196,16 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
                   <div style="background-color: ${alertColor}; height: 100%; width: ${Math.min(percentUsed, 100)}%; border-radius: 4px;"></div>
                 </div>
               </div>
-              
               ${threshold === 100 
                 ? `<p style="margin: 0; color: #f44336; font-size: 14px; font-weight: 600;">You have exceeded your budget by ₹${Math.abs(remainingBudget).toLocaleString('en-IN')}</p>` 
                 : `<p style="margin: 0; color: #ff9800; font-size: 14px; font-weight: 600;">Remaining Budget: ₹${remainingBudget.toLocaleString('en-IN')}</p>`}
             </div>
-            
             <div style="background-color: #fef3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p style="margin: 0; color: #856404; font-size: 13px;">💡 <strong>Tip:</strong> Review your spending in the ${category} category and adjust if needed.</p>
             </div>
-            
             <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000/dashboard" style="display: inline-block; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 15px;">View Budget Details</a>
+              <a href="http://localhost:3000/budgets" style="background-color: ${alertColor}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block;">View Budget Details</a>
             </div>
-            
             <p style="color: #999; font-size: 13px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
               You can manage your budget alerts in your profile settings. This is an automated message, please do not reply.
             </p>
@@ -238,15 +221,11 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
     return { ok: false, error: error.message };
   }
 };
-
-// Dedicated over-budget email (100%+)
 exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount }) => {
   try {
     const percentUsed = Math.round((spentAmount / budgetAmount) * 100);
     const exceededBy = spentAmount - budgetAmount;
-
     const subject = `BachatSaathi: Budget Exceeded for ${category}`;
-
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
@@ -274,25 +253,20 @@ exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount
                     </td>
                   </tr>
                 </table>
-
                 <div style="margin-top:18px;">
                   <div style="height:12px; background:#e6eef8; border-radius:8px; overflow:hidden;">
                     <div style="width:${Math.min(percentUsed, 200)}%; background:linear-gradient(90deg,#f97316,#ef4444); height:100%;"></div>
                   </div>
                   <div style="margin-top:8px; font-size:13px; color:#374151;">Usage: <strong>${percentUsed}%</strong> — Exceeded by <strong>₹${exceededBy.toLocaleString('en-IN')}</strong></div>
                 </div>
-
                 <div style="margin-top:20px; padding:14px; background:#fff7ed; border-left:4px solid #f59e0b; border-radius:6px;">
                   <div style="font-size:13px; color:#92400e;"><strong>Tip:</strong> Review recent transactions in this category and consider transferring funds or adjusting upcoming expenses.</div>
                 </div>
-
                 <div style="text-align:center; margin-top:22px;">
-                  <a href="http://localhost:3000/dashboard" style="display:inline-block; padding:12px 22px; background:linear-gradient(90deg,#2563eb,#7c3aed); color:#fff; text-decoration:none; border-radius:6px; font-weight:600;">Review Budget</a>
+                  <a href="http://localhost:3000/budgets" style="background:#ef4444; color:#fff; display:inline-block; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:700; font-size:14px;">Review My Budget</a>
                 </div>
-
                 <hr style="border:none; border-top:1px solid #f1f5f9; margin:22px 0;" />
-
-                <div style="font-size:12px; color:#6b7280;">You can manage your budget alerts in your <a href="http://localhost:3000/profile" style="color:#2563eb; text-decoration:none;">profile settings</a>. This is an automated message, please do not reply.</div>
+                <div style="font-size:12px; color:#6b7280;">You can manage your budget alerts in your <a href="http://localhost:3000/profile" style="color:#2563eb; text-decoration:none;">Profile Settings</a>.</div>
                 <div style="margin-top:14px; font-size:12px; color:#9ca3af;">© ${new Date().getFullYear()} BachatSaathi</div>
               </td>
             </tr>
@@ -300,7 +274,6 @@ exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount
         </div>
       `
     });
-
     console.log(`Over-budget email sent to ${userEmail} (category: ${category})`);
     return { ok: true };
   } catch (error) {

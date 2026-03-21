@@ -7,7 +7,6 @@ import StatsSection from '../components/landing/StatsSection';
 import PricingSection from '../components/landing/PricingSection';
 import CTASection from '../components/landing/CTASection';
 import Footer from '../components/landing/Footer';
-
 const Landing = () => {
   return (
     <div className="min-h-screen bg-background text-foreground scroll-smooth">
@@ -22,5 +21,4 @@ const Landing = () => {
     </div>
   );
 };
-
 export default Landing;

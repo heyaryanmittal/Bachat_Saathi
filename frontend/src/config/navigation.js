@@ -1,4 +1,4 @@
-// Navigation configuration
+
 export const navigationItems = [
   { path: '/dashboard', name: 'Dashboard', icon: 'LayoutDashboard' },
   {
@@ -26,5 +26,4 @@ export const navigationItems = [
     ]
   }
 ];
-
 export default navigationItems;

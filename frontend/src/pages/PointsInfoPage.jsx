@@ -58,12 +58,12 @@ function PointsInfoPage() {
             <div className="max-w-5xl mx-auto space-y-6 animate-entrance pb-24">
                 {/* Metrics Grid */}
                 <motion.div variants={containers} initial="initial" animate="animate" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                    <motion.div variants={item}><StatsCard title="Days Active" value={usageStats.daysActive} variant="primary" icon={<Calendar />} /></motion.div>
-                    <motion.div variants={item}><StatsCard title="Transactions" value={usageStats.totalTransactions} variant="success" icon={<Receipt />} /></motion.div>
-                    <motion.div variants={item}><StatsCard title="Budgets" value={usageStats.totalBudgets} variant="gradient" icon={<BarChart3 />} /></motion.div>
-                    <motion.div variants={item}><StatsCard title="Debts Paid" value={usageStats.totalDebts} variant="error" icon={<Landmark />} /></motion.div>
-                    <motion.div variants={item}><StatsCard title="Goals" value={usageStats.totalGoals} variant="secondary" icon={<Target />} /></motion.div>
-                    <motion.div variants={item}><StatsCard title="Wallets" value={usageStats.totalWallets} variant="primary" icon={<Wallet />} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Days Active" value={usageStats.daysActive} variant="primary" prefix={null} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Transactions" value={usageStats.totalTransactions} variant="success" prefix={null} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Budgets" value={usageStats.totalBudgets} variant="gradient" prefix={null} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Debts Paid" value={usageStats.totalDebts} variant="error" prefix={null} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Goals" value={usageStats.totalGoals} variant="secondary" prefix={null} /></motion.div>
+                    <motion.div variants={item}><StatsCard title="Wallets" value={usageStats.totalWallets} variant="primary" prefix={null} /></motion.div>
                 </motion.div>
 
                 {/* Navigation (Back Button) */}

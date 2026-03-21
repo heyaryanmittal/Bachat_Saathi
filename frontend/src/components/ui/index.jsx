@@ -65,6 +65,7 @@ export const StatsCard = ({
     trendValue,
     variant = "default",
     size = "md",
+    prefix = "₹",
     className,
     ...props
 }) => (
@@ -79,7 +80,8 @@ export const StatsCard = ({
                 </p>
                 <div className="flex items-baseline space-x-2">
                     <p className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-                        ₹{typeof value === 'number' ? value.toLocaleString('en-IN') : value}
+                        {prefix && <span>{prefix}</span>}
+                        {typeof value === 'number' ? value.toLocaleString('en-IN') : value}
                     </p>
                 </div>
                 {trend && trendValue && (

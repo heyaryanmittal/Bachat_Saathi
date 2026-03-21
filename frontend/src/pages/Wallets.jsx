@@ -101,8 +101,8 @@ const Wallets = () => {
       {/* Wallet Stats Bar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatsCard title="Total Wealth" value={wallets.reduce((acc, w) => acc + (w.balance || 0), 0)} variant="gradient" icon={<Wallet />} />
-        <StatsCard title="Active Wallets" value={wallets.length} variant="primary" icon={<Layers />} />
-        <StatsCard title="Accounts Count" value={wallets.filter(w => w.type !== 'Cash').length} variant="secondary" icon={<History />} />
+        <StatsCard title="Active Wallets" value={wallets.length} variant="primary" icon={<Layers />} prefix={null} />
+        <StatsCard title="Accounts Count" value={wallets.filter(w => w.type !== 'Cash').length} variant="secondary" icon={<History />} prefix={null} />
       </div>
 
       {/* SaaS Wallets Header (Actions) */}

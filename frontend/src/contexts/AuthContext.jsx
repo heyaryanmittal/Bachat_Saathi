@@ -63,12 +63,13 @@ export function AuthProvider({ children }) {
         console.log('Fetching user profile...');
         const user = await fetchUser();
         console.log('User from fetchUser:', user);
-        if (user && ['/login', '/signup', '/'].includes(location.pathname)) {
+        if (user && ['/login', '/signup'].includes(location.pathname)) {
           console.log('User authenticated, redirecting to /dashboard');
           setTimeout(() => {
             navigate('/dashboard', { replace: true });
           }, 0);
         }
+
       } else {
         console.log('No token found, setting loading to false');
         setLoading(false);

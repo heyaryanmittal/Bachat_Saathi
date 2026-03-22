@@ -35,7 +35,7 @@ const Navbar = () => {
           </button>
           <Button 
             size="sm" 
-            className="bg-white text-[#EEA62B] hover:bg-slate-50 text-[12px] font-black uppercase tracking-widest px-8 h-10 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
+            className="bg-white !text-[#EEA62B] hover:bg-slate-50 text-[13px] font-black uppercase tracking-widest px-8 h-10 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
             onClick={() => navigate('/signup')}
           >
             Get Started

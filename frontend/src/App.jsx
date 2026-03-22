@@ -41,10 +41,20 @@ if (import.meta.env.VITE_API_URL) {
 }
 
 function ProtectedRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
   if (!user) return <Navigate to="/login" replace />;
   return children ? children : <Outlet />;
 }
+
 
 const getPageContext = (path) => {
   const contexts = {
@@ -111,8 +121,17 @@ function ProtectedLayout() {
 }
 
 function PublicLayout({ showNavbar = true, children }) {
+  const { loading } = useAuth();
   const location = useLocation();
   const isLanding = location.pathname === '/';
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background relative selection:bg-primary/30">
@@ -123,6 +142,7 @@ function PublicLayout({ showNavbar = true, children }) {
     </div>
   );
 }
+
 
 function App() {
   return (

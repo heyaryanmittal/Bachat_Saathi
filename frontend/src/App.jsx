@@ -81,24 +81,25 @@ function ProtectedLayout() {
     <div className="flex min-h-screen bg-background transition-colors duration-500">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 lg:ml-72">
-        <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
+        <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-30 bg-[#EEA62B] dark:bg-background/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
           <div className="flex-1">
-             <h2 className="text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1">
+             <h2 className="text-2xl font-black uppercase tracking-widest text-white dark:text-foreground leading-none mb-1">
                {title}
              </h2>
-             <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest opacity-60 leading-none">
+             <p className="text-[11px] font-black text-white/70 dark:text-muted-foreground uppercase tracking-widest opacity-60 leading-none">
                {desc}
              </p>
           </div>
           <div className="flex items-center space-x-6">
             <ThemeToggle />
-            <div className="flex items-center space-x-4 text-[11px] font-black text-muted-foreground uppercase tracking-widest hidden sm:flex">
+            <div className="flex items-center space-x-4 text-[11px] font-black text-white dark:text-muted-foreground uppercase tracking-widest hidden sm:flex">
               <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-              <span className="w-1 h-1 bg-border rounded-full"></span>
-              <span className="text-emerald-500">Status: Active</span>
+              <span className="w-1 h-1 bg-white dark:bg-border rounded-full"></span>
+              <span className="text-white dark:text-emerald-500">Status: Active</span>
             </div>
           </div>
         </header>
+
         <main className="flex-1 p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full">
            <AIAssistant />
            <Outlet />

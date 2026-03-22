@@ -7,6 +7,8 @@ import { Button, Card, Input } from '../components/ui';
 import { Wallet, LogIn, ShieldCheck, Mail, Lock } from 'lucide-react';
 import api from '../services/api';
 import Logo from '../components/Logo';
+import ThemeToggle from '../components/ThemeToggle';
+
 function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +20,7 @@ function Login() {
   const [otpError, setOtpError] = useState('');
   const [pending2FAEmail, setPending2FAEmail] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm();
+
   const onSubmit = async (data) => {
     setError('');
     setIsLoading(true);
@@ -43,6 +46,7 @@ function Login() {
       setIsLoading(false);
     }
   };
+
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     setOtpError('');
@@ -62,11 +66,16 @@ function Login() {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="h-screen grid lg:grid-cols-2 bg-background overflow-hidden relative">
       <div className="absolute top-8 left-8 z-50 pointer-events-auto">
         <Logo isLight={true} />
       </div>
+      <div className="absolute top-8 right-8 z-50">
+        <ThemeToggle />
+      </div>
+
       {}
       <div className="hidden lg:flex flex-col items-center justify-center p-20 relative overflow-hidden bg-emerald-950 group">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/20 mix-blend-overlay opacity-50 group-hover:opacity-60 transition-opacity"></div>

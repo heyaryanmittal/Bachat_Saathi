@@ -7,6 +7,8 @@ import { Wallet, UserPlus, ShieldCheck, Mail, Lock, CheckCircle2 } from 'lucide-
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
 import Logo from '../components/Logo';
+import ThemeToggle from '../components/ThemeToggle';
+
 function Signup() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +20,9 @@ function Signup() {
   const { setAuthData } = useAuth();
   const navigate = useNavigate();
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
+
   const password = watch('password');
+
   const onSubmit = async (data) => {
     try {
       setError('');
@@ -37,6 +41,7 @@ function Signup() {
       setIsLoading(false);
     }
   };
+
   const handleOtpVerification = async (e) => {
     e.preventDefault();
     if (!otp || otp.length !== 6) {
@@ -62,11 +67,16 @@ function Signup() {
       setIsVerifyingOtp(false);
     }
   };
+
   return (
     <div className="h-screen grid lg:grid-cols-2 bg-background overflow-hidden relative">
       <div className="absolute top-8 left-8 z-50 pointer-events-auto">
         <Logo isLight={true} />
       </div>
+      <div className="absolute top-8 right-8 z-50">
+        <ThemeToggle />
+      </div>
+
       {}
       <div className="hidden lg:flex flex-col items-center justify-center p-20 relative overflow-hidden bg-emerald-950 group">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/20 mix-blend-overlay opacity-50 group-hover:opacity-60 transition-opacity"></div>

@@ -30,11 +30,14 @@
     --radius: 1rem;
     --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
     --gradient-sidebar: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-    --hero-gradient: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
-    --hero-gradient-premium: radial-gradient(circle at top right, #065f46, #064e3b);
+    --hero-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    --hero-gradient-premium: radial-gradient(circle at top right, #10b981, #065f46);
     font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   }
   .dark {
+    --hero-gradient: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    --hero-gradient-premium: radial-gradient(circle at top right, #065f46, #064e3b);
+
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --sidebar: 0 0% 0%;

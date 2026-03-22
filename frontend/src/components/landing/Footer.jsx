@@ -30,7 +30,8 @@ const Footer = () => {
     },
   ];
   return (
-    <footer className="bg-foreground text-white/70 py-16">
+    <footer className="bg-slate-950 dark:bg-black text-white/70 py-16">
+
       <div className="container mx-auto px-6">
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
           <div className="lg:col-span-2 space-y-4">

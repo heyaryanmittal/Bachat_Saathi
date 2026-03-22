@@ -41,7 +41,20 @@
 
     <!-- Accessibility -->
     <meta name="format-detection" content="telephone=no">
+
+    <script>
+      (function() {
+        try {
+          var darkMode = localStorage.getItem('darkMode');
+          var isDark = darkMode ? JSON.parse(darkMode) : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

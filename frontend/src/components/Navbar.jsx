@@ -25,13 +25,14 @@ function Navbar() {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? 'py-4 bg-white/80 backdrop-blur-xl border-b border-[#E5E7EB] shadow-sm' 
+          ? 'py-4 bg-[#EEA62B] dark:bg-background/80 backdrop-blur-xl border-b border-white/10 shadow-sm' 
           : 'py-8 bg-transparent'
       }`}
     >
       <div className="container-saas flex items-center justify-between">
         <div className="flex items-center space-x-12">
-          <Logo />
+          <Logo isLight={scrolled ? true : false} />
+
           {user && (
             <nav className="hidden lg:flex items-center space-x-1">
                <NavigationLinks />

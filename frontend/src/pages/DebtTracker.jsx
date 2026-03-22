@@ -9,6 +9,7 @@ import {
   Percent, History, Info
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { numberToWords } from '../utils/numberToWords';
 import { format } from 'date-fns';
 const DebtTracker = () => {
     const [debts, setDebts] = useState([]);
@@ -201,7 +202,14 @@ const DebtTracker = () => {
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
-                                <Input label="Principal Amount (₹)" type="number" value={newDebt.amount} onChange={e => setNewDebt({...newDebt, amount: e.target.value})} placeholder="0.00" required />
+                                <div className="space-y-1">
+                                    <Input label="Principal Amount (₹)" type="number" value={newDebt.amount} onChange={e => setNewDebt({...newDebt, amount: e.target.value})} placeholder="0.00" required />
+                                    {Number(newDebt.amount) > 0 && (
+                                        <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1 text-left">
+                                            {numberToWords(Number(newDebt.amount))}
+                                        </p>
+                                    )}
+                                </div>
                                 <Input label="Interest Rate (%)" type="number" step="0.01" value={newDebt.interestRate} onChange={e => setNewDebt({...newDebt, interestRate: e.target.value})} placeholder="0.00" />
                                 <div className="md:col-span-2">
                                     <Input label="Due Date" type="date" value={newDebt.dueDate} onChange={e => setNewDebt({...newDebt, dueDate: e.target.value})} required />
@@ -227,7 +235,14 @@ const DebtTracker = () => {
                         <h3 className="text-2xl font-black mb-2 tracking-tighter uppercase tracking-widest">Make Payment</h3>
                         <p className="text-sm text-muted-foreground mb-8">Recording a payment for <span className="text-foreground font-black">{paymentModal.debt?.title}</span>.</p>
                         <form onSubmit={handlePayment}>
-                            <Input label="Amount (₹)" type="number" step="0.01" value={paymentModal.amount} onChange={e => setPaymentModal({...paymentModal, amount: e.target.value})} placeholder="0.00" required autoFocus />
+                            <div className="space-y-1 text-left">
+                                <Input label="Amount (₹)" type="number" step="0.01" value={paymentModal.amount} onChange={e => setPaymentModal({...paymentModal, amount: e.target.value})} placeholder="0.00" required autoFocus />
+                                {Number(paymentModal.amount) > 0 && (
+                                    <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+                                        {numberToWords(Number(paymentModal.amount))}
+                                    </p>
+                                )}
+                            </div>
                             <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8">Record Payment</Button>
                             <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setPaymentModal({ show: false, debt: null, amount: '' })}>Cancel</Button>
                         </form>

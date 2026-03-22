@@ -5,6 +5,7 @@ import { Card, Button, Input, LoadingSpinner, Modal, StatsCard } from '../compon
 import { Link } from 'react-router-dom';
 import { Wallet, Banknote, CreditCard, ArrowRightLeft, Plus, RefreshCw, Layers, History, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { numberToWords } from '../utils/numberToWords';
 const Wallets = () => {
   const [wallets, setWallets] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -164,13 +165,20 @@ const Wallets = () => {
                               <option value="Other">Other</option>
                           </select>
                       </div>
-                      <Input
-                        label="Initial Value (₹)"
-                        type="number"
-                        value={editingWallet ? editingWallet.openingBalance : newWallet.openingBalance}
-                        onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, openingBalance: Number(e.target.value)}) : setNewWallet({...newWallet, openingBalance: Number(e.target.value)})}
-                        placeholder="0.00"
-                      />
+                      <div className="space-y-1">
+                        <Input
+                          label="Initial Value (₹)"
+                          type="number"
+                          value={editingWallet ? editingWallet.openingBalance : newWallet.openingBalance}
+                          onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, openingBalance: Number(e.target.value)}) : setNewWallet({...newWallet, openingBalance: Number(e.target.value)})}
+                          placeholder="0.00"
+                        />
+                        {(editingWallet ? editingWallet.openingBalance : newWallet.openingBalance) > 0 && (
+                          <p className="text-[10px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+                            {numberToWords(editingWallet ? editingWallet.openingBalance : newWallet.openingBalance)}
+                          </p>
+                        )}
+                      </div>
                       <div className="flex items-center space-x-3 pt-4">
                           <Button type="button" variant="secondary" onClick={() => { setIsCreating(false); setEditingWallet(null); }} className="w-full">Cancel</Button>
                           <Button type="submit" className="w-full btn-saas-primary">{editingWallet ? 'Save Changes' : 'Create Wallet'}</Button>
@@ -197,14 +205,21 @@ const Wallets = () => {
                               {wallets.filter(w => w._id !== transferFrom).map(w => <option key={w._id} value={w._id}>{w.name} (₹{w.currentBalance})</option>)}
                           </select>
                       </div>
-                      <Input
-                        label="Amount"
-                        type="number"
-                        value={transferAmount}
-                        onChange={(e) => setTransferAmount(e.target.value)}
-                        placeholder="0.00"
-                        required
-                      />
+                      <div className="space-y-1">
+                        <Input
+                          label="Amount"
+                          type="number"
+                          value={transferAmount}
+                          onChange={(e) => setTransferAmount(e.target.value)}
+                          placeholder="0.00"
+                          required
+                        />
+                        {Number(transferAmount) > 0 && (
+                          <p className="text-[10px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+                            {numberToWords(Number(transferAmount))}
+                          </p>
+                        )}
+                      </div>
                       <Input
                         label="Note"
                         value={transferNotes}

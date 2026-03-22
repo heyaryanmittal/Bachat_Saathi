@@ -8,6 +8,7 @@ import {
   DollarSign, Briefcase, Zap, Star, Calendar
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { numberToWords } from '../utils/numberToWords';
 const Goals = () => {
     const [goals, setGoals] = useState([]);
     const [stats, setStats] = useState({});
@@ -163,7 +164,14 @@ const Goals = () => {
                             <Input label="Goal Name" value={newGoal.title} onChange={e => setNewGoal({...newGoal, title: e.target.value})} placeholder="Emergency Fund..." required />
                             <Input label="Description" value={newGoal.description} onChange={e => setNewGoal({...newGoal, description: e.target.value})} placeholder="What is this goal for?..." />
                             <div className="grid grid-cols-2 gap-4">
-                                <Input label="Target Amount (₹)" type="number" value={newGoal.targetAmount} onChange={e => setNewGoal({...newGoal, targetAmount: e.target.value})} required />
+                                <div className="space-y-1">
+                                    <Input label="Target Amount (₹)" type="number" value={newGoal.targetAmount} onChange={e => setNewGoal({...newGoal, targetAmount: e.target.value})} required />
+                                    {Number(newGoal.targetAmount) > 0 && (
+                                        <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+                                            {numberToWords(Number(newGoal.targetAmount))}
+                                        </p>
+                                    )}
+                                </div>
                                 <Input label="Target Date" type="date" value={newGoal.deadline} onChange={e => setNewGoal({...newGoal, deadline: e.target.value})} required />
                             </div>
                             <div className="space-y-2">
@@ -192,7 +200,14 @@ const Goals = () => {
                         <h3 className="text-2xl font-black mb-2 tracking-tighter uppercase tracking-widest">Add Savings</h3>
                         <p className="text-sm text-muted-foreground mb-8 italic">Adding savings to <span className="text-foreground font-black">{selectedGoal.title}</span>.</p>
                         <form onSubmit={handleSavings}>
-                            <Input label="Amount (₹)" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
+                            <div className="space-y-1 text-left">
+                                <Input label="Amount (₹)" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
+                                {Number(savingsAmount) > 0 && (
+                                    <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+                                        {numberToWords(Number(savingsAmount))}
+                                    </p>
+                                )}
+                            </div>
                             <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8">Add to Goal</Button>
                             <Button type="button" variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowSavingsModal(false)}>Cancel</Button>
                         </form>

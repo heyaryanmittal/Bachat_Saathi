@@ -3,6 +3,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { expenseCategories } from "../config/categories";
 import { Button, Input } from "./ui";
 import { Tag, Calendar, Bell, DollarSign } from 'lucide-react';
+import { numberToWords } from '../utils/numberToWords';
 function BudgetForm({ onSubmit, initialData = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState: { errors }, setValue, control } = useForm({
@@ -51,13 +52,20 @@ function BudgetForm({ onSubmit, initialData = null }) {
             </div>
             {errors.category && <p className="text-[10px] text-rose-500 font-bold ml-2 uppercase">{errors.category.message}</p>}
         </div>
-        <Input
-          label="Maximum Outbound (₹)"
-          type="number"
-          placeholder="0.00"
-          {...register("amount", { required: "Limit required", min: 0.01 })}
-          error={errors.amount?.message}
-        />
+        <div className="space-y-1">
+          <Input
+            label="Maximum Outbound (₹)"
+            type="number"
+            placeholder="0.00"
+            {...register("amount", { required: "Limit required", min: 0.01 })}
+            error={errors.amount?.message}
+          />
+          {useWatch({ control, name: 'amount' }) > 0 && (
+            <p className="text-[10px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+              {numberToWords(Number(useWatch({ control, name: 'amount' })))}
+            </p>
+          )}
+        </div>
         <Input
           label="Strategy Period"
           type="month"

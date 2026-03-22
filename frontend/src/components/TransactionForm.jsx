@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { expenseCategories, incomeCategories } from '../config/categories';
 import { Button, Input } from './ui';
 import { Wallet, Tag, Calendar, PenTool, Hash } from 'lucide-react';
+import { numberToWords } from '../utils/numberToWords';
 const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({
@@ -50,13 +51,20 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
              <input type="hidden" {...register('type')} />
           </div>
         </div>
-        <Input
-          label="Transmission Value (₹)"
-          type="number"
-          placeholder="0.00"
-          {...register('amount', { required: "Value required", min: 0.01 })}
-          error={errors.amount?.message}
-        />
+        <div className="space-y-1">
+          <Input
+            label="Transmission Value (₹)"
+            type="number"
+            placeholder="0.00"
+            {...register('amount', { required: "Value required", min: 0.01 })}
+            error={errors.amount?.message}
+          />
+          {watch('amount') > 0 && (
+            <p className="text-[10px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
+              {numberToWords(Number(watch('amount')))}
+            </p>
+          )}
+        </div>
         <div className="space-y-2">
             <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Source Node</label>
             <div className="relative group">

@@ -124,7 +124,7 @@ function Signup() {
                 id="signup-name"
                 name="name"
                 autoComplete="name"
-                placeholder="Aryan Mittal"
+                placeholder="Your Name"
                 {...register('name', { required: 'Name required', minLength: 2 })}
                 error={errors.name?.message}
               />
@@ -134,7 +134,7 @@ function Signup() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="aryan@wealth.com"
+                placeholder="Your Email"
                 {...register('email', { required: 'Email required' })}
                 error={errors.email?.message}
               />

@@ -90,14 +90,14 @@ const DebtTracker = () => {
                 <StatsCard title="Active Debts" value={stats.activeDebts || 0} variant="secondary" icon={<History />} />
                 <StatsCard title="Paid Off" value={stats.totalDebts - stats.activeDebts || 0} variant="success" icon={<CheckCircle2 />} />
             </div>
-            {}
-            <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2">
+                <div className="bg-primary/5 border border-primary/10 py-2.5 px-5 rounded-2xl flex items-center gap-3 text-primary w-fit">
+                    <Info className="w-4 h-4 opacity-70 flex-shrink-0" />
+                    <p className="text-sm font-black italic tracking-tight">Note: Only fully paid debts can be deleted from your records. Active debts must be paid off first.</p>
+                </div>
                 <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />Add Debt</Button>
             </div>
-            <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl flex items-center gap-4 text-primary max-w-2xl mx-auto">
-                <Info className="w-8 h-8 opacity-50 flex-shrink-0" />
-                <p className="text-sm font-black italic tracking-tight">Note: Only fully paid debts can be deleted from your records. Active debts must be paid off first.</p>
-            </div>
+
             {}
             <Card variant="glass" className="saas-card overflow-hidden">
                 <div className="p-8 border-b border-border/50 flex items-center justify-between">
@@ -107,13 +107,13 @@ const DebtTracker = () => {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-muted/30">
-                                <th className="px-8 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Source</th>
-                                <th className="px-8 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Principal</th>
-                                <th className="px-8 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Remaining</th>
-                                <th className="px-8 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Interest</th>
-                                <th className="px-8 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Due Date</th>
-                                <th className="px-8 py-4 text-center font-black text-[10px] uppercase tracking-widest text-muted-foreground">Status</th>
-                                <th className="px-8 py-4 text-right font-black text-[10px] uppercase tracking-widest text-muted-foreground">Actions</th>
+                                <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Source</th>
+                                <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Principal</th>
+                                <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Remaining</th>
+                                <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Interest</th>
+                                <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Due Date</th>
+                                <th className="px-6 py-3 text-center font-black text-[10px] uppercase tracking-widest text-muted-foreground">Status</th>
+                                <th className="px-6 py-3 text-right font-black text-[10px] uppercase tracking-widest text-muted-foreground">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/50">
@@ -123,46 +123,50 @@ const DebtTracker = () => {
                                 debts.map(d => {
                                     const { label, color, icon: StatusIcon } = getStatusConfig(d);
                                     return (
-                                        <tr key={d._id} className="hover:bg-muted/20 transition-colors group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-primary border border-border/50 group-hover:scale-110 transition-transform">
+                                        <tr key={d._id} className="hover:bg-muted/10 transition-colors">
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-primary border border-border/50">
                                                         {getTypeIcon(d.type)}
                                                     </div>
                                                     <div>
-                                                        <p className="font-black text-sm tracking-tighter uppercase">{d.title}</p>
-                                                        <p className="text-[10px] font-black text-muted-foreground uppercase opacity-70">{d.type}</p>
+                                                        <p className="font-black text-xs tracking-tighter uppercase">{d.title}</p>
+                                                        <p className="text-[9px] font-black text-muted-foreground uppercase opacity-70">{d.type}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 font-black text-sm tracking-tighter italic">₹{d.amount.toLocaleString()}</td>
-                                            <td className="px-8 py-6 font-black text-sm tracking-tighter text-rose-500 italic">₹{d.remainingAmount.toLocaleString()}</td>
-                                            <td className="px-8 py-6 font-black text-sm tracking-tighter italic flex items-center gap-2">
-                                                <Percent className="w-3 h-3 text-muted-foreground" />
-                                                {d.interestRate}%
+                                            <td className="px-6 py-3 font-black text-xs">₹{d.amount.toLocaleString()}</td>
+                                            <td className="px-6 py-3 font-black text-xs text-rose-500">₹{d.remainingAmount.toLocaleString()}</td>
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-1.5 font-black text-xs">
+                                                    <Percent className="w-3 h-3 text-muted-foreground" />
+                                                    {d.interestRate}%
+                                                </div>
                                             </td>
-                                            <td className="px-8 py-6 text-[11px] font-black uppercase text-muted-foreground italic flex items-center gap-2">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                                {format(new Date(d.dueDate), 'MMM dd, yyyy')}
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground/80">
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    {format(new Date(d.dueDate), 'MMM dd, yyyy')}
+                                                </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <div className={`mx-auto w-fit px-3 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${color}`}>
-                                                    <StatusIcon className="w-3.5 h-3.5" />
+                                            <td className="px-6 py-3">
+                                                <div className={`mx-auto w-fit px-2.5 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 ${color}`}>
+                                                    <StatusIcon className="w-3 h-3" />
                                                     {label}
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <td className="px-6 py-3 text-right">
+                                                <div className="flex items-center justify-end gap-2">
                                                     {d.status !== 'closed' && (
                                                         <>
-                                                            <Button variant="secondary" size="sm" onClick={() => setPaymentModal({ show: true, debt: d, amount: '' })} className="text-[9px] font-black">Make Payment</Button>
+                                                            <Button variant="secondary" size="sm" onClick={() => setPaymentModal({ show: true, debt: d, amount: '' })} className="h-7 px-3 text-[9px] font-black uppercase">Payment</Button>
                                                             {d.interestRate > 0 && (
-                                                                <Button variant="secondary" size="sm" onClick={() => handleInterest(d)} className="text-[9px] font-black"><TrendingDown className="w-3 h-3 mr-1" /> Add Interest</Button>
+                                                                <Button variant="secondary" size="sm" onClick={() => handleInterest(d)} className="h-7 px-3 text-[9px] font-black uppercase"><Plus className="w-3 h-3 mr-1" />Interest</Button>
                                                             )}
                                                         </>
                                                     )}
                                                     {d.status === 'closed' && (
-                                                        <Button variant="secondary" size="sm" onClick={() => setDeleteModal({ show: true, debt: d })}><Trash2 className="w-3.5 h-3.5 text-rose-500" /></Button>
+                                                        <Button variant="secondary" onClick={() => setDeleteModal({ show: true, debt: d })} className="h-7 w-7 p-0 flex items-center justify-center"><Trash2 className="w-3.5 h-3.5 text-rose-500" /></Button>
                                                     )}
                                                 </div>
                                             </td>

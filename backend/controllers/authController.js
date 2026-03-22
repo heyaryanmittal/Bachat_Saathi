@@ -1,19 +1,40 @@
-const { sendSignupOtpEmail } = require('../utils/emailService');
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/jwt');
+const { 
+  sendSignupOtpEmail, 
+  sendWelcomeEmail, 
+  send2FAOtpEmail, 
+  sendPasswordChanged 
+} = require('../utils/emailService');
+const logger = require('../utils/logger');
+
+const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN
+  });
+};
+
 exports.signupRequestOtp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
+    
     if (existingUser && existingUser.passwordHash) {
       return res.status(400).json({ 
         status: 'error', 
         message: 'This email is already registered. Please login instead.' 
       });
     }
+
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       return res.status(400).json({ status: 'error', message: 'Invalid email format' });
     }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 10 * 60 * 1000); 
+
     let user = await User.findOne({ email });
     if (!user) {
       user = new User({ name, email, passwordHash: '', signupOTP: otp, signupOTPExpiry: expiry });
@@ -22,36 +43,50 @@ exports.signupRequestOtp = async (req, res) => {
       user.signupOTPExpiry = expiry;
     }
     await user.save();
+
     const emailResult = await sendSignupOtpEmail(email, { name, otp });
     if (!emailResult.ok) {
       return res.status(400).json({ status: 'error', message: 'Failed to send OTP. Please check your email address.' });
     }
+
     res.json({ status: 'success', message: 'OTP sent to your email.' });
   } catch (error) {
+    logger.error('Signup OTP request error:', error);
     res.status(500).json({ status: 'error', message: 'Failed to send OTP', error: error.message });
   }
 };
+
 exports.signupVerifyOtp = async (req, res) => {
   try {
     const { name, email, password, otp } = req.body;
     const user = await User.findOne({ email });
+
     if (!user || !user.signupOTP || !user.signupOTPExpiry) {
       return res.status(400).json({ status: 'error', message: 'No OTP requested for this email.' });
     }
+
     if (user.signupOTPExpiry < new Date()) {
       return res.status(400).json({ status: 'error', message: 'OTP expired. Please request a new one.' });
     }
+
     if (user.signupOTP !== otp) {
       return res.status(400).json({ status: 'error', message: 'Invalid OTP.' });
     }
+
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
+
     user.name = name;
     user.passwordHash = passwordHash;
     user.signupOTP = undefined;
     user.signupOTPExpiry = undefined;
+    
     await user.save();
-    sendWelcomeEmail(email, { name, email, password }).catch(() => {});
+
+    sendWelcomeEmail(email, { name, email, password }).catch(err => {
+      logger.error('Failed to send welcome email:', err);
+    });
+
     const token = generateToken(user._id);
     res.status(201).json({
       status: 'success',
@@ -62,10 +97,10 @@ exports.signupVerifyOtp = async (req, res) => {
       }
     });
   } catch (error) {
+    logger.error('Signup verification error:', error);
     res.status(500).json({ status: 'error', message: 'Signup failed', error: error.message });
   }
 };
-const { sendWelcomeEmail, send2FAOtpEmail, sendPasswordChanged } = require('../utils/emailService');
 exports.send2FAOtp = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -81,6 +116,7 @@ exports.send2FAOtp = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to send OTP', error: error.message });
   }
 };
+
 exports.verify2FAOtp = async (req, res) => {
   try {
     const { otp } = req.body;
@@ -101,6 +137,7 @@ exports.verify2FAOtp = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to verify OTP', error: error.message });
   }
 };
+
 exports.get2FAStatus = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -110,16 +147,7 @@ exports.get2FAStatus = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to get 2FA status', error: error.message });
   }
 };
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/jwt');
-const logger = require('../utils/logger');
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN
-  });
-};
+
 exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -168,21 +196,36 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    logger.info(`Login attempt for email: ${email}`);
+    
     const user = await User.findOne({ email });
     if (!user) {
+      logger.warn(`Login failed: User not found for email ${email}`);
       return res.status(401).json({
         status: 'error',
         message: 'Invalid credentials'
       });
     }
+
+    if (!user.passwordHash) {
+      logger.warn(`Login failed: User ${email} has no passwordHash (possibly OTP signup incomplete)`);
+      return res.status(401).json({
+        status: 'error',
+        message: 'Account not fully setup. Please complete signup or reset password.'
+      });
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
+      logger.warn(`Login failed: Incorrect password for email ${email}`);
       return res.status(401).json({
         status: 'error',
         message: 'Invalid credentials'
       });
     }
+
     if (user.is2FAEnabled) {
+      logger.info(`2FA required for user ${email}`);
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const expiry = new Date(Date.now() + 10 * 60 * 1000); 
       user.twoFAOTP = otp;
@@ -195,8 +238,11 @@ exports.login = async (req, res) => {
         data: { user: { id: user._id, name: user.name, email: user.email } }
       });
     }
+
+    logger.info(`Login successful for user ${email}`);
     user.lastLogin = new Date();
     await user.save();
+    
     const token = generateToken(user._id);
     res.status(200).json({
       status: 'success',
@@ -209,6 +255,7 @@ exports.login = async (req, res) => {
         token
       }
     });
+
   } catch (error) {
     res.status(500).json({
       status: 'error',

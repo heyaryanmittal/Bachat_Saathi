@@ -6,7 +6,9 @@ import UserMenu from './UserMenu';
 import NavigationLinks from './NavigationLinks';
 import MobileMenu from './MobileMenu';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Menu, X, Bell } from 'lucide-react';
+
 import { Button } from './ui';
 function Navbar() {
   const { user } = useAuth();
@@ -14,6 +16,7 @@ function Navbar() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { darkMode } = useTheme();
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
@@ -25,13 +28,15 @@ function Navbar() {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? 'py-4 bg-[#EEA62B] dark:bg-background/80 backdrop-blur-xl border-b border-white/10 shadow-sm' 
+          ? 'py-4 bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm' 
           : 'py-8 bg-transparent'
       }`}
     >
       <div className="container-saas flex items-center justify-between">
         <div className="flex items-center space-x-12">
-          <Logo isLight={scrolled ? true : false} />
+          <Logo isLight={darkMode ? true : (scrolled ? false : false)} />
+
+
 
           {user && (
             <nav className="hidden lg:flex items-center space-x-1">

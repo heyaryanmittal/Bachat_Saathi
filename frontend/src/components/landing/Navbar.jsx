@@ -41,11 +41,12 @@ const Navbar = () => {
           </button>
           <Button 
             size="sm" 
-            className="bg-white dark:bg-primary text-[#EEA62B] dark:text-white hover:bg-slate-50 dark:hover:bg-primary/90 text-[13px] font-black uppercase tracking-widest px-8 h-10 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
+            className="bg-white dark:bg-primary text-black dark:text-white hover:bg-slate-50 dark:hover:bg-primary/90 text-[13px] font-black uppercase tracking-widest px-8 h-10 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
             onClick={() => navigate('/signup')}
           >
             Get Started
           </Button>
+
         </div>
 
         <div className="md:hidden flex items-center gap-4">
@@ -74,7 +75,8 @@ const Navbar = () => {
           ))}
           <div className="flex gap-3 pt-2">
             <Button variant="ghost" size="sm" className="flex-1" onClick={() => navigate('/login')}>Log in</Button>
-            <Button size="sm" className="flex-1" onClick={() => navigate('/signup')}>Get Started</Button>
+            <Button size="sm" className="flex-1 bg-white text-black dark:bg-primary dark:text-white" onClick={() => navigate('/signup')}>Get Started</Button>
+
           </div>
         </div>
       )}

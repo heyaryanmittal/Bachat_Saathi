@@ -53,8 +53,9 @@ const Transactions = () => {
         toast.success('Transaction added.');
       }
       setIsEditing(false); setIsCreating(false);
-      fetchTransactions(); fetchAllStats(); fetchWallets();
+      await Promise.all([fetchTransactions(), fetchAllStats(), fetchWallets()]);
     } catch (e) { toast.error('Failed to save transaction.'); }
+
 
   };
   const confirmDelete = async () => {
@@ -63,8 +64,9 @@ const Transactions = () => {
       await api.deleteTransaction(deleteDialog.transaction._id);
       toast.success('Transaction deleted.');
       setDeleteDialog({ isOpen: false, transaction: null, isDeleting: false });
-      fetchTransactions(); fetchAllStats(); fetchWallets();
+      await Promise.all([fetchTransactions(), fetchAllStats(), fetchWallets()]);
     } catch (e) { toast.error('Failed to delete.'); }
+
 
   };
   const stats = useMemo(() => {

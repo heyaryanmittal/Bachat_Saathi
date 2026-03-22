@@ -321,22 +321,40 @@ exports.updateTransaction = async (req, res) => {
         message: 'Transaction not found'
       });
     }
-    const wallet = await Wallet.findById(oldTransaction.walletId);
-    wallet.currentBalance -= oldTransaction.type === 'Income'
-      ? oldTransaction.amount
-      : -oldTransaction.amount;
-    oldTransaction.type = type || oldTransaction.type;
-    oldTransaction.amount = amount || oldTransaction.amount;
+
+    const { walletId: newWalletId, type: newType, amount: newAmount } = req.body;
+    const oldWalletId = oldTransaction.walletId;
+    const isWalletChanged = newWalletId && newWalletId.toString() !== oldWalletId.toString();
+
+    // 1. Revert balance on OLD wallet
+    const oldWallet = await Wallet.findById(oldWalletId);
+    if (oldWallet) {
+      oldWallet.currentBalance -= oldTransaction.type === 'Income'
+        ? oldTransaction.amount
+        : -oldTransaction.amount;
+      await oldWallet.save();
+    }
+
+    // 2. Update transaction
+    oldTransaction.type = newType || oldTransaction.type;
+    oldTransaction.amount = newAmount !== undefined ? Number(newAmount) : oldTransaction.amount;
+    oldTransaction.walletId = newWalletId || oldTransaction.walletId;
     oldTransaction.category = category || oldTransaction.category;
-    oldTransaction.merchant = merchant || oldTransaction.merchant;
     oldTransaction.notes = notes || oldTransaction.notes;
-    oldTransaction.tags = tags || oldTransaction.tags;
     oldTransaction.date = date || oldTransaction.date;
     await oldTransaction.save();
-    wallet.currentBalance += oldTransaction.type === 'Income'
-      ? oldTransaction.amount
-      : -oldTransaction.amount;
-    await wallet.save();
+
+    // 3. Apply balance to NEW (or same) wallet
+    const targetWalletId = oldTransaction.walletId;
+    const targetWallet = isWalletChanged ? await Wallet.findById(targetWalletId) : oldWallet;
+    
+    if (targetWallet) {
+      targetWallet.currentBalance += oldTransaction.type === 'Income'
+        ? oldTransaction.amount
+        : -oldTransaction.amount;
+      await targetWallet.save();
+    }
+
     clearUserCache(req.user.id);
     userController.awardMonthlySavingsPoints(req.user.id, new Date(oldTransaction.date))
       .catch(error => console.error('Error updating monthly savings points:', error));

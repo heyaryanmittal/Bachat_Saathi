@@ -111,27 +111,39 @@ function Signup() {
               )}
               <Input
                 label="Identity Display Name"
+                id="signup-name"
+                name="name"
+                autoComplete="name"
                 placeholder="Aryan Mittal"
                 {...register('name', { required: 'Name required', minLength: 2 })}
                 error={errors.name?.message}
               />
               <Input
                 label="Secure Email Workspace"
+                id="signup-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 placeholder="aryan@wealth.com"
                 {...register('email', { required: 'Email required' })}
                 error={errors.email?.message}
               />
               <Input
                 label="Master Access Key"
+                id="signup-password"
+                name="password"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 {...register('password', { required: 'Password required', minLength: 6 })}
                 error={errors.password?.message}
               />
               <Input
                 label="Confirm Access Key"
+                id="signup-confirm-password"
+                name="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 {...register('confirmPassword', { 
                     required: 'Confirmation required',
@@ -157,6 +169,9 @@ function Signup() {
             <form className="space-y-6" onSubmit={handleOtpVerification}>
                 <Input
                     label="Verification Code"
+                    id="signup-otp"
+                    name="otp"
+                    autoComplete="one-time-code"
                     maxLength={6}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}

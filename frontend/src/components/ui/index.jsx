@@ -162,39 +162,47 @@ export const Input = React.forwardRef(({
     error,
     helperText,
     className,
+    id,
+    name,
     ...props
-}, ref) => (
-    <div className="space-y-2">
-        {label && (
-            <label className="block text-sm font-bold text-muted-foreground uppercase tracking-wider ml-1">
-                {label}
-                {props.required && <span className="text-destructive ml-1">*</span>}
-            </label>
-        )}
-        <div className="relative">
-            <input
-                ref={ref}
-                className={cn(
-                    "input-saas w-full placeholder:text-muted-foreground/50",
-                    error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
-                    className
-                )}
-                aria-invalid={error ? "true" : "false"}
-                {...props}
-            />
+}, ref) => {
+    const inputId = id || name || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
+    return (
+        <div className="space-y-2">
+            {label && (
+                <label htmlFor={inputId} className="block text-sm font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                    {label}
+                    {props.required && <span className="text-destructive ml-1">*</span>}
+                </label>
+            )}
+            <div className="relative">
+                <input
+                    ref={ref}
+                    id={inputId}
+                    name={name || inputId}
+                    className={cn(
+                        "input-saas w-full placeholder:text-muted-foreground/50",
+                        error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
+                        className
+                    )}
+                    aria-invalid={error ? "true" : "false"}
+                    aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-help` : undefined}
+                    {...props}
+                />
+            </div>
+            {error && (
+                <p id={`${inputId}-error`} className="text-xs font-bold text-rose-500 animate-entrance ml-1">
+                    {error}
+                </p>
+            )}
+            {helperText && !error && (
+                <p id={`${inputId}-help`} className="text-xs text-muted-foreground ml-1">
+                    {helperText}
+                </p>
+            )}
         </div>
-        {error && (
-            <p className="text-xs font-bold text-rose-500 animate-entrance ml-1">
-                {error}
-            </p>
-        )}
-        {helperText && !error && (
-            <p className="text-xs text-muted-foreground ml-1">
-                {helperText}
-            </p>
-        )}
-    </div>
-));
+    );
+});
 Input.displayName = "Input";
 export const Select = React.forwardRef(({
     label,
@@ -203,47 +211,52 @@ export const Select = React.forwardRef(({
     error,
     helperText,
     className,
+    id,
+    name,
     ...props
-}, ref) => (
-    <div className="space-y-1">
-        {label && (
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {label}
-                {props.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-        )}
-        <select
-            ref={ref}
-            className={cn(
-                "block w-full rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors",
-                "focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20",
-                "disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:cursor-not-allowed",
-                error ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600",
-                className
+}, ref) => {
+    const selectId = id || name || (label ? `select-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
+    return (
+        <div className="space-y-2">
+            {label && (
+                <label htmlFor={selectId} className="block text-sm font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                    {label}
+                    {props.required && <span className="text-destructive ml-1">*</span>}
+                </label>
             )}
-            aria-invalid={error ? "true" : "false"}
-            aria-describedby={error ? `${props.id}-error` : helperText ? `${props.id}-help` : undefined}
-            {...props}
-        >
-            {placeholder && <option value="">{placeholder}</option>}
-            {options.map(option => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
-        {error && (
-            <p id={`${props.id}-error`} className="text-sm text-red-600 dark:text-red-400">
-                {error}
-            </p>
-        )}
-        {helperText && !error && (
-            <p id={`${props.id}-help`} className="text-sm text-gray-500 dark:text-gray-400">
-                {helperText}
-            </p>
-        )}
-    </div>
-));
+            <select
+                ref={ref}
+                id={selectId}
+                name={name || selectId}
+                className={cn(
+                    "input-saas w-full appearance-none",
+                    error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
+                    className
+                )}
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-help` : undefined}
+                {...props}
+            >
+                {placeholder && <option value="">{placeholder}</option>}
+                {options.map(option => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+            {error && (
+                <p id={`${selectId}-error`} className="text-xs font-bold text-rose-500 animate-entrance ml-1">
+                    {error}
+                </p>
+            )}
+            {helperText && !error && (
+                <p id={`${selectId}-help`} className="text-xs text-muted-foreground ml-1">
+                    {helperText}
+                </p>
+            )}
+        </div>
+    );
+});
 Select.displayName = "Select";
 export const Alert = ({
     type = "info",

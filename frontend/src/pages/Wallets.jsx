@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import WalletCard from '../components/WalletCard';
-import { Card, Button, Input, LoadingSpinner, Modal, StatsCard } from '../components/ui';
+import { Card, Button, Input, LoadingSpinner, Modal, StatsCard, Select } from '../components/ui';
 import { Link } from 'react-router-dom';
 import { Wallet, Banknote, CreditCard, ArrowRightLeft, Plus, RefreshCw, Layers, History, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -152,19 +152,18 @@ const Wallets = () => {
                         placeholder="Personal Bank"
                         required
                       />
-                      <div>
-                          <label className="block text-sm font-black text-muted-foreground uppercase tracking-widest mb-2">Wallet Type</label>
-                          <select 
-                            className="input-saas w-full"
-                            value={editingWallet ? editingWallet.type : newWallet.type}
-                            onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, type: e.target.value}) : setNewWallet({...newWallet, type: e.target.value})}
-                          >
-                              <option value="Cash">Cash</option>
-                              <option value="Bank">Bank</option>
-                              <option value="Card">Card</option>
-                              <option value="Other">Other</option>
-                          </select>
-                      </div>
+                      <Select 
+                        label="Wallet Type"
+                        id="wallet-type"
+                        value={editingWallet ? editingWallet.type : newWallet.type}
+                        onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, type: e.target.value}) : setNewWallet({...newWallet, type: e.target.value})}
+                        options={[
+                            { value: 'Cash', label: 'Cash' },
+                            { value: 'Bank', label: 'Bank' },
+                            { value: 'Card', label: 'Card' },
+                            { value: 'Other', label: 'Other' }
+                        ]}
+                      />
                       <div className="space-y-1">
                         <Input
                           label="Initial Value (₹)"
@@ -193,18 +192,15 @@ const Wallets = () => {
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
                   <h3 className="text-2xl font-black mb-6 tracking-tighter">Transfer Funds</h3>
                   <form onSubmit={submitTransfer} className="space-y-6">
-                      <div>
-                          <label className="block text-sm font-black text-muted-foreground uppercase tracking-widest mb-2 font-black">To Wallet</label>
-                          <select 
-                            className="input-saas w-full"
-                            value={transferTo}
-                            onChange={(e) => setTransferTo(e.target.value)}
-                            required
-                          >
-                              <option value="">Select Target...</option>
-                              {wallets.filter(w => w._id !== transferFrom).map(w => <option key={w._id} value={w._id}>{w.name} (₹{w.currentBalance})</option>)}
-                          </select>
-                      </div>
+                      <Select 
+                        label="To Wallet"
+                        id="transfer-to"
+                        value={transferTo}
+                        onChange={(e) => setTransferTo(e.target.value)}
+                        options={wallets.filter(w => w._id !== transferFrom).map(w => ({ value: w._id, label: `${w.name} (₹${w.currentBalance})` }))}
+                        required
+                        placeholder="Select Target..."
+                      />
                       <div className="space-y-1">
                         <Input
                           label="Amount"

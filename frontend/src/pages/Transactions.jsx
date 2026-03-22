@@ -91,24 +91,44 @@ const Transactions = () => {
                     <h3 className="font-black text-sm uppercase tracking-widest">Filter Transactions</h3>
                 </div>
                 <div className="space-y-6">
-                    <select className="input-saas w-full" value={filters.walletId} onChange={e => setFilters({...filters, walletId: e.target.value})}>
-                        <option value="">All Wallets</option>
-                        {wallets.map(w => <option key={w._id} value={w._id}>{w.name}</option>)}
-                    </select>
-                    <select className="input-saas w-full" value={filters.type} onChange={e => setFilters({...filters, type: e.target.value})}>
-                        <option value="">All Types</option>
-                        <option value="Income">Income</option>
-                        <option value="Expense">Expense</option>
-                    </select>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-2">Timeline Start</label>
-                        <input type="date" className="input-saas w-full" value={filters.startDate} onChange={e => setFilters({...filters, startDate: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase ml-2">Timeline End</label>
-                        <input type="date" className="input-saas w-full" value={filters.endDate} onChange={e => setFilters({...filters, endDate: e.target.value})} />
-                    </div>
-                    <Button variant="secondary" className="w-full font-black text-[10px] uppercase tracking-widest" onClick={() => setFilters({ walletId: '', type: '', category: '', startDate: '', endDate: '' })}>Reset Filters</Button>
+                    <Select 
+                        label="Wallet Nodes"
+                        id="filter-wallet"
+                        name="walletId"
+                        value={filters.walletId} 
+                        onChange={e => setFilters({...filters, walletId: e.target.value})}
+                        options={wallets.map(w => ({ value: w._id, label: w.name }))}
+                        placeholder="All Wallets"
+                    />
+                    <Select 
+                        label="Flux Type"
+                        id="filter-type"
+                        name="type"
+                        value={filters.type} 
+                        onChange={e => setFilters({...filters, type: e.target.value})}
+                        options={[
+                            { value: 'Income', label: 'Inbound' },
+                            { value: 'Expense', label: 'Outbound' }
+                        ]}
+                        placeholder="All Types"
+                    />
+                    <Input 
+                        label="Timeline Start"
+                        id="filter-start"
+                        name="startDate"
+                        type="date" 
+                        value={filters.startDate} 
+                        onChange={e => setFilters({...filters, startDate: e.target.value})} 
+                    />
+                    <Input 
+                        label="Timeline End"
+                        id="filter-end"
+                        name="endDate"
+                        type="date" 
+                        value={filters.endDate} 
+                        onChange={e => setFilters({...filters, endDate: e.target.value})} 
+                    />
+                    <Button variant="secondary" className="w-full font-black text-[10px] uppercase tracking-widest mt-2" onClick={() => setFilters({ walletId: '', type: '', category: '', startDate: '', endDate: '' })}>Reset Filters</Button>
                 </div>
             </Card>
         </div>

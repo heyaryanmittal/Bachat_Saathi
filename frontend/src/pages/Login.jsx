@@ -106,14 +106,20 @@ function Login() {
             )}
             <Input
               label="Email Workspace"
+              id="login-email"
+              name="email"
               type="email"
+              autoComplete="email"
               placeholder="name@company.com"
               {...register('email', { required: 'Email required' })}
               error={errors.email?.message}
             />
             <Input
               label="Password Key"
+              id="login-password"
+              name="password"
               type="password"
+              autoComplete="current-password"
               placeholder="••••••••"
               {...register('password', { required: 'Password required' })}
               error={errors.password?.message}
@@ -150,6 +156,9 @@ function Login() {
                   <form onSubmit={handleOtpSubmit} className="space-y-4">
                       <Input
                         label="6-Digit OTP"
+                        id="login-otp"
+                        name="otp"
+                        autoComplete="one-time-code"
                         maxLength={6}
                         value={otp}
                         onChange={e => setOtp(e.target.value)}

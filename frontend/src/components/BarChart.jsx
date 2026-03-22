@@ -64,78 +64,81 @@ function BarChartComponent({ data }) {
     budget: Number(item.budget) || 0,
     spent: Number(item.spent) || 0
   }));
-  console.log('Chart data:', chartData);
+
   return (
-    <div className="h-80 w-full flex items-center justify-center">
+    <div className="h-80 w-full flex flex-col items-center justify-center">
       {hasData ? (
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 60
-            }}
-            barGap={0}
-            barCategoryGap="25%"
-          >
-            <defs>
-              <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#1D4ED8" stopOpacity={1} />
-              </linearGradient>
-              <linearGradient id="spentGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#EF4444" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#DC2626" stopOpacity={1} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke="rgba(156, 163, 175, 0.2)"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 12, fill: '#6B7280' }}
-              interval={0}
-              angle={-45}
-              textAnchor="end"
-              height={60}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 12, fill: '#6B7280' }}
-              tickFormatter={(value) => `₹${value.toLocaleString()}`}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend
-              wrapperStyle={{ paddingTop: '20px' }}
-              formatter={(value) => (
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {value}
-                </span>
-              )}
-            />
-            <Bar 
-              dataKey="budget" 
-              name="Budget" 
-              fill="url(#budgetGradient)"
-              radius={[4, 4, 0, 0]}
-              barSize={20}
-            />
-            <Bar 
-              dataKey="spent" 
-              name="Spent" 
-              fill="url(#spentGradient)"
-              radius={[4, 4, 0, 0]}
-              barSize={20}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        <>
+          <ResponsiveContainer width="100%" height="80%">
+            <BarChart
+              data={chartData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 20
+              }}
+              barGap={4}
+              barCategoryGap="20%"
+            >
+              <defs>
+                <linearGradient id="budgetGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#1D4ED8" stopOpacity={1} />
+                </linearGradient>
+                <linearGradient id="spentGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#EF4444" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#DC2626" stopOpacity={1} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="rgba(156, 163, 175, 0.1)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 700 }}
+                axisLine={false}
+                tickLine={false}
+                label={{ value: 'Categories', position: 'insideBottom', offset: -10, fontSize: 10, fontWeight: 800, fill: '#94A3B8', textAnchor: 'middle' }}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 700 }}
+                tickFormatter={(value) => `₹${value >= 1000 ? (value/1000).toFixed(0) + 'k' : value}`}
+                axisLine={false}
+                tickLine={false}
+                label={{ value: 'Amount', angle: -90, position: 'insideLeft', offset: 10, fontSize: 10, fontWeight: 800, fill: '#94A3B8' }}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.02)' }}/>
+              <Bar 
+                dataKey="budget" 
+                name="Limit" 
+                fill="url(#budgetGradient)"
+                radius={[4, 4, 0, 0]}
+                barSize={12}
+              />
+              <Bar 
+                dataKey="spent" 
+                name="Used" 
+                fill="url(#spentGradient)"
+                radius={[4, 4, 0, 0]}
+                barSize={12}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="flex items-center gap-6 mt-4 p-3 bg-muted/30 rounded-xl border border-border/50 w-full">
+             <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                <span className="text-[10px] font-black uppercase text-muted-foreground">Budget Cap</span>
+             </div>
+             <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <span className="text-[10px] font-black uppercase text-muted-foreground">Actual Spent</span>
+             </div>
+             <p className="ml-auto text-[9px] font-black italic text-primary uppercase">Comparing planned vs reality</p>
+          </div>
+        </>
       ) : (
         <div className="text-center">
           <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">

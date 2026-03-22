@@ -61,101 +61,84 @@ function LineChartComponent({ data }) {
     return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   };
   return (
-    <div className="h-80 w-full flex items-center justify-center">
+    <div className="h-80 w-full flex flex-col items-center justify-center">
       {hasData ? (
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 60
-            }}
-          >
-            <defs>
-              <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#10B981" stopOpacity={0.05} />
-              </linearGradient>
-              <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#EF4444" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#EF4444" stopOpacity={0.05} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke="rgba(156, 163, 175, 0.2)"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 12, fill: '#6B7280' }}
-              tickFormatter={formatDate}
-              interval="preserveStartEnd"
-              angle={-45}
-              textAnchor="end"
-              height={60}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 12, fill: '#6B7280' }}
-              tickFormatter={(value) => `₹${value.toLocaleString()}`}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend
-              wrapperStyle={{ paddingTop: '20px' }}
-              formatter={(value) => (
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {value}
-                </span>
-              )}
-            />
-            <Line
-              type="monotone"
-              dataKey="income"
-              stroke="#10B981"
-              strokeWidth={3}
-              name="Income"
-              dot={{ 
-                fill: '#10B981', 
-                strokeWidth: 2, 
-                stroke: '#ffffff',
-                r: 5 
+        <>
+          <ResponsiveContainer width="100%" height="80%">
+            <LineChart
+              data={data}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 20
               }}
-              activeDot={{ 
-                r: 7, 
-                fill: '#10B981',
-                stroke: '#ffffff',
-                strokeWidth: 2
-              }}
-              animationDuration={1500}
-            />
-            <Line
-              type="monotone"
-              dataKey="expense"
-              stroke="#EF4444"
-              strokeWidth={3}
-              name="Expense"
-              dot={{ 
-                fill: '#EF4444', 
-                strokeWidth: 2, 
-                stroke: '#ffffff',
-                r: 5 
-              }}
-              activeDot={{ 
-                r: 7, 
-                fill: '#EF4444',
-                stroke: '#ffffff',
-                strokeWidth: 2
-              }}
-              animationDuration={1800}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+            >
+              <defs>
+                <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity={0.05} />
+                </linearGradient>
+                <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#EF4444" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#EF4444" stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="rgba(156, 163, 175, 0.1)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 700 }}
+                tickFormatter={formatDate}
+                axisLine={false}
+                tickLine={false}
+                label={{ value: 'Timeline', position: 'insideBottom', offset: -10, fontSize: 10, fontWeight: 800, fill: '#94A3B8', textAnchor: 'middle' }}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 700 }}
+                tickFormatter={(value) => `₹${value >= 1000 ? (value/1000).toFixed(0) + 'k' : value}`}
+                axisLine={false}
+                tickLine={false}
+                label={{ value: 'Currency', angle: -90, position: 'insideLeft', offset: 10, fontSize: 10, fontWeight: 800, fill: '#94A3B8' }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="income"
+                stroke="#10B981"
+                strokeWidth={3}
+                name="Inflow"
+                dot={{ fill: '#10B981', r: 4 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+                animationDuration={1500}
+              />
+              <Line
+                type="monotone"
+                dataKey="expense"
+                stroke="#EF4444"
+                strokeWidth={3}
+                name="Outflow"
+                dot={{ fill: '#EF4444', r: 4 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+                animationDuration={1500}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          <div className="flex items-center gap-6 mt-4 p-3 bg-muted/30 rounded-xl border border-border/50 w-full">
+             <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span className="text-[10px] font-black uppercase text-muted-foreground">Cash Inflow</span>
+             </div>
+             <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+                <span className="text-[10px] font-black uppercase text-muted-foreground">Cash Outflow</span>
+             </div>
+             <p className="ml-auto text-[9px] font-black italic text-primary uppercase">Tracking daily velocity</p>
+          </div>
+        </>
       ) : (
         <div className="text-center">
           <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">

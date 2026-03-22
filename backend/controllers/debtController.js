@@ -338,3 +338,49 @@ exports.getDebtStats = async (req, res) => {
     });
   }
 };
+exports.closeDebt = async (req, res) => {
+  try {
+    const debt = await Debt.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    });
+    if (!debt) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Debt not found'
+      });
+    }
+    if (debt.status === 'closed') {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Debt is already closed'
+      });
+    }
+    const previousRemaining = debt.remainingAmount;
+    debt.remainingAmount = 0;
+    debt.status = 'closed';
+    await debt.save();
+    const pointsEarned = Math.floor(previousRemaining / 1000) * 10 + 1000;
+    await User.findByIdAndUpdate(req.user.id, { $inc: { points: pointsEarned } });
+    await PointsLog.create({
+      userId: req.user.id,
+      points: pointsEarned,
+      reason: 'debt_completed',
+      description: `Earned ${pointsEarned} bonus points for fully paying off debt: ${debt.title}`,
+      relatedId: debt._id,
+      relatedModel: 'Debt'
+    });
+    clearUserCache(req.user.id);
+    res.json({
+      status: 'success',
+      message: 'Debt marked as paid off!',
+      data: debt
+    });
+  } catch (error) {
+    console.error('Close debt error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to close debt'
+    });
+  }
+};

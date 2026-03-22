@@ -18,6 +18,7 @@ const DebtTracker = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [paymentModal, setPaymentModal] = useState({ show: false, debt: null, amount: '' });
     const [deleteModal, setDeleteModal] = useState({ show: false, debt: null });
+    const [markPaidModal, setMarkPaidModal] = useState({ show: false, debt: null });
     const [newDebt, setNewDebt] = useState({ type: 'personal', title: '', amount: '', interestRate: '', dueDate: '', description: '' });
     useEffect(() => { fetchAll(); }, []);
     const fetchAll = async () => {
@@ -64,6 +65,14 @@ const DebtTracker = () => {
             toast.success(`Accrued ₹${interest.toFixed(2)} interest.`);
             fetchAll();
         } catch (e) { toast.error('Accrual error.'); }
+    };
+    const handleMarkPaid = async () => {
+        try {
+            await api.closeDebt(markPaidModal.debt._id);
+            toast.success('Debt marked as paid off!');
+            setMarkPaidModal({ show: false, debt: null });
+            fetchAll();
+        } catch (e) { toast.error('Action failed.'); }
     };
     const getTypeIcon = (type) => {
         const map = { personal: DollarSign, creditCard: CreditCard, loan: Landmark, business: Briefcase, education: GraduationCap, vehicle: Car, other: ShoppingBag };
@@ -120,8 +129,9 @@ const DebtTracker = () => {
                             {debts.length === 0 ? (
                                 <tr><td colSpan="7" className="px-8 py-20 text-center text-muted-foreground font-black italic tracking-widest uppercase text-xs">No debts found</td></tr>
                             ) : (
-                                debts.map(d => {
-                                    const { label, color, icon: StatusIcon } = getStatusConfig(d);
+                                debts.map((d) => {
+                                    const statusConfig = getStatusConfig(d) || { label: 'Active', color: 'bg-primary/10', icon: History };
+                                    const { label, color: statusColor, icon: StatusIcon } = statusConfig;
                                     return (
                                         <tr key={d._id} className="hover:bg-muted/10 transition-colors">
                                             <td className="px-6 py-3">
@@ -150,7 +160,7 @@ const DebtTracker = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-3">
-                                                <div className={`mx-auto w-fit px-2.5 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 ${color}`}>
+                                                <div className={`mx-auto w-fit px-2.5 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 ${statusColor}`}>
                                                     <StatusIcon className="w-3 h-3" />
                                                     {label}
                                                 </div>
@@ -158,12 +168,21 @@ const DebtTracker = () => {
                                             <td className="px-6 py-3 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     {d.status !== 'closed' && (
-                                                        <>
+                                                        <div className="flex items-center gap-1.5">
                                                             <Button variant="secondary" size="sm" onClick={() => setPaymentModal({ show: true, debt: d, amount: '' })} className="h-7 px-3 text-[9px] font-black uppercase">Payment</Button>
                                                             {d.interestRate > 0 && (
                                                                 <Button variant="secondary" size="sm" onClick={() => handleInterest(d)} className="h-7 px-3 text-[9px] font-black uppercase"><Plus className="w-3 h-3 mr-1" />Interest</Button>
                                                             )}
-                                                        </>
+                                                            <Button 
+                                                                variant="success" 
+                                                                size="sm" 
+                                                                onClick={() => setMarkPaidModal({ show: true, debt: d })} 
+                                                                className="h-7 px-4 text-[9px] font-black uppercase flex items-center bg-emerald-500 hover:bg-emerald-600 border-none text-white shadow-lg shadow-emerald-500/20"
+                                                            >
+                                                                <CheckCircle2 className="w-3 h-3 mr-1.5" />
+                                                                Paid Off
+                                                            </Button>
+                                                        </div>
                                                     )}
                                                     {d.status === 'closed' && (
                                                         <Button variant="secondary" onClick={() => setDeleteModal({ show: true, debt: d })} className="h-7 w-7 p-0 flex items-center justify-center"><Trash2 className="w-3.5 h-3.5 text-rose-500" /></Button>
@@ -250,6 +269,19 @@ const DebtTracker = () => {
                             <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8">Record Payment</Button>
                             <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setPaymentModal({ show: false, debt: null, amount: '' })}>Cancel</Button>
                         </form>
+                    </Card>
+                </div>
+            )}
+            {markPaidModal.show && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+                    <Card variant="glass" className="max-w-md w-full animate-entrance text-center" size="xl">
+                        <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-6 animate-pulse" />
+                        <h3 className="text-2xl font-black mb-4 tracking-tighter uppercase tracking-widest">Mark as Paid?</h3>
+                        <p className="text-sm text-muted-foreground mb-8 font-medium">Are you sure you want to mark <span className="text-foreground font-black">{markPaidModal.debt?.title}</span> as fully paid off? This will settle the remaining balance and award you bonus points.</p>
+                        <div className="flex gap-4">
+                            <Button variant="success" size="xl" className="flex-1 bg-emerald-500" onClick={handleMarkPaid}>Confirm</Button>
+                            <Button variant="secondary" size="xl" className="flex-1" onClick={() => setMarkPaidModal({ show: false, debt: null })}>Cancel</Button>
+                        </div>
                     </Card>
                 </div>
             )}

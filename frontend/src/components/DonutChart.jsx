@@ -34,70 +34,68 @@ function DonutChart({ data }) {
     setHoveredSegment(null);
   };
   return (
-    <div className="h-80 w-full flex items-center justify-center relative">
+    <div className="h-80 w-full flex flex-col items-center justify-center relative">
       {hasData ? (
         <>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <defs>
-                {COLORS.map((color, index) => (
-                  <linearGradient key={index} id={`gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor={color} stopOpacity={0.8} />
-                    <stop offset="100%" stopColor={color} stopOpacity={1} />
-                  </linearGradient>
-                ))}
-              </defs>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={110}
-                paddingAngle={3}
-                dataKey="value"
-                animationBegin={0}
-                animationDuration={1500}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={`url(#gradient-${index % COLORS.length})`}
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth={2}
-                    style={{
-                      filter: hoveredSegment === index ? 'brightness(1.1)' : 'brightness(1)',
-                      transition: 'all 0.2s ease-in-out'
-                    }}
-                  />
-                ))}
-              </Pie>
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ fill: 'rgba(0,0,0,0.1)' }}
-              />
-              <Legend
-                verticalAlign="bottom"
-                align="center"
-                layout="horizontal"
-                wrapperStyle={{ paddingTop: '20px' }}
-                formatter={(value) => (
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {value}
-                  </span>
-                )}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          {}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Total</p>
-              <p className="text-3xl font-black text-foreground tracking-tighter">
-                ₹{totals.toLocaleString()}
-              </p>
+          <div className="flex-1 w-full relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <defs>
+                  {COLORS.map((color, index) => (
+                    <linearGradient key={index} id={`gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={color} stopOpacity={0.8} />
+                      <stop offset="100%" stopColor={color} stopOpacity={1} />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                  animationBegin={0}
+                  animationDuration={1500}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {data.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={`url(#gradient-${index % COLORS.length})`}
+                      stroke="rgba(255,255,255,0.2)"
+                      strokeWidth={2}
+                      style={{
+                        filter: hoveredSegment === index ? 'brightness(1.1)' : 'brightness(1)',
+                        transition: 'all 0.2s ease-in-out'
+                      }}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Total Expenses</p>
+                <p className="text-2xl font-black text-foreground tracking-tighter tabular-nums">
+                  ₹{totals.toLocaleString()}
+                </p>
+              </div>
             </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full mt-4 bg-muted/30 p-3 rounded-2xl border border-border/50">
+             {data.slice(0, 4).map((entry, index) => (
+               <div key={index} className="flex flex-col items-center text-center">
+                  <span className="text-[10px] font-black uppercase tracking-tight text-foreground truncate w-full">{entry.name}</span>
+                  <span className="text-[9px] font-bold text-muted-foreground">{Math.round((entry.value / totals) * 100)}%</span>
+               </div>
+             ))}
           </div>
         </>
       ) : (

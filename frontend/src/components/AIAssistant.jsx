@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, X, Bot, User, Sparkles, Zap, Brain, Terminal } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 const AIAssistant = () => {
     const [isOpen, setIsOpen] = useState(false);

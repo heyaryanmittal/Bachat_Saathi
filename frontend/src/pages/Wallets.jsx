@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import WalletCard from '../components/WalletCard';
-import { Card, Button, Input, LoadingSpinner, Modal, StatsCard, UISelect } from '../components/ui';
+import { Card, Button, Input, UISelect, LoadingSpinner, StatsCard } from '../components/ui';
 import { Link } from 'react-router-dom';
 import { Wallet, Banknote, CreditCard, ArrowRightLeft, Plus, RefreshCw, Layers, History, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';

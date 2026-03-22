@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
-import { Card, Button, LoadingSpinner, StatsCard } from '../components/ui';
+import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui';
 import { 
   ArrowRightLeft, Calendar, Wallet, 
   ArrowRight, History, Info, Clock,

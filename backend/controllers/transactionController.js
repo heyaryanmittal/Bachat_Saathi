@@ -183,6 +183,7 @@ exports.getTransactions = async (req, res) => {
         .skip(skip)
         .limit(limitNum)
         .populate('walletId', 'name type')
+        .populate('toWallet', 'name type')
         .lean(), 
       Transaction.countDocuments(query),
       includeStats === 'true' ? getTransactionStats(req.user.id, query) : null
@@ -250,7 +251,9 @@ exports.getTransaction = async (req, res) => {
       userId: req.user.id
     })
     .populate('walletId', 'name type')
+    .populate('toWallet', 'name type')
     .lean(); 
+
     if (!transaction) {
       return res.status(404).json({
         status: 'error',

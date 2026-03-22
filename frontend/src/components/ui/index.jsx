@@ -233,10 +233,11 @@ export const UISelect = React.forwardRef(({
                     id={selectId}
                     name={name || selectId}
                     className={cn(
-                        "input-saas w-full appearance-none pr-12 transition-all cursor-pointer",
+                        "input-saas w-full appearance-none pr-12 transition-all cursor-pointer bg-none !bg-none",
                         error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
                         className
                     )}
+
                     aria-invalid={error ? "true" : "false"}
                     aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-help` : undefined}
                     {...props}

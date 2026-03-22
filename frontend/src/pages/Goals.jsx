@@ -5,7 +5,7 @@ import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui
 import { 
   Target, CheckCircle, TrendingUp, AlertTriangle, 
   Trash2, Plus, Plane, Car, Home, GraduationCap, 
-  DollarSign, Briefcase, Zap, Star
+  DollarSign, Briefcase, Zap, Star, Calendar
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 const Goals = () => {
@@ -179,7 +179,7 @@ const Goals = () => {
                                 </select>
                             </div>
                             <Button type="submit" size="xl" className="w-full btn-saas-primary mt-4">Create Goal</Button>
-                            <Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+                            <Button type="button" variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowCreateModal(false)}>Cancel</Button>
                         </form>
                     </Card>
                 </div>
@@ -194,7 +194,7 @@ const Goals = () => {
                         <form onSubmit={handleSavings}>
                             <Input label="Amount (₹)" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
                             <Button type="submit" size="xl" className="w-full btn-saas-primary mt-8">Add to Goal</Button>
-                            <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowSavingsModal(false)}>Cancel</Button>
+                            <Button type="button" variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowSavingsModal(false)}>Cancel</Button>
                         </form>
                     </Card>
                 </div>

@@ -172,7 +172,7 @@ const Wallets = () => {
                         placeholder="0.00"
                       />
                       <div className="flex items-center space-x-3 pt-4">
-                          <Button variant="secondary" onClick={() => { setIsCreating(false); setEditingWallet(null); }} className="w-full">Cancel</Button>
+                          <Button type="button" variant="secondary" onClick={() => { setIsCreating(false); setEditingWallet(null); }} className="w-full">Cancel</Button>
                           <Button type="submit" className="w-full btn-saas-primary">{editingWallet ? 'Save Changes' : 'Create Wallet'}</Button>
                       </div>
                   </form>
@@ -212,7 +212,7 @@ const Wallets = () => {
                         placeholder="Reason for transfer..."
                       />
                       <div className="flex items-center space-x-3 pt-4">
-                          <Button variant="secondary" onClick={() => setShowTransferModal(false)} className="w-full">Cancel</Button>
+                          <Button type="button" variant="secondary" onClick={() => setShowTransferModal(false)} className="w-full">Cancel</Button>
                           <Button type="submit" className="w-full btn-saas-primary" loading={isTransferring}>Confirm Transfer</Button>
                       </div>
                   </form>

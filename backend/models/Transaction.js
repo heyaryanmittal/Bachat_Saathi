@@ -10,6 +10,11 @@ const transactionSchema = new mongoose.Schema({
     ref: 'Wallet',
     required: true
   },
+  toWallet: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Wallet'
+  },
+
   type: {
     type: String,
     enum: ['Income', 'Expense', 'Transfer'],

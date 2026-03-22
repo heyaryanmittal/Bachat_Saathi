@@ -227,26 +227,34 @@ export const UISelect = React.forwardRef(({
                     {props.required && <span className="text-destructive ml-1">*</span>}
                 </label>
             )}
-            <select
-                ref={ref}
-                id={selectId}
-                name={name || selectId}
-                className={cn(
-                    "input-saas w-full appearance-none",
-                    error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
-                    className
-                )}
-                aria-invalid={error ? "true" : "false"}
-                aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-help` : undefined}
-                {...props}
-            >
-                {placeholder && <option value="">{placeholder}</option>}
-                {options.map(option => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
+            <div className="relative group/select">
+                <select
+                    ref={ref}
+                    id={selectId}
+                    name={name || selectId}
+                    className={cn(
+                        "input-saas w-full appearance-none pr-12 transition-all cursor-pointer",
+                        error ? "border-rose-400 focus:ring-rose-400/10" : "focus:border-primary/50",
+                        className
+                    )}
+                    aria-invalid={error ? "true" : "false"}
+                    aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-help` : undefined}
+                    {...props}
+                >
+                    {placeholder && <option value="" className="bg-background text-muted-foreground">{placeholder}</option>}
+                    {options.map(option => (
+                        <option key={option.value} value={option.value} className="bg-background text-foreground py-4">
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground group-hover/select:text-primary transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+
             {error && (
                 <p id={`${selectId}-error`} className="text-xs font-bold text-rose-500 animate-entrance ml-1">
                     {error}

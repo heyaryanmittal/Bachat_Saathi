@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expenseCategories, incomeCategories } from '../config/categories';
+import { Button, Input, UISelect } from './ui';
+import { numberToWords } from '../utils/numberToWords';
+
 function RecurringForm({ onSubmit, wallets, initialData = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
@@ -9,10 +12,13 @@ function RecurringForm({ onSubmit, wallets, initialData = null }) {
       cadence: 'monthly'
     }
   });
+
   const type = watch('type');
+  const amount = watch('amount');
   const categories = type === 'Expense' 
-    ? expenseCategories.map(cat => cat.name)
-    : incomeCategories.map(cat => cat.name);
+    ? expenseCategories 
+    : incomeCategories;
+
   const handleFormSubmit = async (data) => {
     setIsLoading(true);
     try {
@@ -23,134 +29,94 @@ function RecurringForm({ onSubmit, wallets, initialData = null }) {
       setIsLoading(false);
     }
   };
+
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Type
-        </label>
-        <select
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6 animate-entrance">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <UISelect
+          label="Flow Type"
+          id="recurring-type"
           {...register('type', { required: 'Type is required' })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-        >
-          <option value="Expense">Expense</option>
-          <option value="Income">Income</option>
-        </select>
-        {errors.type && (
-          <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Wallet
-        </label>
-        <select
+          options={[
+            { value: 'Expense', label: 'Outbound' },
+            { value: 'Income', label: 'Inbound' }
+          ]}
+          error={errors.type?.message}
+        />
+
+        <UISelect
+          label="Execution Node"
+          id="recurring-wallet"
           {...register('walletId', { required: 'Wallet is required' })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-        >
-          <option value="">Select a wallet</option>
-          {wallets.map(wallet => (
-            <option key={wallet._id} value={wallet._id}>
-              {wallet.name}
-            </option>
-          ))}
-        </select>
-        {errors.walletId && (
-          <p className="mt-1 text-sm text-red-600">{errors.walletId.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Amount
-        </label>
-        <div className="mt-1 relative rounded-md shadow-sm">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">₹</span>
-          </div>
-          <input
+          options={wallets.map(wallet => ({ value: wallet._id, label: wallet.name }))}
+          error={errors.walletId?.message}
+          placeholder="Select a node"
+        />
+
+        <div className="space-y-1">
+          <Input
+            label="Magnitude (₹)"
+            id="recurring-amount"
             type="number"
             {...register('amount', {
               required: 'Amount is required',
-              min: { value: 0, message: 'Amount must be positive' }
+              min: { value: 0.01, message: 'Amount must be positive' }
             })}
-            className="block w-full pl-7 pr-12 border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600"
             placeholder="0.00"
+            error={errors.amount?.message}
           />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">INR</span>
-          </div>
+          {amount > 0 && (
+            <p className="text-[10px] font-black text-primary uppercase tracking-widest ml-4 animate-in fade-in slide-in-from-top-1">
+              {numberToWords(Number(amount))}
+            </p>
+          )}
         </div>
-        {errors.amount && (
-          <p className="mt-1 text-sm text-red-600">{errors.amount.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Category
-        </label>
-        <select
+
+        <UISelect
+          label="Classification"
+          id="recurring-category"
           {...register('category', { required: 'Category is required' })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-        >
-          <option value="">Select a category</option>
-          {categories.map(category => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        {errors.category && (
-          <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Cadence
-        </label>
-        <select
+          options={categories.map(cat => ({ value: cat.name, label: `${cat.icon || ''} ${cat.name}` }))}
+          error={errors.category?.message}
+          placeholder="Select categories"
+        />
+
+        <UISelect
+          label="Execution Cadence"
+          id="recurring-cadence"
           {...register('cadence', { required: 'Cadence is required' })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-        >
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-        </select>
-        {errors.cadence && (
-          <p className="mt-1 text-sm text-red-600">{errors.cadence.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Start Date
-        </label>
-        <input
+          options={[
+            { value: 'weekly', label: 'Weekly Interval' },
+            { value: 'monthly', label: 'Monthly Cycle' }
+          ]}
+          error={errors.cadence?.message}
+        />
+
+        <Input
+          label="Start Horizon"
+          id="recurring-start"
           type="date"
           {...register('startDate', { required: 'Start date is required' })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+          error={errors.startDate?.message}
         />
-        {errors.startDate && (
-          <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          End Date (Optional)
-        </label>
-        <input
+
+        <Input
+          label="End Horizon (Optional)"
+          id="recurring-end"
           type="date"
           {...register('endsAt')}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
         />
       </div>
-      <div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {isLoading ? 'Processing...' : initialData ? 'Update Rule' : 'Add Rule'}
-        </button>
-      </div>
+
+      <Button
+        type="submit"
+        className="w-full btn-saas-primary mt-4"
+        loading={isLoading}
+      >
+        {initialData ? 'Update Matrix' : 'Initialize Rule'}
+      </Button>
     </form>
   );
 }
+
 export default RecurringForm;

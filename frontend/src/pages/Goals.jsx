@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import { format } from 'date-fns';
-import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui';
+import { Card, Button, Input, LoadingSpinner, StatsCard, UISelect } from '../components/ui';
 import { 
   Target, CheckCircle, TrendingUp, AlertTriangle, 
   Trash2, Plus, Plane, Car, Home, GraduationCap, 
@@ -161,31 +161,35 @@ const Goals = () => {
                     <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
                         <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">Create New Goal</h3>
                         <form onSubmit={handleCreate} className="space-y-6">
-                            <Input label="Goal Name" value={newGoal.title} onChange={e => setNewGoal({...newGoal, title: e.target.value})} placeholder="Emergency Fund..." required />
-                            <Input label="Description" value={newGoal.description} onChange={e => setNewGoal({...newGoal, description: e.target.value})} placeholder="What is this goal for?..." />
+                            <Input label="Goal Name" id="goal-title" name="title" value={newGoal.title} onChange={e => setNewGoal({...newGoal, title: e.target.value})} placeholder="Emergency Fund..." required />
+                            <Input label="Description" id="goal-description" name="description" value={newGoal.description} onChange={e => setNewGoal({...newGoal, description: e.target.value})} placeholder="What is this goal for?..." />
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <Input label="Target Amount (₹)" type="number" value={newGoal.targetAmount} onChange={e => setNewGoal({...newGoal, targetAmount: e.target.value})} required />
+                                    <Input label="Target Amount (₹)" id="goal-amount" name="targetAmount" type="number" value={newGoal.targetAmount} onChange={e => setNewGoal({...newGoal, targetAmount: e.target.value})} required />
                                     {Number(newGoal.targetAmount) > 0 && (
                                         <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
                                             {numberToWords(Number(newGoal.targetAmount))}
                                         </p>
                                     )}
                                 </div>
-                                <Input label="Target Date" type="date" value={newGoal.deadline} onChange={e => setNewGoal({...newGoal, deadline: e.target.value})} required />
+                                <Input label="Target Date" id="goal-deadline" name="deadline" type="date" value={newGoal.deadline} onChange={e => setNewGoal({...newGoal, deadline: e.target.value})} required />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Category</label>
-                                <select value={newGoal.category} onChange={e => setNewGoal({...newGoal, category: e.target.value})} className="input-saas w-full">
-                                    <option value="emergency">Emergency</option>
-                                    <option value="vacation">Vacation</option>
-                                    <option value="car">Vehicle</option>
-                                    <option value="house">Real Estate</option>
-                                    <option value="education">Education</option>
-                                    <option value="investment">Investment</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
+                            <UISelect 
+                                label="Category"
+                                id="goal-category"
+                                name="category"
+                                value={newGoal.category} 
+                                onChange={e => setNewGoal({...newGoal, category: e.target.value})}
+                                options={[
+                                    { value: 'emergency', label: 'Emergency' },
+                                    { value: 'vacation', label: 'Vacation' },
+                                    { value: 'car', label: 'Vehicle' },
+                                    { value: 'house', label: 'Real Estate' },
+                                    { value: 'education', label: 'Education' },
+                                    { value: 'investment', label: 'Investment' },
+                                    { value: 'other', label: 'Other' }
+                                ]}
+                            />
                             <Button type="submit" size="xl" className="w-full btn-saas-primary mt-4">Create Goal</Button>
                             <Button type="button" variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setShowCreateModal(false)}>Cancel</Button>
                         </form>
@@ -201,7 +205,7 @@ const Goals = () => {
                         <p className="text-sm text-muted-foreground mb-8 italic">Adding savings to <span className="text-foreground font-black">{selectedGoal.title}</span>.</p>
                         <form onSubmit={handleSavings}>
                             <div className="space-y-1 text-left">
-                                <Input label="Amount (₹)" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
+                                <Input label="Amount (₹)" id="goal-savings-amount" name="amount" type="number" value={savingsAmount} onChange={e => setSavingsAmount(e.target.value)} placeholder="0.00" required autoFocus />
                                 {Number(savingsAmount) > 0 && (
                                     <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
                                         {numberToWords(Number(savingsAmount))}

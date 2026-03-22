@@ -89,16 +89,18 @@ const AIAssistant = () => {
                         {}
                         <div className="p-6 border-t border-border/20 bg-background/50">
                             <form onSubmit={handleSubmit} className="relative group">
-                                <input
-                                    type="text"
+                                <Input
+                                    id="ai-assistant-input"
+                                    name="message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     placeholder="Enter query protocol..."
-                                    className="w-full pl-12 pr-12 py-4 rounded-2xl bg-muted/30 border border-border/30 focus:border-primary/50 text-[11px] font-black uppercase tracking-tighter transition-all outline-none"
+                                    className="pl-12 pr-12 py-4 text-[11px] font-black uppercase tracking-tighter"
                                     disabled={isLoading}
+                                    aria-label="Ask AI Assistant"
                                 />
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"><MessageSquare className="w-4 h-4" /></div>
-                                <button type="submit" disabled={!message.trim() || isLoading} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-primary text-white hover:opacity-90 disabled:opacity-30 transition-all"><Send className="h-4 w-4" /></button>
+                                <div className="absolute left-4 top-[22px] text-primary opacity-50 z-10"><MessageSquare className="w-4 h-4" /></div>
+                                <button type="submit" disabled={!message.trim() || isLoading} className="absolute right-2 top-[6px] p-3 rounded-xl bg-primary text-white hover:opacity-90 disabled:opacity-30 transition-all z-10"><Send className="h-4 w-4" /></button>
                             </form>
                             <div className="mt-4 flex items-center justify-center gap-2 opacity-30">
                                 <Zap className="w-3 h-3 text-primary" />

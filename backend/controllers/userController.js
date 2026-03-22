@@ -126,7 +126,7 @@ exports.awardMonthlySavingsPoints = async (userId, date = new Date()) => {
       {
         $match: {
           userId: mongoose.Types.ObjectId(userId),
-          type: 'income',
+          type: 'Income',
           date: { $gte: startOfMonth, $lte: endOfMonth }
         }
       },
@@ -141,7 +141,7 @@ exports.awardMonthlySavingsPoints = async (userId, date = new Date()) => {
       {
         $match: {
           userId: mongoose.Types.ObjectId(userId),
-          type: 'expense',
+          type: 'Expense',
           date: { $gte: startOfMonth, $lte: endOfMonth }
         }
       },
@@ -156,7 +156,7 @@ exports.awardMonthlySavingsPoints = async (userId, date = new Date()) => {
     const totalExpenses = expenseResult[0]?.total || 0;
     const savings = totalIncome - totalExpenses;
     if (savings > 0) {
-      const pointsEarned = Math.max(1, Math.floor(savings / 1000) * 5);
+      const pointsEarned = Math.floor(savings / 1000) * 5;
       await User.findByIdAndUpdate(userId, { $inc: { points: pointsEarned } });
       const monthYear = startOfMonth.toLocaleString('default', { month: 'long', year: 'numeric' });
       await PointsLog.create({

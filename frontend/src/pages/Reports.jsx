@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, subDays, startOfMonth, endOfMonth, subMonths, isBefore, isAfter } from 'date-fns';
 import api from '../services/api';
-import { Card, Button, LoadingSpinner, StatsCard } from '../components/ui';
+import { Card, Button, LoadingSpinner, StatsCard, UISelect } from '../components/ui';
 import { 
   BarChart2, TrendingUp, PieChart, Calendar, Download, 
   ChevronRight, ArrowUpRight, ArrowDownRight, Activity, 
@@ -55,9 +55,14 @@ const Reports = () => {
     const renderHeader = () => (
         <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
             <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50">
-                <select value={dateRange} onChange={e => setDateRange(e.target.value)} className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4">
-                    {DATE_RANGES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                </select>
+                <UISelect 
+                    id="report-date-range"
+                    name="dateRange"
+                    value={dateRange} 
+                    onChange={e => setDateRange(e.target.value)} 
+                    className="border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4"
+                    options={DATE_RANGES}
+                />
                 <Button variant="secondary" onClick={() => toast.success('Exporting report...')}><Download className="w-4 h-4 mr-2" />Download</Button>
             </div>
         </div>

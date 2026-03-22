@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
-import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui';
+import { Card, Button, Input, LoadingSpinner, StatsCard, UISelect } from '../components/ui';
 import { 
   TrendingDown, AlertCircle, CheckCircle2, 
   Trash2, Plus, DollarSign, Calendar, 
@@ -122,7 +122,7 @@ const DebtTracker = () => {
                                 <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Interest</th>
                                 <th className="px-6 py-3 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Due Date</th>
                                 <th className="px-6 py-3 text-center font-black text-[10px] uppercase tracking-widest text-muted-foreground">Status</th>
-                                <th className="px-6 py-3 text-right font-black text-[10px] uppercase tracking-widest text-muted-foreground">Actions</th>
+                                <th className="px-6 py-3 text-right font-black text-[10px] uppercase tracking-widest text-muted-foreground min-w-[200px]">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/50">
@@ -212,30 +212,42 @@ const DebtTracker = () => {
                         </div>
                         <form onSubmit={handleCreate} className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <Input label="Debt Title" value={newDebt.title} onChange={e => setNewDebt({...newDebt, title: e.target.value})} placeholder="e.g. HDFC Home Loan" required />
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Type</label>
-                                    <select value={newDebt.type} onChange={e => setNewDebt({...newDebt, type: e.target.value})} className="input-saas w-full">
-                                        <option value="personal">Personal Loan</option>
-                                        <option value="creditCard">Credit Card</option>
-                                        <option value="loan">Mortgage</option>
-                                        <option value="business">Business Loan</option>
-                                        <option value="education">Education Loan</option>
-                                        <option value="vehicle">Car Loan</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
+                                <Input label="Debt Title" id="debt-title" name="title" value={newDebt.title} onChange={e => setNewDebt({...newDebt, title: e.target.value})} placeholder="e.g. HDFC Home Loan" required />
+                                <UISelect 
+                                    label="Type"
+                                    id="debt-type"
+                                    name="type"
+                                    value={newDebt.type} 
+                                    onChange={e => setNewDebt({...newDebt, type: e.target.value})}
+                                    options={[
+                                        { value: 'personal', label: 'Personal Loan' },
+                                        { value: 'creditCard', label: 'Credit Card' },
+                                        { value: 'loan', label: 'Mortgage' },
+                                        { value: 'business', label: 'Business Loan' },
+                                        { value: 'education', label: 'Education Loan' },
+                                        { value: 'vehicle', label: 'Car Loan' },
+                                        { value: 'other', label: 'Other' }
+                                    ]}
+                                />
                                 <div className="space-y-1">
-                                    <Input label="Principal Amount (₹)" type="number" value={newDebt.amount} onChange={e => setNewDebt({...newDebt, amount: e.target.value})} placeholder="0.00" required />
+                                    <Input label="Principal Amount (₹)" id="debt-amount" name="amount" type="number" value={newDebt.amount} onChange={e => setNewDebt({...newDebt, amount: e.target.value})} placeholder="0.00" required />
                                     {Number(newDebt.amount) > 0 && (
                                         <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1 text-left">
                                             {numberToWords(Number(newDebt.amount))}
                                         </p>
                                     )}
                                 </div>
-                                <Input label="Interest Rate (%)" type="number" step="0.01" value={newDebt.interestRate} onChange={e => setNewDebt({...newDebt, interestRate: e.target.value})} placeholder="0.00" />
+                                <Input label="Interest Rate (%)" id="debt-interest" name="interestRate" type="number" step="0.01" value={newDebt.interestRate} onChange={e => setNewDebt({...newDebt, interestRate: e.target.value})} placeholder="0.00" />
                                 <div className="md:col-span-2">
-                                    <Input label="Due Date" type="date" value={newDebt.dueDate} onChange={e => setNewDebt({...newDebt, dueDate: e.target.value})} required />
+                                    <Input 
+                                        label="Due Date" 
+                                        id="debt-due-date"
+                                        name="dueDate"
+                                        type="date" 
+                                        value={newDebt.dueDate} 
+                                        onChange={e => setNewDebt({...newDebt, dueDate: e.target.value})} 
+                                        required 
+                                    />
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -259,7 +271,7 @@ const DebtTracker = () => {
                         <p className="text-sm text-muted-foreground mb-8">Recording a payment for <span className="text-foreground font-black">{paymentModal.debt?.title}</span>.</p>
                         <form onSubmit={handlePayment}>
                             <div className="space-y-1 text-left">
-                                <Input label="Amount (₹)" type="number" step="0.01" value={paymentModal.amount} onChange={e => setPaymentModal({...paymentModal, amount: e.target.value})} placeholder="0.00" required autoFocus />
+                                <Input label="Amount (₹)" id="payment-amount" name="amount" type="number" step="0.01" value={paymentModal.amount} onChange={e => setPaymentModal({...paymentModal, amount: e.target.value})} placeholder="0.00" required autoFocus />
                                 {Number(paymentModal.amount) > 0 && (
                                     <p className="text-[9px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
                                         {numberToWords(Number(paymentModal.amount))}

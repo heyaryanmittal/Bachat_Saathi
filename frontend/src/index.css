@@ -124,6 +124,9 @@
 .btn-saas-primary {
   @apply bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-[10px] py-4 px-8 rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-95;
 }
+.btn-saas-secondary {
+  @apply bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold px-6 py-4 rounded-2xl transition-all active:scale-95;
+}
 .input-saas {
   @apply bg-white/40 dark:bg-white/5 border border-border/50 rounded-2xl px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all outline-none;
 }

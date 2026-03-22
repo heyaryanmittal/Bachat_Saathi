@@ -10,7 +10,10 @@ import {
   CheckCircle2, Flame, Award
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
 const Achievements = () => {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [achievements, setAchievements] = useState([]);
     const [userPoints, setUserPoints] = useState(0);
@@ -35,9 +38,9 @@ const Achievements = () => {
                 ]);
                 const map = aRes.data.data || {};
                 setAchievements([
-                    { id: 'budgetMaster', name: 'Budget Master', desc: 'Stayed on budget for 3 consecutive months.', icon: <Target/>, earned: map.budgetMaster?.earned, pts: 100 },
-                    { id: 'goalCrusher', name: 'Goal Crusher', desc: 'Completed 5 financial goals.', icon: <Trophy/>, earned: map.goalCrusher?.earned, pts: 150 },
-                    { id: 'consistentSaver', name: 'Saving Streak', desc: 'Maintained a 6 month saving streak.', icon: <Flame/>, earned: map.consistentSaver?.earned, pts: 150 },
+                    { id: 'budgetMaster', name: 'Budget Master', desc: 'Stayed on budget for 3 consecutive months.', icon: <Target/>, earned: map.budgetMaster?.earned, pts: 50 },
+                    { id: 'goalCrusher', name: 'Goal Crusher', desc: 'Completed 5 financial goals.', icon: <Trophy/>, earned: map.goalCrusher?.earned, pts: 100 },
+                    { id: 'consistentSaver', name: 'Saving Streak', desc: 'Maintained a 6 month saving streak.', icon: <Flame/>, earned: map.consistentSaver?.earned, pts: 100 },
                 ]);
                 setUserPoints(pRes.data?.data?.points || 0);
                 setPointsHistory(hRes.data.data || []);

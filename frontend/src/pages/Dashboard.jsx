@@ -172,7 +172,7 @@ function Dashboard() {
           </h2>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest">
-              Wealth Score: 782
+              Wealth Score: {user?.points?.toLocaleString() || '0'}
             </span>
             <span className="text-slate-400 text-[9px] font-black uppercase tracking-widest">
               Live

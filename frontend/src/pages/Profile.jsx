@@ -143,14 +143,16 @@ const Profile = () => {
                                     <h3 className="font-black text-xs uppercase tracking-widest">Temporal Records</h3>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <Input label="Full Name" value={editedUser.name} onChange={e => setEditedUser({...editedUser, name: e.target.value})} readOnly={!isEditing} />
-                                    <Input label="Email" value={editedUser.email} readOnly={true} className="opacity-50" />
-                                    <Input label="Phone" value={editedUser.phone} onChange={e => setEditedUser({...editedUser, phone: e.target.value})} readOnly={!isEditing} />
-                                    <Input label="Location" value={editedUser.location} onChange={e => setEditedUser({...editedUser, location: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Full Name" id="profile-name" name="name" autoComplete="name" value={editedUser.name} onChange={e => setEditedUser({...editedUser, name: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Email" id="profile-email" name="email" autoComplete="email" value={editedUser.email} readOnly={true} className="opacity-50" />
+                                    <Input label="Phone" id="profile-phone" name="phone" autoComplete="tel" value={editedUser.phone} onChange={e => setEditedUser({...editedUser, phone: e.target.value})} readOnly={!isEditing} />
+                                    <Input label="Location" id="profile-location" name="location" autoComplete="address-level2" value={editedUser.location} onChange={e => setEditedUser({...editedUser, location: e.target.value})} readOnly={!isEditing} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Bio</label>
+                                    <label htmlFor="profile-bio" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Bio</label>
                                     <textarea 
+                                        id="profile-bio"
+                                        name="bio"
                                         rows={4} 
                                         value={editedUser.bio} 
                                         onChange={e => setEditedUser({...editedUser, bio: e.target.value})} 
@@ -177,20 +179,20 @@ const Profile = () => {
                                         <div className="p-3 bg-primary/10 rounded-xl"><Bell className="w-6 h-6 text-primary" /></div>
                                         <div>
                                             <p className="font-black text-lg tracking-tight">Email Notifications</p>
-                                            <p className="text-xs text-muted-foreground font-medium">Receive monthly financial reports via email.</p>
+                                            <label htmlFor="pref-email-notify" className="text-xs text-muted-foreground font-medium cursor-pointer">Receive monthly financial reports via email.</label>
                                         </div>
                                     </div>
-                                    <input type="checkbox" className="w-6 h-6 border-2 border-primary rounded accent-primary bg-transparent focus:ring-primary" checked={user?.emailNotificationsEnabled} readOnly />
+                                    <input id="pref-email-notify" name="emailNotifications" type="checkbox" className="w-6 h-6 border-2 border-primary rounded accent-primary bg-transparent focus:ring-primary cursor-pointer" checked={user?.emailNotificationsEnabled} readOnly />
                                 </div>
                                 <div className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-2xl hover:bg-muted/30 transition-colors">
                                     <div className="flex items-center space-x-4">
                                         <div className="p-3 bg-amber-500/10 rounded-xl"><Lock className="w-6 h-6 text-amber-500" /></div>
                                         <div>
                                             <p className="font-black text-lg tracking-tight">Constraint Alerts</p>
-                                            <p className="text-xs text-muted-foreground italic font-medium">Get notified when proxies reach 90% consumption.</p>
+                                            <label htmlFor="pref-budget-alerts" className="text-xs text-muted-foreground italic font-medium cursor-pointer">Get notified when proxies reach 90% consumption.</label>
                                         </div>
                                     </div>
-                                    <input type="checkbox" className="w-6 h-6 border-2 border-amber-500 rounded accent-amber-500 bg-transparent" checked={user?.budgetAlertEnabled} readOnly />
+                                    <input id="pref-budget-alerts" name="budgetAlerts" type="checkbox" className="w-6 h-6 border-2 border-amber-500 rounded accent-amber-500 bg-transparent cursor-pointer" checked={user?.budgetAlertEnabled} readOnly />
                                 </div>
                             </div>
                         </Card>

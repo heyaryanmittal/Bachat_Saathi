@@ -53,7 +53,9 @@ const Leaderboard = () => {
                                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🥈</div>
                                 <h3 className="font-black text-xl tracking-tighter uppercase mb-1">{currentLeaderboard[1].username}</h3>
                                 <p className="text-[10px] font-black text-muted-foreground uppercase mb-6 tracking-widest">Rank #2</p>
-                                <div className="text-3xl font-black text-primary tracking-tighter mb-1">{(currentLeaderboard[1].monthlyPoints || currentLeaderboard[1].lifetimePoints).toLocaleString()}</div>
+                                <div className="text-3xl font-black text-primary tracking-tighter mb-1">
+                                    {Number((activeTab === 'monthly' ? currentLeaderboard[1].monthlyPoints : currentLeaderboard[1].lifetimePoints) || 0).toLocaleString()}
+                                </div>
                                 <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Points</p>
                              </div>
                         </Card>
@@ -68,7 +70,9 @@ const Leaderboard = () => {
                                 <div className="text-6xl mb-6 animate-float">🥇</div>
                                 <h3 className="font-black text-3xl tracking-tighter uppercase mb-1">{currentLeaderboard[0].username}</h3>
                                 <p className="text-[11px] font-black text-yellow-500/70 uppercase mb-8 tracking-widest">Saving Champion</p>
-                                <div className="text-5xl font-black text-primary tracking-tighter mb-2">{(currentLeaderboard[0].monthlyPoints || currentLeaderboard[0].lifetimePoints).toLocaleString()}</div>
+                                <div className="text-5xl font-black text-primary tracking-tighter mb-2">
+                                    {Number((activeTab === 'monthly' ? currentLeaderboard[0].monthlyPoints : currentLeaderboard[0].lifetimePoints) || 0).toLocaleString()}
+                                </div>
                                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Points</p>
                              </div>
                         </Card>
@@ -80,7 +84,9 @@ const Leaderboard = () => {
                                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🥉</div>
                                 <h3 className="font-black text-xl tracking-tighter uppercase mb-1">{currentLeaderboard[2].username}</h3>
                                 <p className="text-[10px] font-black text-muted-foreground uppercase mb-6 tracking-widest">Rank #3</p>
-                                <div className="text-3xl font-black text-primary tracking-tighter mb-1">{(currentLeaderboard[2].monthlyPoints || currentLeaderboard[2].lifetimePoints).toLocaleString()}</div>
+                                <div className="text-3xl font-black text-primary tracking-tighter mb-1">
+                                    {Number((activeTab === 'monthly' ? currentLeaderboard[2].monthlyPoints : currentLeaderboard[2].lifetimePoints) || 0).toLocaleString()}
+                                </div>
                                 <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Points</p>
                              </div>
                         </Card>
@@ -111,7 +117,7 @@ const Leaderboard = () => {
                                 </div>
                                 <div className="text-center">
                                     <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Monthly Points</p>
-                                    <p className="text-3xl font-black tracking-tighter text-primary">{userStats.monthlyPoints.toLocaleString()}</p>
+                                    <p className="text-3xl font-black tracking-tighter text-primary">{Number(userStats.monthlyPoints || 0).toLocaleString()}</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Lifetime Rank</p>
@@ -119,7 +125,7 @@ const Leaderboard = () => {
                                 </div>
                                 <div className="text-center">
                                     <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total Points</p>
-                                    <p className="text-3xl font-black tracking-tighter text-primary">{userStats.lifetimePoints.toLocaleString()}</p>
+                                    <p className="text-3xl font-black tracking-tighter text-primary">{Number(userStats.lifetimePoints || 0).toLocaleString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -148,7 +154,7 @@ const Leaderboard = () => {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className={`text-2xl font-black tracking-tighter ${isUser ? 'text-white' : 'text-primary'}`}>{points.toLocaleString()}</p>
+                                    <p className={`text-2xl font-black tracking-tighter ${isUser ? 'text-white' : 'text-primary'}`}>{Number(points || 0).toLocaleString()}</p>
                                     <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Points</p>
                                 </div>
                             </motion.div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { expenseCategories } from "../config/categories";
-import { Button, Input } from "./ui";
+import { Button, Input, UISelect } from "./ui";
 import { Tag, Calendar, Bell, DollarSign } from 'lucide-react';
 import { numberToWords } from '../utils/numberToWords';
 function BudgetForm({ onSubmit, initialData = null }) {
@@ -39,23 +39,18 @@ function BudgetForm({ onSubmit, initialData = null }) {
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Scope Classification</label>
-            <div className="relative group">
-                <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary" />
-                <select 
-                    {...register("category", { required: "Select node" })}
-                    className="input-saas w-full pl-12"
-                >
-                    <option value="">Select Category...</option>
-                    {expenseCategories.map(c => <option key={c.name} value={c.name}>{c.icon} {c.name}</option>)}
-                </select>
-            </div>
-            {errors.category && <p className="text-[10px] text-rose-500 font-bold ml-2 uppercase">{errors.category.message}</p>}
-        </div>
+        <UISelect
+          label="Scope Classification"
+          id="budget-category"
+          {...register("category", { required: "Select node" })}
+          options={expenseCategories.map(c => ({ value: c.name, label: `${c.icon} ${c.name}` }))}
+          error={errors.category?.message}
+        />
         <div className="space-y-1">
           <Input
             label="Maximum Outbound (₹)"
+            id="budget-amount"
+            name="amount"
             type="number"
             placeholder="0.00"
             {...register("amount", { required: "Limit required", min: 0.01 })}
@@ -69,18 +64,21 @@ function BudgetForm({ onSubmit, initialData = null }) {
         </div>
         <Input
           label="Strategy Period"
+          id="budget-period"
+          name="monthYear"
           type="month"
           {...register("monthYear", { required: "Period required" })}
           error={errors.monthYear?.message}
         />
         <div className="space-y-4">
             <div className="flex justify-between items-center px-2">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Alert Threshold</label>
+                <label htmlFor="budget-threshold" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Alert Threshold</label>
                 <span className="text-sm font-black text-primary">{watchAlertThreshold}%</span>
             </div>
             <div className="relative pt-1 px-2">
                 <input
                     type="range"
+                    id="budget-threshold"
                     min="50"
                     max="100"
                     step="5"

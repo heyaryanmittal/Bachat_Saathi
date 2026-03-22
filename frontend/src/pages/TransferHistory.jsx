@@ -51,8 +51,15 @@ const TransferHistory = () => {
                         <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center"><History className="w-4 h-4 mr-2" /> Recent Transfers</h3>
                         <div className="flex items-center gap-4">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-50" />
-                                <input type="text" placeholder="Search transfers..." className="input-saas pl-10 h-10 w-64 text-[11px] uppercase tracking-tighter font-black border-border/50 bg-background/50" />
+                                <Input 
+                                    id="search-transfers"
+                                    name="search"
+                                    type="text" 
+                                    placeholder="Search transfers..." 
+                                    className="pl-10 h-10 w-64 text-[11px] uppercase tracking-tighter font-black" 
+                                    aria-label="Search recent transfers"
+                                />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-50 z-10" />
                             </div>
                         </div>
                     </div>

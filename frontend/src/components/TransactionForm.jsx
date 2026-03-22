@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { expenseCategories, incomeCategories } from '../config/categories';
-import { Button, Input, Select } from './ui';
+import { Button, Input, UISelect } from './ui';
 import { Wallet, Tag, Calendar, PenTool, Hash } from 'lucide-react';
 import { numberToWords } from '../utils/numberToWords';
 const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null }) => {
@@ -36,7 +36,7 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2 mb-2 block">Protocol Type</label>
+          <label htmlFor="tx-protocol-type" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2 mb-2 block">Protocol Type</label>
           <div className="flex bg-muted/50 p-1 rounded-xl">
              <button
                type="button"
@@ -48,7 +48,7 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
                onClick={() => reset({ ...watch(), type: 'Income' })}
                className={`flex-1 py-2 text-xs font-black uppercase rounded-lg transition-all ${transactionType === 'Income' ? 'bg-emerald-500 text-white shadow-lg' : 'text-muted-foreground'}`}
              > Inbound </button>
-             <input type="hidden" {...register('type')} />
+             <input type="hidden" id="tx-protocol-type" {...register('type')} />
           </div>
         </div>
         <div className="space-y-1">
@@ -67,14 +67,14 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
             </p>
           )}
         </div>
-        <Select
+        <UISelect
           label="Source Node"
           id="tx-wallet"
           {...register('walletId', { required: "Select node" })}
           options={wallets.map(w => ({ value: w._id, label: `${w.name} (₹${w.currentBalance})` }))}
           error={errors.walletId?.message}
         />
-        <Select
+        <UISelect
           label="Classification"
           id="tx-category"
           {...register('category', { required: "Select category" })}

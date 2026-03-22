@@ -166,7 +166,8 @@ export const Input = React.forwardRef(({
     name,
     ...props
 }, ref) => {
-    const inputId = id || name || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
+    const generatedId = React.useId();
+    const inputId = id || name || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : `input-${generatedId}`);
     return (
         <div className="space-y-2">
             {label && (
@@ -204,7 +205,8 @@ export const Input = React.forwardRef(({
     );
 });
 Input.displayName = "Input";
-export const Select = React.forwardRef(({
+
+export const UISelect = React.forwardRef(({
     label,
     options,
     placeholder = "Select an option",
@@ -215,7 +217,8 @@ export const Select = React.forwardRef(({
     name,
     ...props
 }, ref) => {
-    const selectId = id || name || (label ? `select-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
+    const generatedId = React.useId();
+    const selectId = id || name || (label ? `select-${label.replace(/\s+/g, '-').toLowerCase()}` : `select-${generatedId}`);
     return (
         <div className="space-y-2">
             {label && (
@@ -257,7 +260,8 @@ export const Select = React.forwardRef(({
         </div>
     );
 });
-Select.displayName = "Select";
+UISelect.displayName = "UISelect";
+
 export const Alert = ({
     type = "info",
     title,

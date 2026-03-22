@@ -43,13 +43,17 @@ const startServer = (port) => {
     }
   });
 
-  process.on("SIGINT", () => {
+  process.on("SIGINT", async () => {
     console.log("\n🛑 Server shutting down...");
-    server.close(() => {
-      mongoose.connection.close(false, () => {
+    server.close(async () => {
+      try {
+        await mongoose.connection.close();
         console.log("✅ MongoDB connection closed");
         process.exit(0);
-      });
+      } catch (err) {
+        console.error("❌ Error closing MongoDB:", err);
+        process.exit(1);
+      }
     });
   });
 };

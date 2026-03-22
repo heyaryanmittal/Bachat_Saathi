@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import WalletCard from '../components/WalletCard';
-import { Card, Button, Input, LoadingSpinner, Modal, StatsCard, Select } from '../components/ui';
+import { Card, Button, Input, LoadingSpinner, Modal, StatsCard, UISelect } from '../components/ui';
 import { Link } from 'react-router-dom';
 import { Wallet, Banknote, CreditCard, ArrowRightLeft, Plus, RefreshCw, Layers, History, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -147,12 +147,14 @@ const Wallets = () => {
                   <form onSubmit={handleWalletAction} className="space-y-6">
                       <Input
                         label="Wallet Name"
+                        id="wallet-name"
+                        name="walletName"
                         value={editingWallet ? editingWallet.name : newWallet.name}
                         onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, name: e.target.value}) : setNewWallet({...newWallet, name: e.target.value})}
                         placeholder="Personal Bank"
                         required
                       />
-                      <Select 
+                      <UISelect 
                         label="Wallet Type"
                         id="wallet-type"
                         value={editingWallet ? editingWallet.type : newWallet.type}
@@ -192,7 +194,7 @@ const Wallets = () => {
               <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
                   <h3 className="text-2xl font-black mb-6 tracking-tighter">Transfer Funds</h3>
                   <form onSubmit={submitTransfer} className="space-y-6">
-                      <Select 
+                      <UISelect 
                         label="To Wallet"
                         id="transfer-to"
                         value={transferTo}

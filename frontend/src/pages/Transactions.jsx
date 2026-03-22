@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import * as api from '../services/api';
 import TransactionForm from '../components/TransactionForm';
-import { Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui';
+import { UISelect, Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui/index';
 import { 
   TrendingUp, TrendingDown, Search, Plus, Edit3, Trash2, 
   Calendar, CreditCard, Filter, ChevronLeft, ChevronRight, Layers
@@ -91,7 +91,7 @@ const Transactions = () => {
                     <h3 className="font-black text-sm uppercase tracking-widest">Filter Transactions</h3>
                 </div>
                 <div className="space-y-6">
-                    <Select 
+                    <UISelect 
                         label="Wallet Nodes"
                         id="filter-wallet"
                         name="walletId"
@@ -100,7 +100,7 @@ const Transactions = () => {
                         options={wallets.map(w => ({ value: w._id, label: w.name }))}
                         placeholder="All Wallets"
                     />
-                    <Select 
+                    <UISelect 
                         label="Flux Type"
                         id="filter-type"
                         name="type"

@@ -45,7 +45,14 @@ const TransferHistory = () => {
         fetchAll();
     }, [filters]);
 
-    const getWalletName = (id) => wallets.find(w => w._id === id)?.name || id;
+    const getWalletName = (wallet) => {
+        if (!wallet) return 'Unknown';
+        const id = typeof wallet === 'object' ? wallet?._id : wallet;
+        const name = typeof wallet === 'object' ? wallet?.name : null;
+        if (name) return name;
+        return wallets.find(w => w._id === id)?.name || 'Direct Entry';
+    };
+
     const handleTransfer = async (e) => {
         e.preventDefault();
         if (!transferData.from || !transferData.to || !transferData.amount) {
@@ -78,11 +85,19 @@ const TransferHistory = () => {
         }
     };
 
-    const filteredTransfers = transfers.filter(t => 
-        (getWalletName(t.walletId)?.toLowerCase() || '').includes(search.toLowerCase()) ||
-        (getWalletName(t.toWallet)?.toLowerCase() || '').includes(search.toLowerCase()) ||
-        (t.notes?.toLowerCase() || '').includes(search.toLowerCase())
-    );
+    const filteredTransfers = transfers.filter(t => {
+        const fromName = getWalletName(t.walletId) || '';
+        const toName = getWalletName(t.toWallet) || '';
+        const notes = t.notes || '';
+        const searchLower = search.toLowerCase();
+        
+        return (
+            fromName.toLowerCase().includes(searchLower) ||
+            toName.toLowerCase().includes(searchLower) ||
+            notes.toLowerCase().includes(searchLower)
+        );
+    });
+
 
     if (isLoading && !transfers.length) {
         return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Syncing transfer matrix..." /></div>;

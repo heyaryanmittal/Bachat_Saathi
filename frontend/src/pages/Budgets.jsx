@@ -76,9 +76,9 @@ const Budgets = () => {
     <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
       {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <StatsCard title="Total Budgeted" value={stats.budgeted} variant="primary" icon={<Target />} />
-        <StatsCard title="Total Spent" value={stats.spent} variant="error" icon={<TrendingDown />} />
-        <StatsCard title="Remaining" value={stats.remaining} variant="success" icon={<Layers />} />
+        <StatsCard title="Total Budgeted" value={stats.budgeted} variant="primary" icon={<Target />} prefix="₹" />
+        <StatsCard title="Total Spent" value={stats.spent} variant="error" icon={<TrendingDown />} prefix="₹" />
+        <StatsCard title="Remaining" value={stats.remaining} variant="success" icon={<Layers />} prefix="₹" />
       </div>
       {}
       <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">

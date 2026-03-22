@@ -85,7 +85,7 @@ const Goals = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                 <StatsCard title="Total Goals" value={stats.totalGoals || 0} variant="primary" icon={<Target />} />
                 <StatsCard title="Completed" value={stats.completedGoals || 0} variant="success" icon={<CheckCircle />} />
-                <StatsCard title="Total Saved" value={stats.totalSavedAmount || 0} variant="gradient" icon={<Briefcase />} />
+                <StatsCard title="Total Saved" value={stats.totalSavedAmount || 0} variant="gradient" icon={<Briefcase />} prefix="₹" />
                 <StatsCard title="Success Rate" value={(stats.totalGoals > 0 ? Math.round((stats.completedGoals / stats.totalGoals) * 100) : 0) + '%'} variant="secondary" icon={<TrendingUp />} />
             </div>
             {}

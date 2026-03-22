@@ -59,7 +59,7 @@ export const StatsCard = ({
     trendValue,
     variant = "default",
     size = "md",
-    prefix = "₹",
+    prefix = "",
     className,
     ...props
 }) => (

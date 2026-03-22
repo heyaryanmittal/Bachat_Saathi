@@ -1,5 +1,6 @@
 const LeaderboardService = require('../services/leaderboardService');
 const Leaderboard = require('../models/Leaderboard');
+const User = require('../models/User');
 exports.getMonthlyLeaderboard = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
@@ -47,7 +48,7 @@ exports.getUserStats = async (req, res) => {
     const userId = req.user.id;
     let stats = await LeaderboardService.getUserStats(userId);
     if (!stats) {
-      const user = await mongoose.model('User').findById(userId);
+      const user = await User.findById(userId);
       stats = await LeaderboardService.initializeUser(userId, user.name);
     }
     res.json({

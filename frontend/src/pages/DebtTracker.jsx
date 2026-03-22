@@ -85,8 +85,8 @@ const DebtTracker = () => {
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-                <StatsCard title="Total Debt" value={stats.totalAmount || 0} variant="primary" icon={<DollarSign />} />
-                <StatsCard title="Remaining Balance" value={stats.totalRemaining || 0} variant="error" icon={<TrendingDown />} />
+                <StatsCard title="Total Debt" value={stats.totalAmount || 0} variant="primary" icon={<DollarSign />} prefix="₹" />
+                <StatsCard title="Remaining Balance" value={stats.totalRemaining || 0} variant="error" icon={<TrendingDown />} prefix="₹" />
                 <StatsCard title="Active Debts" value={stats.activeDebts || 0} variant="secondary" icon={<History />} />
                 <StatsCard title="Paid Off" value={stats.totalDebts - stats.activeDebts || 0} variant="success" icon={<CheckCircle2 />} />
             </div>

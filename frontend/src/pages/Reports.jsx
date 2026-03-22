@@ -75,9 +75,9 @@ const Reports = () => {
         return (
             <div className="space-y-8 animate-entrance">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatsCard title="Total Spending" value={d.totalSpending || 0} variant="error" icon={<ArrowDownRight />} />
+                    <StatsCard title="Total Spending" value={d.totalSpending || 0} variant="error" icon={<ArrowDownRight />} prefix="₹" />
                     <StatsCard title="Categories" value={d.categories?.length || 0} variant="primary" icon={<Layers />} />
-                    <StatsCard title="Daily Avg" value={(d.totalSpending || 0) / 30} variant="secondary" icon={<Activity />} />
+                    <StatsCard title="Daily Avg" value={(d.totalSpending || 0) / 30} variant="secondary" icon={<Activity />} prefix="₹" />
                 </div>
                 {renderHeader()}
                 {renderTabs()}
@@ -120,9 +120,9 @@ const Reports = () => {
         return (
             <div className="space-y-8 animate-entrance">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatsCard title="Total Income" value={d.totalIncome || 0} variant="success" icon={<ArrowUpRight />} />
+                    <StatsCard title="Total Income" value={d.totalIncome || 0} variant="success" icon={<ArrowUpRight />} prefix="₹" />
                     <StatsCard title="Sources" value={d.sources?.length || 0} variant="primary" icon={<Layers />} />
-                    <StatsCard title="Daily Average" value={(d.totalIncome || 0) / 30} variant="secondary" icon={<TrendingUp />} />
+                    <StatsCard title="Daily Average" value={(d.totalIncome || 0) / 30} variant="secondary" icon={<TrendingUp />} prefix="₹" />
                 </div>
                 {renderHeader()}
                 {renderTabs()}
@@ -146,9 +146,9 @@ const Reports = () => {
         return (
             <div className="space-y-8 animate-entrance">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatsCard title="Total Budget" value={d.totalBudget || 0} variant="primary" icon={<Layers />} />
-                    <StatsCard title="Total Spent" value={d.totalSpent || 0} variant="error" icon={<ArrowDownRight />} />
-                    <StatsCard title="Remaining" value={(d.totalBudget || 0) - (d.totalSpent || 0)} variant="success" icon={<ArrowUpRight />} />
+                    <StatsCard title="Total Budget" value={d.totalBudget || 0} variant="primary" icon={<Layers />} prefix="₹" />
+                    <StatsCard title="Total Spent" value={d.totalSpent || 0} variant="error" icon={<ArrowDownRight />} prefix="₹" />
+                    <StatsCard title="Remaining" value={(d.totalBudget || 0) - (d.totalSpent || 0)} variant="success" icon={<ArrowUpRight />} prefix="₹" />
                 </div>
                 {renderHeader()}
                 {renderTabs()}

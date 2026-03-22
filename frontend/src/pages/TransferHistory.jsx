@@ -35,7 +35,7 @@ const TransferHistory = () => {
             {}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 px-4">
                 <StatsCard title="Total Transfers" value={transfers.length} variant="primary" icon={<ArrowRightLeft />} />
-                <StatsCard title="Total Amount" value={transfers.reduce((acc, t) => acc + t.amount, 0)} variant="gradient" icon={<History />} />
+                <StatsCard title="Total Amount" value={transfers.reduce((acc, t) => acc + t.amount, 0)} variant="gradient" icon={<History />} prefix="₹" />
                 <StatsCard title="Active Wallets" value={wallets.length} variant="secondary" icon={<Wallet />} />
             </div>
             {}

@@ -77,9 +77,9 @@ const Transactions = () => {
     <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
       {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <StatsCard title="Total Income" value={stats.income} variant="success" icon={<TrendingUp />} />
-        <StatsCard title="Total Expense" value={stats.expense} variant="error" icon={<TrendingDown />} />
-        <StatsCard title="Net Balance" value={stats.net} variant="gradient" icon={<Layers />} />
+        <StatsCard title="Total Income" value={stats.income} variant="success" icon={<TrendingUp />} prefix="₹" />
+        <StatsCard title="Total Expense" value={stats.expense} variant="error" icon={<TrendingDown />} prefix="₹" />
+        <StatsCard title="Net Balance" value={stats.net} variant="gradient" icon={<Layers />} prefix="₹" />
       </div>
       {}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">

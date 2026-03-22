@@ -15,6 +15,7 @@ function BudgetForm({ onSubmit, initialData = null }) {
     },
   });
   const watchAlertThreshold = useWatch({ control, name: 'alertThreshold', defaultValue: 80 });
+  const watchAmount = useWatch({ control, name: 'amount' });
   const handleFormSubmit = async (data) => {
     setIsLoading(true);
     try {
@@ -60,9 +61,9 @@ function BudgetForm({ onSubmit, initialData = null }) {
             {...register("amount", { required: "Limit required", min: 0.01 })}
             error={errors.amount?.message}
           />
-          {useWatch({ control, name: 'amount' }) > 0 && (
+          {watchAmount > 0 && (
             <p className="text-[10px] font-black text-primary uppercase tracking-widest ml-4 transition-all animate-in fade-in slide-in-from-top-1">
-              {numberToWords(Number(useWatch({ control, name: 'amount' })))}
+              {numberToWords(Number(watchAmount))}
             </p>
           )}
         </div>

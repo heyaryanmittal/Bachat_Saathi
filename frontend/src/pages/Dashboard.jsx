@@ -207,6 +207,7 @@ function Dashboard() {
           trend="up"
           trendValue={incomeTrend}
           variant="success"
+          prefix="₹"
         />
         <StatsCard
           title="Current Outflow"
@@ -215,12 +216,14 @@ function Dashboard() {
           trend={Number(expenseTrend) > 0 ? "up" : "down"}
           trendValue={Math.abs(expenseTrend)}
           variant="error"
+          prefix="₹"
         />
         <StatsCard
           title="Potential Savings"
           value={totalIncome - totalExpenses}
           icon={<IndianRupee className="w-6 h-6" />}
           variant="gradient"
+          prefix="₹"
         />
       </div>
       {}

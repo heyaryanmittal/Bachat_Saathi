@@ -6,6 +6,8 @@ class LeaderboardService {
     try {
       const user = await User.findById(userId);
       if (!user) return null;
+      user.points = (user.points || 0) + pointsEarned;
+      await user.save();
       let entry = await Leaderboard.findOne({ userId });
       if (!entry) {
         entry = new Leaderboard({
@@ -18,6 +20,12 @@ class LeaderboardService {
         entry.monthlyPoints += pointsEarned;
         entry.lifetimePoints += pointsEarned;
       }
+      await PointsLog.create({
+        userId,
+        points: pointsEarned,
+        reason,
+        description: `Earned ${pointsEarned} points for ${reason.replace(/_/g, ' ')}`
+      });
       entry.lastUpdated = new Date();
       await entry.save();
       await this.calculateRanks();

@@ -205,6 +205,8 @@ exports.addSavingsToGoal = async (req, res) => {
         req.user.id,
         { $inc: { points: pointsEarned } }
       );
+      await require('../services/leaderboardService').updateUser(req.user.id, pointsEarned, 'goal_savings')
+        .catch(e => console.error('Error updating leaderboard points for goal savings:', e));
     }
     clearUserCache(req.user.id);
     res.json({

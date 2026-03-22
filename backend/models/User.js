@@ -56,6 +56,18 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: null
+  },
+  points: {
+    type: Number,
+    default: 0
+  },
+  budgetComplianceMonths: {
+    type: [Date],
+    default: []
+  },
+  firstBudgetDate: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 module.exports = mongoose.model('User', userSchema);

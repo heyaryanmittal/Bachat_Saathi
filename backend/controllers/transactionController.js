@@ -59,6 +59,9 @@ exports.createTransaction = async (req, res) => {
     clearUserCache(req.user.id);
     userController.awardMonthlySavingsPoints(req.user.id, new Date(transaction.date))
       .catch(error => console.error('Error calculating monthly savings points:', error));
+    const transactionPoints = 10;
+    require('../services/leaderboardService').updateUser(req.user.id, transactionPoints, 'transaction_recorded')
+      .catch(e => console.error('Error updating leaderboard points for transaction:', e));
     if (type === 'Expense' && category) {
       const txnDate = new Date(transaction.date);
       const month = txnDate.getMonth() + 1;

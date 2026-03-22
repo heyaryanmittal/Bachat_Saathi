@@ -45,12 +45,10 @@ exports.getLifetimeLeaderboard = async (req, res) => {
 exports.getUserStats = async (req, res) => {
   try {
     const userId = req.user.id;
-    const stats = await LeaderboardService.getUserStats(userId);
+    let stats = await LeaderboardService.getUserStats(userId);
     if (!stats) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User not found in leaderboard'
-      });
+      const user = await mongoose.model('User').findById(userId);
+      stats = await LeaderboardService.initializeUser(userId, user.name);
     }
     res.json({
       status: 'success',

@@ -15,7 +15,7 @@ const goalRoutes = require('./routes/goalRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
 const monthlySavingsTierRoutes = require('./routes/monthlySavingsTierRoutes');
-const debugRoutes = require('./routes/debugRoutes');
+
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const app = express();
 const corsOptions = {
@@ -43,7 +43,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/monthly-tiers', monthlySavingsTierRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
-app.use('/api/debug', debugRoutes);
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({

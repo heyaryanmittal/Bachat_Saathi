@@ -92,49 +92,84 @@ export function AuthProvider({ children }) {
     });
   }, [fetchUser, location, navigate]);
   const login = async (email, password) => {
-    console.log('Login attempt started');
+    console.log('[Auth] Login attempt for:', email);
     try {
-      setLoading(true);
       setError(null);
-      console.log('Sending login request...');
+      
       const response = await api.post('/auth/login', { email, password });
-      console.log('Login response:', response.data);
-      console.log('Login response status:', response.data?.status);
-      if (response.data?.status === 'require-2fa' || response.data?.status === 'REQUIRE-2FA') {
-        console.log('2FA required detected');
-        return { require2FA: true, email };
+      console.log('[Auth] Server Response:', response.data);
+      
+      const status = response.data?.status?.toLowerCase();
+      
+      // Explicit 2FA Check
+      if (status === 'require-2fa' || status === '2fa-required') {
+        console.log('[Auth] 2FA Step Required');
+        return { 
+          require2FA: true, 
+          email, 
+          message: response.data.message 
+        };
       }
-      if (!response.data?.data?.token || !response.data?.data?.user) {
-        console.error('Invalid response format:', response.data);
-        throw new Error('Invalid response from server');
-      }
-      const { token, user } = response.data.data;
-      console.log('Login successful, user:', user);
-      console.log('Setting token in localStorage and axios headers');
-      localStorage.setItem('token', token);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      console.log('Updating user state');
-      await new Promise(resolve => {
+
+      // Success Check
+      if (response.data?.data?.token) {
+        const { token, user } = response.data.data;
+        console.log('[Auth] Login success for:', user.email);
+        
+        localStorage.setItem('token', token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
         setUser(user);
         setError(null);
-        resolve();
-      });
-      toast.success(`Welcome back, ${user.name || 'User'}!`);
-      console.log('Login process completed, returning user');
-      return user;
+        toast.success(`Welcome back, ${user.name}!`);
+        return user;
+      }
+
+      throw new Error(response.data?.message || 'Invalid response from server');
     } catch (error) {
-      console.error('Login error:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to log in. Please check your credentials.';
+      console.error('[Auth] Login Failure:', error);
+      
+      // Fallback: Check if error response mentions 2FA
+      if (error.response?.data?.status === 'require-2fa') {
+        return { require2FA: true, email };
+      }
+
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
       setError(errorMessage);
       toast.error(errorMessage);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
+
+  const verify2FA = async (email, otp) => {
+    try {
+      setError(null);
+      const response = await api.post('/auth/login-2fa', { email, otp });
+      
+      if (!response.data?.data?.token || !response.data?.data?.user) {
+        throw new Error('Invalid 2FA verification response');
+      }
+
+      const { token, user } = response.data.data;
+      localStorage.setItem('token', token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      setUser(user);
+      setError(null);
+      
+      toast.success(`2FA Verified. Welcome, ${user.name}!`);
+      return user;
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      const errorMessage = error.response?.data?.message || 'Invalid OTP code.';
+      toast.error(errorMessage);
+      throw error;
+    }
+  };
+
+
   const signup = async (name, email, password) => {
     try {
-      setLoading(true);
       setError(null);
       const response = await api.post('/auth/signup', {
         name: name.trim(),
@@ -158,13 +193,11 @@ export function AuthProvider({ children }) {
       setError(errorMessage);
       toast.error(errorMessage);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
+
   const updateUser = async (updatedData) => {
     try {
-      setLoading(true);
       const response = await api.put('/auth/profile', updatedData);
       const updatedUser = response.data.data.user;
       setUser(prevUser => ({
@@ -178,10 +211,9 @@ export function AuthProvider({ children }) {
       const errorMessage = error.response?.data?.message || 'Failed to update profile.';
       toast.error(errorMessage);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
+
   const logout = () => {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
@@ -204,6 +236,7 @@ export function AuthProvider({ children }) {
     error,
     loading,
     login,
+    verify2FA,
     signup,
     logout,
     updateUser,

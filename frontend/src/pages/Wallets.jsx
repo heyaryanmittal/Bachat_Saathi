@@ -249,7 +249,7 @@ const Wallets = () => {
                                 await fetchWallets();
                                 setDeleteModal({ show: false, wallet: null });
                                 toast.success('Wallet Deleted.');
-                            } catch (e) { toast.error('Failed to delete.'); }
+                            } catch (err) { toast.error(err.response?.data?.message || 'Failed to delete.'); }
                         }}
                       > Delete </Button>
                   </div>

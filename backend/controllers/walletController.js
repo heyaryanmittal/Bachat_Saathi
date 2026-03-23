@@ -115,24 +115,25 @@ exports.deleteWallet = async (req, res) => {
         message: 'Wallet not found'
       });
     }
-    const twelveHoursAgo = new Date();
-    twelveHoursAgo.setHours(twelveHoursAgo.getHours() - 12);
-    if (wallet.createdAt > twelveHoursAgo) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Cannot delete wallet created within the last 12 hours. Please wait before deleting this wallet.'
-      });
-    }
     const twentyFourHoursAgo = new Date();
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+    if (wallet.createdAt > twentyFourHoursAgo) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Wallets can ONLY be deleted 24 hours after their creation.'
+      });
+    }
+
     const recentTransactionCount = await Transaction.countDocuments({
       walletId: req.params.id,
       createdAt: { $gte: twentyFourHoursAgo }
     });
+
     if (recentTransactionCount > 0) {
       return res.status(400).json({
         status: 'error',
-        message: 'Cannot delete wallet with transactions created within the last 24 hours. Please try again later.'
+        message: 'Cannot delete wallet with transactions created within the last 24 hours. Please wait before deleting this wallet.'
       });
     }
     await Wallet.findOneAndDelete({

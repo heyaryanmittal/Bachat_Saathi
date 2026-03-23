@@ -195,7 +195,7 @@ This project is licensed under the MIT License.
 - **Custom CSS Animations**: Added `slideInLeft`, `float3D`, `glow3D`, `sparkle`, and `wiggle` animations
 
 #### 🔒 Enhanced Wallet Security System
-- **12-Hour Creation Protection**: Wallets cannot be deleted within 12 hours of creation
+- **24-Hour Creation Protection**: Wallets cannot be deleted within 24 hours of creation
 - **24-Hour Transaction Protection**: Wallets with recent transactions (within 24 hours) cannot be deleted
 - **Smart Error Handling**: 
   - Blue informational messages for policy restrictions

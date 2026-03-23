@@ -21,27 +21,22 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      if (!['/login', '/signup', '/'].includes(window.location.pathname)) {
-        window.location.href = '/login';
-      }
+      delete api.defaults.headers.common['Authorization'];
+      
+      // We no longer use window.location.href here to avoid full page reloads.
+      // The AuthContext and ProtectedRoute will handle the redirection.
     }
+    
     if (!error.response) {
       toast.error('Network error. Please check your connection.');
       return Promise.reject(error);
     }
-    const { status } = error.response;
-    if (status === 401) {
-      localStorage.removeItem('token');
-      delete api.defaults.headers.common['Authorization'];
-      if (!['/login', '/signup', '/'].includes(window.location.pathname)) {
-        toast.error('Your session has expired. Please log in again.');
-        window.location.href = '/login';
-      }
-    }
-    else if (status >= 500) {
+    
+    if (error.response.status >= 500) {
       console.error('Server error:', error.response.data);
       toast.error('Server error. Please try again later.');
     }
+    
     return Promise.reject(error);
   }
 );

@@ -9,7 +9,7 @@ const TransactionForm = ({ onSubmit, wallets, refreshWallets, initialData = null
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({
     defaultValues: initialData || {
       type: 'Expense',
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toLocaleDateString('en-CA')
     }
   });
   const transactionType = watch('type');

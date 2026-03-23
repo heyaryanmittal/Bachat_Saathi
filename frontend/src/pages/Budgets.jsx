@@ -19,7 +19,11 @@ const Budgets = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null, category: '', isDeleting: false });
-  useEffect(() => { fetchBudgets(); }, [currentMonth]);
+  useEffect(() => { 
+    if (currentMonth && currentMonth.length === 7) {
+      fetchBudgets(); 
+    }
+  }, [currentMonth]);
   const fetchBudgets = async () => {
     try {
       setIsLoading(true);

@@ -20,7 +20,12 @@ const Transactions = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, transaction: null, isDeleting: false });
   useEffect(() => { fetchWallets(); }, []);
-  useEffect(() => { fetchTransactions(); fetchAllStats(); }, [currentPage, filters]);
+  useEffect(() => { 
+    if (filters.startDate && filters.startDate.length < 10) return;
+    if (filters.endDate && filters.endDate.length < 10) return;
+    fetchTransactions(); 
+    fetchAllStats(); 
+  }, [currentPage, filters]);
   const fetchWallets = async () => {
     try {
       const response = await api.getWallets();
@@ -212,7 +217,12 @@ const Transactions = () => {
                   <TransactionForm
                     onSubmit={data => handleAction(data, isEditing)}
                     wallets={wallets}
-                    initialData={isEditing ? { ...editingTransaction, description: editingTransaction.notes } : null}
+                    initialData={isEditing ? { 
+                      ...editingTransaction, 
+                      description: editingTransaction.notes,
+                      walletId: editingTransaction.walletId?._id || editingTransaction.walletId,
+                      date: editingTransaction.date ? new Date(editingTransaction.date).toLocaleDateString('sv-SE').split(' ')[0] : ''
+                    } : null}
                     isEditing={isEditing}
                   />
                   <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingTransaction(null); }}>Cancel</Button>

@@ -124,11 +124,11 @@ const Profile = () => {
                                         <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                                             <div className="bg-muted/30 px-3 py-1.5 rounded-xl border border-border/50 flex items-center">
                                                 <Calendar className="w-3.5 h-3.5 mr-2 text-primary" />
-                                                <span className="text-[10px] font-black uppercase">Joined {new Date(user?.createdAt).toLocaleDateString()}</span>
+                                                <span className="text-[10px] font-black uppercase tracking-tight">Joined {new Date(user?.createdAt).toLocaleDateString()}</span>
                                             </div>
-                                            <div className="bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20 flex items-center">
-                                                <Star className="w-3.5 h-3.5 mr-2 text-primary" />
-                                                <span className="text-[10px] font-black uppercase text-primary">Premium User</span>
+                                            <div className="bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 flex items-center">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2"></div>
+                                                <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Free Plan</span>
                                             </div>
                                         </div>
                                     </div>

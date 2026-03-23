@@ -21,9 +21,9 @@ export const navigationItems = [
     children: [
       { path: '/goals', name: 'Goals', icon: 'Target' },
       { path: '/achievements', name: 'Achievements', icon: 'Medal' },
-      { path: '/leaderboard', name: 'Leaderboard', icon: 'Crown' },
-      { path: '/points-info', name: 'Platform Guide', icon: 'Calculator' }
+      { path: '/leaderboard', name: 'Leaderboard', icon: 'Crown' }
     ]
-  }
+  },
+  { path: '/points-info', name: 'Platform Guide', icon: 'BookOpen' }
 ];
 export default navigationItems;

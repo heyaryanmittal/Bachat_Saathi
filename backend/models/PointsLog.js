@@ -18,9 +18,15 @@ const pointsLogSchema = new mongoose.Schema({
       'goal_completed',          
       'goal_savings',            
       'debt_payment',            
-      'debt_completed',          
-      'weekly_login_streak',     
-      'monthly_savings'          
+      'debt_completed',
+      'debt_paid_off',          
+      'weekly_login_streak',
+      'recurring_saving_streak',     
+      'monthly_savings',
+      'transaction_recorded',
+      'points_earned',
+      'manual_adjustment',
+      'daily_bonus'
     ]
   },
   description: {

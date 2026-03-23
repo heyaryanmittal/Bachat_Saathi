@@ -117,10 +117,10 @@ function PointsInfoPage() {
                     <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center justify-center"><Trophy className="w-4 h-4 mr-2" /> Badge Tiers</h3>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         {[
-                            { name: 'Bronze', pts: '0 - 999', color: 'from-amber-600/20' },
-                            { name: 'Silver', pts: '1,000 - 4,999', color: 'from-slate-400/20' },
-                            { name: 'Gold', pts: '5,000 - 9,999', color: 'from-yellow-500/20' },
-                            { name: 'Platinum', pts: '10,000+', color: 'from-cyan-400/20' },
+                            { name: 'Silver', pts: '0 - 2,500', color: 'from-slate-400/20' },
+                            { name: 'Bronze', pts: '2,500 - 7,500', color: 'from-amber-600/20' },
+                            { name: 'Gold', pts: '7,500 - 15,000', color: 'from-yellow-500/20' },
+                            { name: 'Platinum', pts: '15,000+', color: 'from-cyan-400/20' },
                         ].map((t, i) => (
                             <div key={i} className={`bg-gradient-to-br ${t.color} to-transparent p-6 rounded-3xl border border-border/50 text-center group hover:scale-105 transition-transform`}>
                                 <h4 className="font-black text-xl tracking-tighter uppercase mb-1">{t.name}</h4>

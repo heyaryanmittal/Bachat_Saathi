@@ -80,6 +80,10 @@ export const updateDebtPayment = (id, data) =>
   api.patch(`/debts/${id}/payment`, data);
 export const updateDebtInterest = (id, data) =>
   api.patch(`/debts/${id}/interest`, data);
+export const removeDebtInterest = (id) =>
+  api.patch(`/debts/${id}/interest/remove-last`);
+export const resetDebtInterest = (id) =>
+  api.patch(`/debts/${id}/interest/reset`);
 export const closeDebt = (id) =>
   api.patch(`/debts/${id}/close`);
 export const getGoals = (params) =>

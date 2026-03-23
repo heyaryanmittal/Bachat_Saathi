@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 const Achievements = () => {
     const navigate = useNavigate();
@@ -22,10 +23,10 @@ const Achievements = () => {
     const [activeTab, setActiveTab] = useState('inventory');
     const [selectedBadge, setSelectedBadge] = useState(null);
     const badgeTiers = [
-        { name: 'Bronze Saver', points: 1000, icon: <Award className="w-8 h-8"/>, color: 'from-amber-600 to-amber-400', desc: 'Congratulations on getting started!' },
-        { name: 'Silver Saver', points: 5000, icon: <ShieldCheck className="w-8 h-8"/>, color: 'from-slate-400 to-slate-200', desc: 'You are building a solid financial base.' },
-        { name: 'Gold Saver', points: 10000, icon: <Crown className="w-8 h-8"/>, color: 'from-yellow-500 to-yellow-200', desc: 'Expert at managing your expenses.' },
-        { name: 'Platinum Saver', points: 25000, icon: <Zap className="w-8 h-8"/>, color: 'from-cyan-400 to-indigo-500', desc: 'Master of personal financial planning.' },
+        { name: 'Silver Saver', points: 0, icon: <ShieldCheck className="w-8 h-8"/>, color: 'from-slate-400 to-slate-200', desc: 'Initialize financial protocols.' },
+        { name: 'Bronze Saver', points: 2500, icon: <Award className="w-8 h-8"/>, color: 'from-amber-600 to-amber-400', desc: 'Congratulations on getting started!' },
+        { name: 'Gold Saver', points: 7500, icon: <Crown className="w-8 h-8"/>, color: 'from-yellow-500 to-yellow-200', desc: 'Expert at managing your expenses.' },
+        { name: 'Platinum Saver', points: 15000, icon: <Zap className="w-8 h-8"/>, color: 'from-cyan-400 to-indigo-500', desc: 'Master of personal financial planning.' },
     ];
     useEffect(() => {
         const fetchData = async () => {
@@ -50,11 +51,10 @@ const Achievements = () => {
         fetchData();
     }, [user]);
     const getCurrentTier = () => {
-        if (userPoints >= 25000) return badgeTiers[3];
-        if (userPoints >= 10000) return badgeTiers[2];
-        if (userPoints >= 5000) return badgeTiers[1];
-        if (userPoints >= 1000) return badgeTiers[0];
-        return { name: 'Recruit', color: 'from-muted to-muted', desc: 'Initialize financial protocols.' };
+        if (userPoints >= 15000) return badgeTiers[3];
+        if (userPoints >= 7500) return badgeTiers[2];
+        if (userPoints >= 2500) return badgeTiers[1];
+        return badgeTiers[0];
     };
     if (isLoading) return <div className="h-[80vh] flex items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading achievements..." /></div>;
     const currentTier = getCurrentTier();
@@ -73,10 +73,10 @@ const Achievements = () => {
                         <div className="space-y-2 max-w-md mx-auto md:mx-0">
                             <div className="flex justify-between text-[10px] font-black uppercase opacity-70">
                                 <span>Progress to Next Tier</span>
-                                <span>{Math.min(Math.round((userPoints / 25000) * 100), 100)}%</span>
+                                <span>{Math.min(Math.round((userPoints / 15000) * 100), 100)}%</span>
                             </div>
                             <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                                <motion.div initial={{ width: 0 }} animate={{ width: `${(userPoints / 25000) * 100}%` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-primary"></motion.div>
+                                <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min((userPoints / 15000) * 100, 100)}%` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-primary"></motion.div>
                             </div>
                         </div>
                     </div>

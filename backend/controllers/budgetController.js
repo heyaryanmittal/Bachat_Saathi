@@ -21,7 +21,7 @@ exports.createBudget = async (req, res) => {
     const spent = await Transaction.aggregate([
       {
         $match: {
-          userId: req.user.id,
+          userId: new (require('mongoose').Types.ObjectId)(req.user.id),
           category,
           type: 'Expense',
           date: { $gte: startDate, $lte: endDate }
@@ -195,24 +195,24 @@ exports.getBudgetSummary = async (req, res) => {
     }
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
+    endDate.setHours(23, 59, 59, 999);
     const budgets = await Budget.find({
       userId: req.user.id,
-      month,
-      year
+      month: parseInt(month),
+      year: parseInt(year)
     });
     const summary = await Transaction.aggregate([
       {
         $match: {
-          userId: req.user.id,
-          month: req.query.month,
-          year: req.query.year,
-          type: "Expense"
+          userId: new (require('mongoose').Types.ObjectId)(req.user.id),
+          type: "Expense",
+          date: { $gte: startDate, $lte: endDate }
         }
       },
       {
         $group: {
           _id: "$category",
-          spent: { $sum: { $toDouble: "$amount" } } 
+          spent: { $sum: { $toDouble: "$amount" } }
         }
       }
     ]);

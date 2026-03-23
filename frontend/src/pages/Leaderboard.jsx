@@ -20,14 +20,20 @@ const Leaderboard = () => {
         const fetchAll = async () => {
             setLoading(true);
             try {
-                const [mRes, lRes, sRes] = await Promise.all([
+                const [mRes, lRes, sRes, mCtx, lCtx] = await Promise.all([
                     api.get('/leaderboard/monthly?limit=10'),
                     api.get('/leaderboard/lifetime?limit=10'),
-                    api.get('/leaderboard/user/stats')
+                    api.get('/leaderboard/user/stats'),
+                    api.get('/leaderboard/user/context?type=monthly&range=2'),
+                    api.get('/leaderboard/user/context?type=lifetime&range=2')
                 ]);
                 setMonthlyLeaderboard(mRes.data.data);
                 setLifetimeLeaderboard(lRes.data.data);
-                setUserStats(sRes.data.data);
+                setUserStats({
+                    ...sRes.data.data,
+                    monthlyContext: mCtx.data.data.context,
+                    lifetimeContext: lCtx.data.data.context
+                });
             } catch (e) {  }
             finally { setLoading(false); }
         };
@@ -135,31 +141,78 @@ const Leaderboard = () => {
             {}
             <div className="space-y-4 px-4">
                 <AnimatePresence mode="wait">
-                    {currentLeaderboard.map((entry, idx) => {
-                        const rank = idx + 1;
-                        const points = activeTab === 'monthly' ? entry.monthlyPoints : entry.lifetimePoints;
-                        const isUser = entry.username === user?.name;
+                    {(() => {
+                        const topList = currentLeaderboard;
+                        const userRank = activeTab === 'monthly' ? userStats?.monthlyRank : userStats?.lifetimeRank;
+                        const contextList = activeTab === 'monthly' ? userStats?.monthlyContext : userStats?.lifetimeContext;
+                        
+                        const isUserInTopList = topList.some(e => e.username === user?.name);
+                        
                         return (
-                            <motion.div key={entry.username} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
-                                <div className="flex items-center gap-6">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl ${isUser ? 'bg-white/20' : 'bg-background border border-border/50'}`}>
-                                        {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-black text-lg tracking-tighter uppercase">{entry.username}</p>
-                                            <span className="text-xl">{getBadgeIcon(entry.badges?.[0])}</span>
+                            <>
+                                {topList.map((entry, idx) => {
+                                    const rank = idx + 1;
+                                    const points = activeTab === 'monthly' ? entry.monthlyPoints : entry.lifetimePoints;
+                                    const isUser = entry.username === user?.name;
+                                    return (
+                                        <motion.div key={entry.username} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
+                                            <div className="flex items-center gap-6">
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl ${isUser ? 'bg-white/20' : 'bg-background border border-border/50'}`}>
+                                                    {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-black text-lg tracking-tighter uppercase">{entry.username}</p>
+                                                        <span className="text-xl">{getBadgeIcon(entry.badges?.[0])}</span>
+                                                    </div>
+                                                    <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>{rank <= 3 ? 'Top Saver' : 'Member'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className={`text-2xl font-black tracking-tighter ${isUser ? 'text-white' : 'text-primary'}`}>{Number(points || 0).toLocaleString()}</p>
+                                                <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Points</p>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+
+                                {!isUserInTopList && contextList && contextList.length > 0 && (
+                                    <>
+                                        <div className="flex items-center justify-center py-4">
+                                            <div className="h-px bg-border/50 flex-1"></div>
+                                            <div className="px-6 text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] italic">Your Position</div>
+                                            <div className="h-px bg-border/50 flex-1"></div>
                                         </div>
-                                        <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>{rank <= 3 ? 'Top Saver' : 'Member'}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className={`text-2xl font-black tracking-tighter ${isUser ? 'text-white' : 'text-primary'}`}>{Number(points || 0).toLocaleString()}</p>
-                                    <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Points</p>
-                                </div>
-                            </motion.div>
-                        )
-                    })}
+                                        {contextList.map((entry, idx) => {
+                                            const rank = activeTab === 'monthly' ? entry.monthlyRank : entry.lifetimeRank;
+                                            const points = activeTab === 'monthly' ? entry.monthlyPoints : entry.lifetimePoints;
+                                            const isUser = entry.username === user?.name;
+                                            return (
+                                                <motion.div key={entry.username + '_ctx'} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
+                                                    <div className="flex items-center gap-6">
+                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl ${isUser ? 'bg-white/20' : 'bg-background border border-border/50'}`}>
+                                                            #{rank}
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="font-black text-lg tracking-tighter uppercase">{entry.username}</p>
+                                                                <span className="text-xl">{getBadgeIcon(entry.badges?.[0])}</span>
+                                                            </div>
+                                                            <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Your Neighbors</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className={`text-2xl font-black tracking-tighter ${isUser ? 'text-white' : 'text-primary'}`}>{Number(points || 0).toLocaleString()}</p>
+                                                        <p className={`text-[9px] font-black uppercase tracking-widest ${isUser ? 'text-white/70' : 'text-muted-foreground'}`}>Points</p>
+                                                    </div>
+                                                </motion.div>
+                                            );
+                                        })}
+                                    </>
+                                )}
+                            </>
+                        );
+                    })()}
                 </AnimatePresence>
             </div>
             {}

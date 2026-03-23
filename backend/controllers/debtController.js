@@ -281,6 +281,71 @@ exports.updateDebtInterest = async (req, res) => {
     });
   }
 };
+exports.removeDebtInterest = async (req, res) => {
+  try {
+    const debt = await Debt.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    });
+    if (!debt) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Debt not found'
+      });
+    }
+    if (!debt.interestHistory || debt.interestHistory.length === 0) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'No interest history to remove'
+      });
+    }
+    const lastInterest = debt.interestHistory.pop();
+    debt.remainingAmount = Math.max(0, debt.remainingAmount - lastInterest.amount);
+    await debt.save();
+    clearUserCache(req.user.id);
+    res.json({
+      status: 'success',
+      message: `Removed ₹${lastInterest.amount.toFixed(2)} interest`,
+      data: debt
+    });
+  } catch (error) {
+    console.error('Remove debt interest error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to remove interest'
+    });
+  }
+};
+exports.resetDebtInterest = async (req, res) => {
+  try {
+    const debt = await Debt.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    });
+    if (!debt) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Debt not found'
+      });
+    }
+    const totalInterest = debt.interestHistory.reduce((sum, item) => sum + item.amount, 0);
+    debt.remainingAmount = Math.max(0, debt.remainingAmount - totalInterest);
+    debt.interestHistory = [];
+    await debt.save();
+    clearUserCache(req.user.id);
+    res.json({
+      status: 'success',
+      message: 'Interest history reset successfully',
+      data: debt
+    });
+  } catch (error) {
+    console.error('Reset debt interest error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to reset interest history'
+    });
+  }
+};
 exports.getDebtStats = async (req, res) => {
   try {
     const userId = req.user.id;

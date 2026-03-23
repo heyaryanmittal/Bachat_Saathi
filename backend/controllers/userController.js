@@ -16,7 +16,7 @@ exports.getUserPoints = async (req, res) => {
       });
     }
     const pointsLog = await PointsLog.aggregate([
-      { $match: { userId: user._id } },
+      { $match: { userId: new (require('mongoose').Types.ObjectId)(user._id) } },
       { $group: { _id: null, total: { $sum: '$points' } } }
     ]);
     const totalPoints = pointsLog.length > 0 ? pointsLog[0].total : 0;
@@ -125,7 +125,7 @@ exports.awardMonthlySavingsPoints = async (userId, date = new Date()) => {
     const incomeResult = await Transaction.aggregate([
       {
         $match: {
-          userId: mongoose.Types.ObjectId(userId),
+          userId: new (require('mongoose').Types.ObjectId)(userId),
           type: 'Income',
           date: { $gte: startOfMonth, $lte: endOfMonth }
         }
@@ -140,7 +140,7 @@ exports.awardMonthlySavingsPoints = async (userId, date = new Date()) => {
     const expenseResult = await Transaction.aggregate([
       {
         $match: {
-          userId: mongoose.Types.ObjectId(userId),
+          userId: new (require('mongoose').Types.ObjectId)(userId),
           type: 'Expense',
           date: { $gte: startOfMonth, $lte: endOfMonth }
         }
@@ -230,7 +230,7 @@ exports.getUserAchievements = async (req, res) => {
       },
       financialGuru: {
         title: 'Financial Guru',
-        description: 'Reach 1000 total points',
+        description: 'Reach 15000 total points',
         icon: '🧠',
         earned: false
       }
@@ -292,7 +292,7 @@ exports.getUserAchievements = async (req, res) => {
       createdAt: { $gte: sixMonthsAgo }
     }).countDocuments();
     achievements.consistentSaver.earned = recentSavingLogs >= 6;
-    achievements.financialGuru.earned = user.points >= 1000;
+    achievements.financialGuru.earned = user.points >= 15000;
     res.json({
       status: 'success',
       data: achievements

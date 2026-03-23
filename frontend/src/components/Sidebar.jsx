@@ -16,6 +16,7 @@ import {
   Target, 
   Medal, 
   Crown,
+  BookOpen,
   ChevronDown,
   LogOut,
   User,
@@ -34,6 +35,7 @@ const iconMap = {
   Target,
   Medal,
   Crown,
+  BookOpen,
   ChevronDown
 };
 function IconRenderer({ iconName, className = "h-5 w-5" }) {

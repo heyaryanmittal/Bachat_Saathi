@@ -160,10 +160,25 @@ exports.getTransactions = async (req, res) => {
     }
     if (category) query.category = category;
     if (type) query.type = type;
-    if (startDate || endDate) {
+
+    // Handle month and year parameters by converting them to date range
+    let start = startDate;
+    let end = endDate;
+
+    if (req.query.month || req.query.year) {
+      const now = new Date();
+      const y = parseInt(req.query.year) || now.getFullYear();
+      const m = parseInt(req.query.month) || (req.query.year ? 1 : now.getMonth() + 1); // Default to Jan if only year provided
+      
+      start = new Date(y, m - 1, 1);
+      end = new Date(y, m, 0); // Last day of month
+      end.setHours(23, 59, 59, 999);
+    }
+
+    if (start || end) {
       query.date = {};
-      if (startDate) query.date.$gte = new Date(startDate);
-      if (endDate) query.date.$lte = new Date(endDate);
+      if (start) query.date.$gte = new Date(start);
+      if (end) query.date.$lte = new Date(end);
     }
     if (minAmount || maxAmount) {
       query.amount = {};
@@ -216,7 +231,10 @@ exports.getTransactions = async (req, res) => {
   }
 };
 const getTransactionStats = async (userId, baseQuery = {}) => {
-  const query = { ...baseQuery, userId };
+  const query = { 
+    ...baseQuery, 
+    userId: new (require('mongoose').Types.ObjectId)(userId) 
+  };
   const stats = await Transaction.aggregate([
     { $match: query },
     {

@@ -71,7 +71,8 @@ const Budgets = () => {
   const stats = useMemo(() => {
     const budgeted = summary.reduce((s, i) => s + i.budgeted, 0);
     const spent = summary.reduce((s, i) => s + i.spent, 0);
-    return { budgeted, spent, remaining: budgeted - spent };
+    const utilization = budgeted > 0 ? (spent / budgeted) * 100 : 0;
+    return { budgeted, spent, remaining: budgeted - spent, utilization };
   }, [summary]);
   if (isLoading && !budgets.length) {
     return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Calculating limits..." /></div>;
@@ -81,8 +82,20 @@ const Budgets = () => {
       {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatsCard title="Total Budgeted" value={stats.budgeted} variant="primary" icon={<Target />} prefix="₹" />
-        <StatsCard title="Total Spent" value={stats.spent} variant="error" icon={<TrendingDown />} prefix="₹" />
-        <StatsCard title="Remaining" value={stats.remaining} variant="success" icon={<Layers />} prefix="₹" />
+        <StatsCard 
+          title="Total Spent" 
+          value={stats.spent} 
+          variant={stats.utilization >= 100 ? "error" : stats.utilization >= 80 ? "warning" : "secondary"} 
+          icon={<TrendingDown />} 
+          prefix="₹" 
+        />
+        <StatsCard 
+          title="Remaining" 
+          value={stats.remaining} 
+          variant={stats.remaining < 0 ? "error" : "success"} 
+          icon={<Layers />} 
+          prefix="₹" 
+        />
       </div>
       {}
       <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
@@ -111,8 +124,8 @@ const Budgets = () => {
         ) : (
           summary.map(item => {
             const progress = item.budgeted > 0 ? (item.spent / item.budgeted) * 100 : 0;
-            const isCritical = progress >= 90;
-            const isWarning = progress >= 75 && progress < 90;
+            const isCritical = progress >= 100;
+            const isWarning = progress >= 80 && progress < 100;
             return (
               <Card key={item.category} variant="glass" className="saas-card group p-6 h-full flex flex-col">
                 <div className="flex justify-between items-start mb-6">

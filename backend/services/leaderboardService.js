@@ -155,13 +155,31 @@ class LeaderboardService {
     try {
       const existing = await Leaderboard.findOne({ userId });
       if (existing) return existing;
+
+      const user = await User.findById(userId);
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      const monthlyPointsResult = await PointsLog.aggregate([
+        {
+          $match: {
+            userId: new (require('mongoose').Types.ObjectId)(userId),
+            createdAt: { $gte: firstDay }
+          }
+        },
+        { $group: { _id: null, total: { $sum: '$points' } } }
+      ]);
+      
+      const monthlyPoints = monthlyPointsResult.length > 0 ? monthlyPointsResult[0].total : 0;
+
       const entry = new Leaderboard({
         userId,
-        username,
-        monthlyPoints: 0,
-        lifetimePoints: 0
+        username: user.name,
+        monthlyPoints,
+        lifetimePoints: user.points || 0
       });
       await entry.save();
+      await this.calculateRanks();
       return entry;
     } catch (error) {
       console.error('LeaderboardService.initializeUser error:', error);
@@ -207,7 +225,7 @@ class LeaderboardService {
         const monthlyPointsResult = await PointsLog.aggregate([
           {
             $match: {
-              userId: entry.userId,
+              userId: new (require('mongoose').Types.ObjectId)(entry.userId),
               createdAt: { $gte: currentMonthStart, $lte: currentMonthEnd }
             }
           },

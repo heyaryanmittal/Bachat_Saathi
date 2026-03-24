@@ -6,20 +6,20 @@ const HeroSection = () => {
   const navigate = useNavigate();
   return (
     <section className="relative min-h-[90vh] flex items-center hero-gradient overflow-hidden pt-16">
-      {}
+      { }
       <div className="absolute inset-0 opacity-[0.04]" style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
         backgroundSize: '32px 32px',
       }} />
       <div className="container mx-auto px-6 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div className="space-y-8">
+          <div className="space-y-8 md:ml-10 lg:ml-20 xl:ml-28">
             <h1
               className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight text-balance animate-fade-up"
               style={{ animationDelay: '100ms' }}
             >
-              Your money deserves a
-              <span className="text-accent"> better plan</span>
+              Your money deserves<br />
+              <span className="text-accent">a better plan</span>
             </h1>
             <p
               className="text-white/70 text-xl sm:text-2xl max-w-xl leading-relaxed animate-fade-up"
@@ -31,16 +31,16 @@ const HeroSection = () => {
               className="flex flex-col sm:flex-row gap-4 animate-fade-up"
               style={{ animationDelay: '300ms' }}
             >
-              <Button 
-                variant="hero" 
-                size="xl" 
+              <Button
+                variant="hero"
+                size="xl"
                 onClick={() => navigate('/signup')}
               >
                 Start Saving Today
                 <ArrowRight size={18} />
               </Button>
-              <Button 
-                variant="hero-outline" 
+              <Button
+                variant="hero-outline"
                 size="xl"
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
               >

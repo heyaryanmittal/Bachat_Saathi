@@ -18,7 +18,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#EEA62B] dark:bg-background/80 backdrop-blur-xl border-b border-white/5 shadow-2xl transition-all duration-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6 sm:px-8">
         <Logo isLight={true} className="scale-110" />
-        
+
         <div className="hidden md:flex items-center gap-2">
           {links.map((link) => (
             <a
@@ -33,14 +33,14 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-6">
           <ThemeToggle />
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="text-white/90 dark:text-foreground/80 hover:text-white dark:hover:text-foreground font-bold text-[13px] tracking-wide transition-colors"
           >
             Log in
           </button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             className="bg-white dark:bg-primary text-black dark:text-white hover:bg-slate-50 dark:hover:bg-primary/90 text-[13px] font-black uppercase tracking-widest px-8 h-10 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
             onClick={() => navigate('/signup')}
           >

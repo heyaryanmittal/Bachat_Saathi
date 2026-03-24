@@ -55,7 +55,7 @@ const FeatureCard = ({ feature, index }) => {
         transition: `all 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${index * 100}ms`,
       }}
     >
-      {}
+      { }
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
       <div className="relative z-10">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-8 group-hover:from-primary group-hover:to-emerald-600 transition-all duration-500 shadow-inner">
@@ -105,15 +105,15 @@ const FeaturesSection = () => {
                   transition: `all 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${index * 100}ms`,
                 }}
               >
-                {}
+                { }
                 <div className="relative h-full bg-primary rounded-[2.5rem] p-8 flex flex-col items-start text-left shadow-2xl shadow-primary/20 group-hover:bg-emerald-700 transition-all duration-500 overflow-hidden">
-                  {}
+                  { }
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
-                  {}
+                  { }
                   <div className="mb-6 w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                     <Icon size={28} className="text-white drop-shadow-md" />
                   </div>
-                  {}
+                  { }
                   <div className="space-y-4">
                     <h3 className="font-display font-bold text-xl text-[#fbbf24] tracking-tight leading-tight">
                       {feature.title}

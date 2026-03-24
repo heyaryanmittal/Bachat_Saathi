@@ -97,9 +97,9 @@ const PricingSection = () => {
                 transition: `all 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`
               }}
             >
-              {}
+              { }
               <div className={`absolute -inset-1 bg-gradient-to-r ${plan.glowColor} rounded-[2.5rem] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500`}></div>
-              {}
+              { }
               <div className={`absolute top-0 right-0 w-40 h-40 ${plan.premium ? 'bg-primary/5' : 'bg-highlight/5'} rounded-full -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-500`}></div>
               <div className="relative z-10 space-y-8 flex-1 flex flex-col">
                 <div>
@@ -124,8 +124,8 @@ const PricingSection = () => {
                     </div>
                   ))}
                 </div>
-                <Button 
-                  variant={plan.variant} 
+                <Button
+                  variant={plan.variant}
                   className={`w-full h-15 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg group-hover:scale-105 transition-all duration-500 mt-8 ${plan.buttonAccent}`}
                   onClick={() => navigate('/signup')}
                 >
@@ -136,7 +136,7 @@ const PricingSection = () => {
           ))}
         </div>
         <p className="text-center mt-12 text-sm text-muted-foreground font-medium uppercase tracking-widest animate-pulse">
-           ✨ Current Default: All users start on Free Plan
+          ✨ Current Default: All users start on Free Plan
         </p>
       </div>
     </section>

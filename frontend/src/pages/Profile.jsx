@@ -26,6 +26,11 @@ const Profile = () => {
     const [show2FAModal, setShow2FAModal] = useState(false);
     const [otp, setOtp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
     useEffect(() => {
         if (user) {
             setEditedUser({
@@ -73,6 +78,29 @@ const Profile = () => {
             toast.success('Vault secured.');
         } catch (e) { toast.error('Integrity failure.'); }
         finally { setIsLoading(false); }
+    };
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            return toast.error("Binary mismatch. Codes must align.");
+        }
+        if (passwordData.newPassword.length < 6) {
+            return toast.error("Complexity failure. Sequence too short.");
+        }
+        try {
+            setIsLoading(true);
+            await api.put('/auth/change-password', {
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword
+            });
+            setShowPasswordModal(false);
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            toast.success('Security protocol updated.');
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Access denied. Check credentials.');
+        } finally {
+            setIsLoading(false);
+        }
     };
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
@@ -234,6 +262,51 @@ const Profile = () => {
                 </div>
             </div>
             {}
+            {showPasswordModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
+                    <Card variant="glass" className="max-w-md w-full animate-entrance" size="xl">
+                        <div className="flex items-center space-x-4 mb-8">
+                            <div className="p-3 bg-rose-500/10 rounded-xl"><Lock className="w-8 h-8 text-rose-500" /></div>
+                            <div>
+                                <h3 className="text-2xl font-black tracking-tighter uppercase tracking-widest">Update Security</h3>
+                                <p className="text-xs text-muted-foreground italic">Redefine your vault access sequence.</p>
+                            </div>
+                        </div>
+                        <form onSubmit={handlePasswordChange} className="space-y-6">
+                            <Input 
+                                label="Current Protocol" 
+                                type="password" 
+                                value={passwordData.currentPassword} 
+                                onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})} 
+                                placeholder="Enter current PIN" 
+                                required 
+                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Input 
+                                    label="New Protocol" 
+                                    type="password" 
+                                    value={passwordData.newPassword} 
+                                    onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})} 
+                                    placeholder="Min 6 chars" 
+                                    required 
+                                />
+                                <Input 
+                                    label="Confirm Sequence" 
+                                    type="password" 
+                                    value={passwordData.confirmPassword} 
+                                    onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})} 
+                                    placeholder="Re-enter to verify" 
+                                    required 
+                                />
+                            </div>
+                            <div className="flex space-x-4 pt-4">
+                                <Button variant="ghost" className="flex-1 font-black text-[10px] uppercase tracking-widest" onClick={() => setShowPasswordModal(false)}>Discard</Button>
+                                <Button type="submit" size="xl" className="flex-1 btn-saas-primary" loading={isLoading}>Sync Password</Button>
+                            </div>
+                        </form>
+                    </Card>
+                </div>
+            )}
             {show2FAModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
                     <Card variant="glass" className="max-w-sm w-full animate-entrance text-center" size="xl">

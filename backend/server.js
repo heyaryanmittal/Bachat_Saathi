@@ -19,10 +19,10 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    // Database connection established
+    console.log("✅ Database: Connected to MongoDB");
   })
   .catch((error) => {
-    console.error("❌ MongoDB connection error:", error.message);
+    console.error("❌ Database: Connection error:", error.message);
     process.exit(1);
   });
 
@@ -33,9 +33,10 @@ require("./cronJobs/resetBudgetAlerts")();
 
 const startServer = (port) => {
   const server = app.listen(port, () => {
-    // Server started
+    console.log(`🚀 Server: Initialized on port ${port}`);
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
+      console.log(`⚠️ Server: Port ${port} is busy, trying ${port + 1}...`);
       startServer(port + 1);
     } else {
       console.error("❌ Server error:", err);

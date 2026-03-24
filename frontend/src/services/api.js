@@ -126,4 +126,6 @@ export const calculateCurrentMonthTier = () =>
   api.post("/monthly-tiers/calculate");
 export const getTierStats = () =>
   api.get("/monthly-tiers/stats");
+export const changePassword = (data) => 
+  api.put("/auth/change-password", data);
 export default api;

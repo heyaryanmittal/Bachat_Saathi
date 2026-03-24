@@ -7,7 +7,8 @@ import { Card, Button, Input } from '../components/ui';
 import {
   User, Settings, Shield, Bell, Key, Edit3, 
   Save, X, Camera, TrendingUp, Calendar, Mail, 
-  ChevronLeft, Smartphone, Globe, Lock, Star, CheckCircle
+  ChevronLeft, Smartphone, Globe, Lock, Star, CheckCircle,
+  Eye, EyeOff
 } from 'lucide-react';
 const TABS = [
   { id: 'overview', label: 'Identity', icon: User },
@@ -26,10 +27,17 @@ const Profile = () => {
     const [show2FAModal, setShow2FAModal] = useState(false);
     const [otp, setOtp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [passwordData, setPasswordData] = useState({
+    const [passwordData, setEditedPassword] = useState({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
+    });
+    const [passwordOtp, setPasswordOtp] = useState('');
+    const [isPasswordOtpRequested, setIsPasswordOtpRequested] = useState(false);
+    const [showPasswords, setShowPasswords] = useState({
+        current: false,
+        new: false,
+        confirm: false
     });
     useEffect(() => {
         if (user) {
@@ -82,10 +90,10 @@ const Profile = () => {
     const handlePasswordChange = async (e) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            return toast.error("Binary mismatch. Codes must align.");
+            return toast.error("Passwords mismatch.");
         }
         if (passwordData.newPassword.length < 6) {
-            return toast.error("Complexity failure. Sequence too short.");
+            return; // Error is shown on input
         }
         try {
             setIsLoading(true);
@@ -93,11 +101,27 @@ const Profile = () => {
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword
             });
-            setShowPasswordModal(false);
-            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-            toast.success('Security protocol updated.');
+            setIsPasswordOtpRequested(true);
+            toast.success('Verification code sent to your email.');
         } catch (e) {
             toast.error(e.response?.data?.message || 'Access denied. Check credentials.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const handleVerifyPasswordOtp = async (e) => {
+        e.preventDefault();
+        try {
+            setIsLoading(true);
+            await api.post('/auth/verify-change-password', { otp: passwordOtp });
+            setShowPasswordModal(false);
+            setIsPasswordOtpRequested(false);
+            setPasswordOtp('');
+            setEditedPassword({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setShowPasswords({ current: false, new: false, confirm: false });
+            toast.success('Password Changed Successfully');
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Verification failure.');
         } finally {
             setIsLoading(false);
         }
@@ -268,42 +292,88 @@ const Profile = () => {
                         <div className="flex items-center space-x-4 mb-8">
                             <div className="p-3 bg-rose-500/10 rounded-xl"><Lock className="w-8 h-8 text-rose-500" /></div>
                             <div>
-                                <h3 className="text-2xl font-black tracking-tighter uppercase tracking-widest">Update Security</h3>
-                                <p className="text-xs text-muted-foreground italic">Redefine your vault access sequence.</p>
+                                <h3 className="text-2xl font-black tracking-tighter uppercase tracking-widest">{isPasswordOtpRequested ? 'Verify Reset' : 'Update Password'}</h3>
+                                <p className="text-xs text-muted-foreground italic">{isPasswordOtpRequested ? 'Enter the security code to finalize.' : 'Change your account security key.'}</p>
                             </div>
                         </div>
-                        <form onSubmit={handlePasswordChange} className="space-y-6">
-                            <Input 
-                                label="Current Protocol" 
-                                type="password" 
-                                value={passwordData.currentPassword} 
-                                onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})} 
-                                placeholder="Enter current PIN" 
-                                required 
-                            />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {!isPasswordOtpRequested ? (
+                            <form onSubmit={handlePasswordChange} className="space-y-6">
+                                <div className="relative">
+                                    <Input 
+                                        label="Current Password" 
+                                        type={showPasswords.current ? "text" : "password"}
+                                        value={passwordData.currentPassword} 
+                                        onChange={e => setEditedPassword({...passwordData, currentPassword: e.target.value})} 
+                                        placeholder="Enter current password" 
+                                        required 
+                                    />
+                                    <button 
+                                        type="button"
+                                        className="absolute right-4 bottom-3 text-muted-foreground hover:text-primary transition-colors"
+                                        onClick={() => setShowPasswords({...showPasswords, current: !showPasswords.current})}
+                                    >
+                                        {showPasswords.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                <div className="space-y-6">
+                                    <div className="relative">
+                                        <Input 
+                                            label="New Password" 
+                                            type={showPasswords.new ? "text" : "password"}
+                                            value={passwordData.newPassword} 
+                                            onChange={e => setEditedPassword({...passwordData, newPassword: e.target.value})} 
+                                            placeholder="Min 6 chars" 
+                                            required 
+                                            error={passwordData.newPassword && passwordData.newPassword.length < 6 ? "Too short" : ""}
+                                        />
+                                        <button 
+                                            type="button"
+                                            className="absolute right-4 bottom-3 text-muted-foreground hover:text-primary transition-colors"
+                                            onClick={() => setShowPasswords({...showPasswords, new: !showPasswords.new})}
+                                        >
+                                            {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    <div className="relative">
+                                        <Input 
+                                            label="Confirm New Password" 
+                                            type={showPasswords.confirm ? "text" : "password"}
+                                            value={passwordData.confirmPassword} 
+                                            onChange={e => setEditedPassword({...passwordData, confirmPassword: e.target.value})} 
+                                            placeholder="Re-enter to verify" 
+                                            required 
+                                        />
+                                        <button 
+                                            type="button"
+                                            className="absolute right-4 bottom-3 text-muted-foreground hover:text-primary transition-colors"
+                                            onClick={() => setShowPasswords({...showPasswords, confirm: !showPasswords.confirm})}
+                                        >
+                                            {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-4 pt-4">
+                                    <Button variant="ghost" className="flex-1 font-black text-[10px] uppercase tracking-widest text-muted-foreground" onClick={() => { setShowPasswordModal(false); setShowPasswords({current:false, new:false, confirm:false}) }}>Discard</Button>
+                                    <Button type="submit" size="xl" className="flex-1 btn-saas-primary" loading={isLoading} disabled={passwordData.newPassword && passwordData.newPassword.length < 6}>Send Code</Button>
+                                </div>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleVerifyPasswordOtp} className="space-y-6">
                                 <Input 
-                                    label="New Protocol" 
-                                    type="password" 
-                                    value={passwordData.newPassword} 
-                                    onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})} 
-                                    placeholder="Min 6 chars" 
+                                    label="Security Code" 
+                                    value={passwordOtp} 
+                                    onChange={e => setPasswordOtp(e.target.value)} 
+                                    placeholder="000000" 
+                                    maxLength={6} 
                                     required 
+                                    autoFocus 
                                 />
-                                <Input 
-                                    label="Confirm Sequence" 
-                                    type="password" 
-                                    value={passwordData.confirmPassword} 
-                                    onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})} 
-                                    placeholder="Re-enter to verify" 
-                                    required 
-                                />
-                            </div>
-                            <div className="flex space-x-4 pt-4">
-                                <Button variant="ghost" className="flex-1 font-black text-[10px] uppercase tracking-widest" onClick={() => setShowPasswordModal(false)}>Discard</Button>
-                                <Button type="submit" size="xl" className="flex-1 btn-saas-primary" loading={isLoading}>Sync Password</Button>
-                            </div>
-                        </form>
+                                <div className="flex space-x-4 pt-4">
+                                    <Button variant="ghost" className="flex-1 font-black text-[10px] uppercase tracking-widest text-muted-foreground" onClick={() => setIsPasswordOtpRequested(false)}>Back</Button>
+                                    <Button type="submit" size="xl" className="flex-1 btn-saas-primary" loading={isLoading}>Confirm & Finalize</Button>
+                                </div>
+                            </form>
+                        )}
                     </Card>
                 </div>
             )}

@@ -15,4 +15,5 @@ router.post('/login', authController.login);
 router.get('/profile', protect, authController.getProfile);
 router.put('/profile', protect, authController.updateProfile);
 router.put('/change-password', protect, authController.changePassword);
+router.post('/verify-change-password', protect, authController.verifyChangePassword);
 module.exports = router;

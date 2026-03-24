@@ -6,7 +6,8 @@ const {
   sendSignupOtpEmail, 
   sendWelcomeEmail, 
   send2FAOtpEmail, 
-  sendPasswordChanged 
+  sendPasswordChanged,
+  sendPasswordChangeOtpEmail 
 } = require('../utils/emailService');
 const logger = require('../utils/logger');
 
@@ -337,35 +338,71 @@ exports.changePassword = async (req, res) => {
     }
     const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!isValidPassword) {
-      return res.status(401).json({
+      return res.status(400).json({
         status: 'error',
         message: 'Current password is incorrect'
       });
     }
     const salt = await bcrypt.genSalt(10);
     const newPasswordHash = await bcrypt.hash(newPassword, salt);
-    user.passwordHash = newPasswordHash;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); 
+    user.passwordChangeOTP = otp;
+    user.passwordChangeOTPExpiry = expiry;
+    user.pendingPasswordHash = newPasswordHash;
     await user.save();
-    (async () => {
-      try {
-        if (user.emailNotificationsEnabled !== false) {
-          const result = await sendPasswordChanged(user.email, { name: user.name || '', newPassword });
-          if (!result.ok) {
-            console.error('Failed to send password-changed email for user:', user.email, 'error:', result.error);
-          }
-        }
-      } catch (err) {
-        console.error('Error while sending password-changed email:', err);
-      }
-    })();
+    logger.info(`Password change requested for ${user.email}. Generating security sequence.`);
+    const emailRes = await sendPasswordChangeOtpEmail(user.email, { name: user.name, otp });
+    if (!emailRes.ok) {
+      logger.error(`Failed to dispatch security code to ${user.email}: ${emailRes.error}`);
+      return res.status(400).json({ status: 'error', message: 'Failed to send verification code.' });
+    }
+    logger.info(`Security sequence dispatched successfully to ${user.email}`);
     res.status(200).json({
       status: 'success',
-      message: 'Password changed successfully'
+      message: 'Verification code sent to your email.'
     });
   } catch (error) {
     res.status(500).json({
       status: 'error',
-      message: 'Error changing password',
+      message: 'Error initiating password change',
+      error: error.message
+    });
+  }
+};
+exports.verifyChangePassword = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ status: 'error', message: 'User not found' });
+    if (!user.passwordChangeOTP || !user.passwordChangeOTPExpiry || user.passwordChangeOTPExpiry < new Date()) {
+      return res.status(400).json({ status: 'error', message: 'OTP expired or not requested' });
+    }
+    if (user.passwordChangeOTP !== otp) {
+      return res.status(400).json({ status: 'error', message: 'Invalid verification code' });
+    }
+    const newPasswordHash = user.pendingPasswordHash;
+    if (!newPasswordHash) {
+      return res.status(400).json({ status: 'error', message: 'No pending password change found' });
+    }
+    user.passwordHash = newPasswordHash;
+    user.passwordChangeOTP = undefined;
+    user.passwordChangeOTPExpiry = undefined;
+    user.pendingPasswordHash = undefined;
+    await user.save();
+    if (user.emailNotificationsEnabled !== false) {
+      sendPasswordChanged(user.email, { name: user.name || '' }).catch(err => {
+        console.error('Failed to send notification email:', err);
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Password update verification failed',
       error: error.message
     });
   }

@@ -1,9 +1,8 @@
 const dotenv = require("dotenv");
+dotenv.config();
 const mongoose = require("mongoose");
 const dns = require("dns");
 const app = require("./app");
-
-dotenv.config();
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 

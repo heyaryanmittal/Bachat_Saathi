@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
         message: 'No token provided, authorization denied'
       });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.id).select('-passwordHash');
     if (!user) {
       return res.status(401).json({

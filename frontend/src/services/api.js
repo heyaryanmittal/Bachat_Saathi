@@ -128,4 +128,6 @@ export const getTierStats = () =>
   api.get("/monthly-tiers/stats");
 export const changePassword = (data) => 
   api.put("/auth/change-password", data);
+export const verifyChangePassword = (data) =>
+  api.post("/auth/verify-change-password", data);
 export default api;

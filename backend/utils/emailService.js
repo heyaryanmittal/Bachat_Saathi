@@ -217,6 +217,38 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
     return { ok: false, error: error.message };
   }
 };
+exports.sendPasswordChangeOtpEmail = async (userEmail, { name, otp }) => {
+  try {
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to: userEmail,
+      subject: 'BachatSaathi: Confirm Password Change',
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #ef4444, #b91c1c); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">Security Verification</h1>
+          </div>
+          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Hello <strong>${name || 'there'}</strong>,</p>
+            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">You requested to change your BachatSaathi password. Please enter the following code to verify your request:</p>
+            <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 5px; margin: 25px 0; text-align: center;">
+              <p style="margin: 0; color: #666; font-size: 14px; margin-bottom: 10px;">Verification Code:</p>
+              <p style="margin: 0; font-size: 36px; font-weight: 700; color: #b91c1c; letter-spacing: 5px;">${otp}</p>
+            </div>
+            <p style="color: #f44336; font-size: 14px; text-align: center; margin: 20px 0;">⏱️ This code will expire in <strong>10 minutes</strong>.</p>
+            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #856404; font-size: 13px;">⚠️ <strong>Security Notice:</strong> If you did not request this change, please contact support and secure your account immediately.</p>
+            </div>
+            <p style="color: #999; font-size: 13px; margin-top: 15px;">Best regards,<br><strong>The BachatSaathi Security Team</strong></p>
+          </div>
+        </div>
+      `
+    });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+};
 exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount }) => {
   try {
     const percentUsed = Math.round((spentAmount / budgetAmount) * 100);

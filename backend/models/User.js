@@ -68,6 +68,9 @@ const userSchema = new mongoose.Schema({
   firstBudgetDate: {
     type: Date,
     default: null
-  }
+  },
+  passwordChangeOTP: String,
+  passwordChangeOTPExpiry: Date,
+  pendingPasswordHash: String
 }, { timestamps: true });
 module.exports = mongoose.model('User', userSchema);

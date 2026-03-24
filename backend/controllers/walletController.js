@@ -82,13 +82,25 @@ exports.updateWallet = async (req, res) => {
       });
     }
     if (newOpeningBalance !== null) {
-      const transactions = await require('../models/Transaction').find({ walletId: wallet._id });
+      const transactions = await require('../models/Transaction').find({
+        $or: [
+          { walletId: wallet._id },
+          { toWallet: wallet._id }
+        ]
+      });
       let income = 0, expense = 0;
       transactions.forEach(t => {
         if (t.type === 'Income') income += t.amount;
-        if (t.type === 'Expense') expense += t.amount;
+        else if (t.type === 'Expense') expense += t.amount;
+        else if (t.type === 'Transfer') {
+          if (t.walletId?.toString() === wallet._id.toString()) {
+            expense += t.amount; 
+          } else if (t.toWallet?.toString() === wallet._id.toString()) {
+            income += t.amount;
+          }
+        }
       });
-      wallet.currentBalance = newOpeningBalance + income - expense;
+      wallet.currentBalance = (Number(newOpeningBalance) || 0) + income - expense;
       await wallet.save();
     }
     res.status(200).json({

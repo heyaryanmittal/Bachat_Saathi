@@ -3,7 +3,6 @@ const Budget = require('../models/Budget');
 const resetBudgetAlerts = () => {
   const task = cron.schedule('5 0 1 * *', async () => {
     try {
-      console.log('🔁 Processing monthly budget compliance and resetting alerts...');
       const now = new Date();
       const prevMonth = now.getMonth() === 0 ? 12 : now.getMonth();
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -25,13 +24,11 @@ const resetBudgetAlerts = () => {
               if (!user.firstBudgetDate) user.firstBudgetDate = firstDateOfMonth;
               await user.save();
               await LeaderboardService.updateUser(userId, 100, 'monthly_budget_compliance');
-              console.log(`🏆 Awarded 100 bonus points to ${user.name} for perfect budget compliance in ${prevMonth}/${prevYear}`);
             }
           }
         }
       }
       await Budget.updateMany({}, { $set: { alert80Sent: false, alert100Sent: false } });
-      console.log('✅ Monthly budget processing and alert reset completed');
     } catch (error) {
       console.error('❌ Error processing budget reset:', error);
     }

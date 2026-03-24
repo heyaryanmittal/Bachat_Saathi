@@ -46,7 +46,6 @@ const processRecurringTransactions = async () => {
       rule.nextRunAt = getNextRunDate(rule.cadence, now);
       await rule.save();
     }
-    console.log(`Processed ${rules.length} recurring transactions`);
   } catch (error) {
     console.error('Error processing recurring transactions:', error);
   }

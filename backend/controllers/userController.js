@@ -88,7 +88,6 @@ exports.awardBudgetPoints = async (userId, budgetId) => {
         relatedModel: 'Budget'
       });
       await LeaderboardService.updateUser(userId, pointsEarned, 'budget_under_limit');
-      console.log(`Awarded ${pointsEarned} points to user ${userId} for budget management`);
     }
   } catch (error) {
     console.error('Award budget points error:', error);
@@ -112,7 +111,6 @@ exports.awardGoalCompletionPoints = async (userId, goalId) => {
         relatedModel: 'Goal'
       });
       await LeaderboardService.updateUser(userId, pointsEarned, 'goal_completed');
-      console.log(`Awarded ${pointsEarned} points to user ${userId} for goal completion`);
     }
   } catch (error) {
     console.error('Award goal completion points error:', error);
@@ -167,7 +165,6 @@ exports.awardMonthlySavingsPoints = async (userId, date = new Date()) => {
         relatedModel: 'Transaction'
       });
       await LeaderboardService.updateUser(userId, pointsEarned, 'monthly_savings');
-      console.log(`Awarded ${pointsEarned} points to user ${userId} for monthly savings`);
       return { success: true, pointsEarned, savings };
     }
     return { success: true, pointsEarned: 0, savings };
@@ -194,7 +191,6 @@ exports.awardDebtPaymentPoints = async (userId, debtId, paymentAmount) => {
         relatedModel: 'Debt'
       });
       await LeaderboardService.updateUser(userId, pointsEarned, 'debt_paid_off');
-      console.log(`Awarded ${pointsEarned} points to user ${userId} for debt payment`);
     }
   } catch (error) {
     console.error('Award debt payment points error:', error);

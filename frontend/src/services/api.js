@@ -99,17 +99,17 @@ export const deleteGoal = (id) =>
 export const addSavingsToGoal = (id, data) =>
   api.patch(`/goals/${id}/savings`, data);
 export const getSpendingAnalysis = (params) =>
-  api.get('/spending-analysis', { params });
+  api.get('/reports/spending-analysis', { params });
 export const getIncomeReport = (params) =>
-  api.get('/income-report', { params });
+  api.get('/reports/income', { params });
 export const getBudgetReport = (params) =>
-  api.get('/budget-report', { params });
+  api.get('/reports/budget', { params });
 export const exportTransactionsCSV = (params) =>
   api.get("/reports/csv/transactions", { params });
 export const exportComprehensiveCSV = () =>
   api.get("/reports/csv/comprehensive");
 export const exportPDFReport = () =>
-  api.get("/reports/pdf/comprehensive");
+  api.get("/reports/pdf/comprehensive", { responseType: 'blob' });
 export const getReportSummary = () =>
   api.get("/reports/summary");
 export const getUserPoints = () =>

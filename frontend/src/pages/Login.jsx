@@ -22,26 +22,21 @@ function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const handleLoginSubmit = async (data) => {
-    console.log('[Login] SUBMIT START:', data.email);
     setError('');
     setIsLoading(true);
     try {
       const result = await login(data.email, data.password);
-      console.log('[Login] RESULT RECEIVED:', result);
       
       if (result && result.require2FA === true) {
-        console.log('[Login] TRIGGERING OTP STEP');
         setPendingEmail(data.email);
         setStep('otp');
       } else if (result && typeof result === 'object' && result.email) {
-        console.log('[Login] TRIGGERING SUCCESS REDIRECT');
         const from = location.state?.from?.pathname || '/dashboard';
         navigate(from, { replace: true });
       } else {
-        console.warn('[Login] UNKNOWN RESULT STATUS:', result);
+        // Handle unexpected result status if necessary, e.g., by setting an error
       }
     } catch (err) {
-      console.error('[Login] SUBMIT CRITICAL ERROR:', err);
       setError('An unexpected error occurred. Please refresh and try again.');
     } finally {
       setIsLoading(false);

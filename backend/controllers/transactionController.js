@@ -45,7 +45,6 @@ exports.createTransaction = async (req, res) => {
       ]);
       fromWallet.currentBalance = Number(fromWallet.currentBalance) - numericAmount;
       toWalletDoc.currentBalance = Number(toWalletDoc.currentBalance) + numericAmount;
-      console.log("From Wallet New Balance:", fromWallet.currentBalance);
       await Promise.all([
         fromWallet.save(),
         toWalletDoc.save()
@@ -90,7 +89,6 @@ exports.createTransaction = async (req, res) => {
                 if (sendRes && sendRes.ok) {
                   budget.alert80Sent = true;
                   alertSent = true;
-                  console.log(`Budget threshold alert sent to ${user.email} for ${category} (${percentUsed.toFixed(2)}% used)`);
                 } else {
                   console.error(`Failed to send budget threshold alert to ${user.email} for ${category}:`, sendRes && sendRes.error);
                 }
@@ -108,7 +106,6 @@ exports.createTransaction = async (req, res) => {
                 if (sendRes && sendRes.ok) {
                   budget.alert100Sent = true;
                   alertSent = true;
-                  console.log(`Budget exceeded alert sent to ${user.email} for ${category} (${percentUsed.toFixed(2)}% used)`);
                 } else {
                   console.error(`Failed to send budget exceeded alert to ${user.email} for ${category}:`, sendRes && sendRes.error);
                 }

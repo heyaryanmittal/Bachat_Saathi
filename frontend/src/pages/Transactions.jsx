@@ -9,7 +9,7 @@ import {
 import { toast } from 'react-hot-toast';
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
-  const [allTransactions, setAllTransactions] = useState([]);
+  const [stats, setStats] = useState({ income: 0, expense: 0, net: 0 });
   const [wallets, setWallets] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -43,9 +43,10 @@ const Transactions = () => {
   };
   const fetchAllStats = async () => {
     try {
-      const response = await api.getTransactions({ ...filters, limit: 1000, page: 1 });
-      setAllTransactions(response.data.data.transactions || []);
-    } catch (e) {  }
+      const response = await api.getTransactionStats(filters);
+      const { totalIncome, totalExpenses, netFlow } = response.data.data.stats;
+      setStats({ income: totalIncome, expense: totalExpenses, net: netFlow });
+    } catch (e) { console.error('Failed to fetch stats:', e); }
   };
   const handleAction = async (data, isEdit) => {
     try {
@@ -74,11 +75,6 @@ const Transactions = () => {
 
 
   };
-  const stats = useMemo(() => {
-    const income = allTransactions.filter(t => t.type?.toLowerCase() === 'income').reduce((s, t) => s + Number(t.amount || 0), 0);
-    const expense = allTransactions.filter(t => t.type?.toLowerCase() === 'expense').reduce((s, t) => s + Number(t.amount || 0), 0);
-    return { income, expense, net: income - expense };
-  }, [allTransactions]);
   if (isLoading && !transactions.length) {
     return <div className="flex h-[80vh] items-center justify-center"><LoadingSpinner size="xl" variant="primary" text="Loading transactions..." /></div>;
   }

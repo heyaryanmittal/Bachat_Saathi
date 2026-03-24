@@ -12,7 +12,6 @@ const cacheMiddleware = (duration = CACHE_DURATION) => {
       const { data, timestamp } = cachedData;
       const isExpired = Date.now() - timestamp > duration;
       if (!isExpired) {
-        console.log(`Cache HIT for ${cacheKey}`);
         return res.json(data);
       } else {
         cache.delete(cacheKey);
@@ -21,7 +20,6 @@ const cacheMiddleware = (duration = CACHE_DURATION) => {
     const originalJson = res.json;
     res.json = function(data) {
       if (res.statusCode === 200) {
-        console.log(`Cache SET for ${cacheKey}`);
         cache.set(cacheKey, {
           data,
           timestamp: Date.now()
@@ -40,11 +38,9 @@ const clearUserCache = (userId) => {
     }
   }
   keysToDelete.forEach(key => cache.delete(key));
-  console.log(`Cleared ${keysToDelete.length} cache entries for user ${userId}`);
 };
 const clearAllCache = () => {
   cache.clear();
-  console.log('Cleared all cache');
 };
 const getCacheStats = () => {
   return {

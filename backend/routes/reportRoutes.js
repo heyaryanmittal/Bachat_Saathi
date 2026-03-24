@@ -7,6 +7,11 @@ router.use(auth);
 router.get('/spending-analysis', reportController.getSpendingAnalysis);
 router.get('/income', reportController.getIncomeReport);
 router.get('/budget', reportController.getBudgetReport);
+router.get('/summary', reportController.getReportSummary);
+router.get('/csv/transactions', reportController.exportTransactionsCSV);
+router.get('/csv/comprehensive', reportController.exportComprehensiveCSV);
+router.get('/pdf/comprehensive', reportController.exportPDFReport);
+
 router.get('/net-worth/history', async (req, res) => {
   try {
     const userId = req.user.id;

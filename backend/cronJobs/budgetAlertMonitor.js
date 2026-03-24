@@ -5,7 +5,6 @@ const emailService = require('../utils/emailService');
 const budgetAlertMonitor = () => {
   const task = cron.schedule('0 9 * * *', async () => {
     try {
-      console.log('🔎 Running daily budget alert monitor...');
       const now = new Date();
       const month = now.getMonth() + 1;
       const year = now.getFullYear();
@@ -48,7 +47,6 @@ const budgetAlertMonitor = () => {
           console.error('Error processing budget alert for budget', b._id, err);
         }
       }
-      console.log('✅ Daily budget alert monitor completed');
     } catch (error) {
       console.error('❌ Error in budget alert monitor:', error);
     }

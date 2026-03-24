@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 const FROM_EMAIL = process.env.SMTP_USER || process.env.EMAIL_USER || 'no-reply@bachatsaathi.com';
 const FROM_NAME = process.env.EMAIL_FROM_NAME || 'BachatSaathi';
 exports.sendSignupOtpEmail = async (userEmail, { name, otp }) => {
-  console.log('DEBUG: Sending signup OTP email to', userEmail, 'with OTP:', otp);
   try {
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
@@ -84,7 +83,6 @@ exports.sendWelcomeEmail = async (userEmail, { name, email, password }) => {
   }
 };
 exports.send2FAOtpEmail = async (userEmail, { name, otp }) => {
-  console.log('DEBUG: Sending 2FA OTP email to', userEmail, 'with OTP:', otp);
   try {
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
@@ -149,7 +147,6 @@ exports.sendPasswordChanged = async (userEmail, { name, newPassword }) => {
         </div>
       `
     });
-    console.log(`Password-change email sent to ${userEmail}`);
     return { ok: true };
   } catch (error) {
     console.error('Error sending password-changed email:', error);
@@ -214,7 +211,6 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
         </div>
       `
     });
-    console.log(`Budget alert email sent to ${userEmail} (threshold: ${threshold})`);
     return { ok: true };
   } catch (error) {
     console.error('Error sending budget alert email:', error);
@@ -274,7 +270,6 @@ exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount
         </div>
       `
     });
-    console.log(`Over-budget email sent to ${userEmail} (category: ${category})`);
     return { ok: true };
   } catch (error) {
     console.error('Error sending over-budget email:', error);

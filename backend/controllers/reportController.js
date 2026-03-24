@@ -316,17 +316,17 @@ exports.exportComprehensiveCSV = async (req, res) => {
     csvContent += '\n=== WALLETS ===\n';
     csvContent += 'Name,Type,Balance,Currency\n';
     wallets.forEach(wallet => {
-      csvContent += `"${wallet.name}","${wallet.type}","${wallet.balance}","${wallet.currency}"\n`;
+      csvContent += `"${wallet.name}","${wallet.type}","${wallet.currentBalance}","INR"\n`;
     });
     csvContent += '\n=== BUDGETS ===\n';
     csvContent += 'Month,Category,Budgeted,Spent,Remaining\n';
     budgets.forEach(budget => {
-      csvContent += `"${budget.month}","${budget.category}","${budget.budgetedAmount}","${budget.spentAmount}","${budget.remainingAmount}"\n`;
+      csvContent += `"${budget.month}","${budget.category}","${budget.amount}","${budget.spent}","${budget.amount - budget.spent}"\n`;
     });
     csvContent += '\n=== GOALS ===\n';
     csvContent += 'Title,Target Amount,Saved Amount,Remaining,Status,Deadline\n';
     goals.forEach(goal => {
-      csvContent += `"${goal.title}","${goal.targetAmount}","${goal.savedAmount}","${goal.remainingAmount}","${goal.status}","${goal.deadline.toISOString().split('T')[0]}"\n`;
+      csvContent += `"${goal.title}","${goal.targetAmount}","${goal.savedAmount}","${goal.targetAmount - goal.savedAmount}","${goal.status}","${goal.deadline.toISOString().split('T')[0]}"\n`;
     });
     csvContent += '\n=== DEBTS ===\n';
     csvContent += 'Title,Type,Amount,Remaining,Interest Rate,Status,Due Date\n';
@@ -399,8 +399,8 @@ exports.exportPDFReport = async (req, res) => {
         const goals = await Goal.find({ userId });
         csvHeader = 'Title,Target Amount,Saved Amount,Remaining,Status,Deadline\n';
         csvData = goals.map(goal => {
-          const remaining = goal.targetAmount - (goal.currentAmount || 0);
-          return `"${goal.title}","${goal.targetAmount}","${goal.currentAmount || 0}","${remaining}","${goal.status}","${goal.deadline.toISOString().split('T')[0]}"`;
+          const remaining = goal.targetAmount - (goal.savedAmount || 0);
+          return `"${goal.title}","${goal.targetAmount}","${goal.savedAmount || 0}","${remaining}","${goal.status}","${goal.deadline.toISOString().split('T')[0]}"`;
         }).join('\n');
         break;
       case 'cashflow':
@@ -483,8 +483,8 @@ exports.exportPDFReport = async (req, res) => {
     } else if (reportType === 'savings') {
       const goals = await Goal.find({ userId });
       const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);
-      const totalSaved = goals.reduce((sum, g) => sum + (g.currentAmount || 0), 0);
-      const completedGoals = goals.filter(g => (g.currentAmount || 0) >= g.targetAmount).length;
+      const totalSaved = goals.reduce((sum, g) => sum + (g.savedAmount || 0), 0);
+      const completedGoals = goals.filter(g => (g.savedAmount || 0) >= g.targetAmount).length;
       doc.fontSize(10);
       doc.text(`Total Goals: ${goals.length}`);
       doc.text(`Completed Goals: ${completedGoals}`);
@@ -549,7 +549,7 @@ exports.getReportSummary = async (req, res) => {
         {
           $group: {
             _id: '$type',
-            totalBalance: { $sum: '$balance' },
+            totalBalance: { $sum: '$currentBalance' },
             count: { $sum: 1 }
           }
         }
@@ -559,9 +559,9 @@ exports.getReportSummary = async (req, res) => {
         {
           $group: {
             _id: null,
-            totalBudgeted: { $sum: '$budgetedAmount' },
-            totalSpent: { $sum: '$spentAmount' },
-            totalRemaining: { $sum: '$remainingAmount' }
+            totalBudgeted: { $sum: '$amount' },
+            totalSpent: { $sum: '$spent' },
+            totalRemaining: { $sum: { $subtract: ['$amount', '$spent'] } }
           }
         }
       ]),

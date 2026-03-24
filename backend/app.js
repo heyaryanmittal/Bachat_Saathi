@@ -43,6 +43,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/monthly-tiers', monthlySavingsTierRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/ai-assistant', aiAssistantRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

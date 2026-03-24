@@ -48,33 +48,23 @@ export function AuthProvider({ children }) {
   }, [navigate, location]);
   const initialized = useRef(false);
   useEffect(() => {
-    console.log('AuthProvider mounted, initializing auth...');
     if (initialized.current) {
-      console.log('Auth already initialized, skipping...');
       return;
     }
     const initializeAuth = async () => {
-      console.log('Running initializeAuth');
       const token = localStorage.getItem('token');
-      console.log('Token from localStorage:', token ? 'exists' : 'not found');
       if (token) {
-        console.log('Token found, setting up axios headers');
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        console.log('Fetching user profile...');
         const user = await fetchUser();
-        console.log('User from fetchUser:', user);
         if (user && ['/login', '/signup'].includes(location.pathname)) {
-          console.log('User authenticated, redirecting to /dashboard');
           setTimeout(() => {
             navigate('/dashboard', { replace: true });
           }, 0);
         }
 
       } else {
-        console.log('No token found, setting loading to false');
         setLoading(false);
         if (!['/login', '/signup', '/'].includes(location.pathname)) {
-          console.log('No token and on protected route, redirecting to /login');
           setTimeout(() => {
             navigate('/login', {
               state: { from: location },
@@ -84,7 +74,6 @@ export function AuthProvider({ children }) {
         }
       }
       initialized.current = true;
-      console.log('Auth initialization complete');
     };
     initializeAuth().catch(error => {
       console.error('Error initializing auth:', error);
@@ -92,18 +81,15 @@ export function AuthProvider({ children }) {
     });
   }, [fetchUser, location, navigate]);
   const login = async (email, password) => {
-    console.log('[Auth] Login attempt for:', email);
     try {
       setError(null);
       
       const response = await api.post('/auth/login', { email, password });
-      console.log('[Auth] Server Response:', response.data);
       
       const status = response.data?.status?.toLowerCase();
       
       // Explicit 2FA Check
       if (status === 'require-2fa' || status === '2fa-required') {
-        console.log('[Auth] 2FA Step Required');
         return { 
           require2FA: true, 
           email, 
@@ -114,7 +100,6 @@ export function AuthProvider({ children }) {
       // Success Check
       if (response.data?.data?.token) {
         const { token, user } = response.data.data;
-        console.log('[Auth] Login success for:', user.email);
         
         localStorage.setItem('token', token);
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

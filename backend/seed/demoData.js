@@ -51,7 +51,6 @@ const seedDatabase = async () => {
         mongoose.connection.once('connected', resolve);
       });
     }
-    console.log('Starting database seed...');
     await Promise.all([
       User.deleteMany({}),
       Wallet.deleteMany({}),
@@ -169,9 +168,7 @@ const seedDatabase = async () => {
         }
       }
     }
-    console.log('Database seeded successfully');
   } catch (error) {
-    console.error('Error seeding database:', error);
     throw error; 
   }
 };

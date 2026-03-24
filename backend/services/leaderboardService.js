@@ -53,7 +53,6 @@ class LeaderboardService {
         await this.assignLifetimeBadges(lifetimeLeaderboard[i], i + 1);
         await lifetimeLeaderboard[i].save();
       }
-      console.log('Leaderboard ranks calculated successfully');
     } catch (error) {
       console.error('LeaderboardService.calculateRanks error:', error);
     }
@@ -143,7 +142,6 @@ class LeaderboardService {
           lastMonthlyReset: now
         }
       );
-      console.log(`Monthly leaderboard reset. Updated ${updated.modifiedCount} entries`);
       await this.calculateRanks();
       return updated;
     } catch (error) {
@@ -219,7 +217,6 @@ class LeaderboardService {
       const now = new Date();
       const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
       const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-      console.log(`📅 Recalculating monthly points for ${currentMonthStart.toLocaleDateString()} to ${currentMonthEnd.toLocaleDateString()}`);
       const leaderboardEntries = await Leaderboard.find();
       for (const entry of leaderboardEntries) {
         const monthlyPointsResult = await PointsLog.aggregate([
@@ -235,10 +232,8 @@ class LeaderboardService {
         entry.monthlyPoints = monthlyPoints;
         entry.lastUpdated = new Date();
         await entry.save();
-        console.log(`✅ Updated ${entry.username}: ${monthlyPoints} monthly points`);
       }
       await this.calculateRanks();
-      console.log('✅ Monthly points recalculation completed and ranks updated');
       return true;
     } catch (error) {
       console.error('LeaderboardService.recalculateMonthlyPoints error:', error);

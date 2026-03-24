@@ -15,7 +15,6 @@ const sendDebtReminders = async () => {
       status: 'active'
     }).populate('userId', 'email name emailNotificationsEnabled');
     if (upcomingDebts.length === 0) {
-      console.log('No debt reminders to send');
       return;
     }
     const debtsByUser = {};
@@ -28,10 +27,15 @@ const sendDebtReminders = async () => {
       }
       debtsByUser[debt.userId._id].debts.push(debt);
     });
+
+    if (Object.keys(debtsByUser).length === 0) {
+      return;
+    }
+
     for (const userId in debtsByUser) {
       const { user, debts } = debtsByUser[userId];
         if (user.emailNotificationsEnabled === false) {
-          console.log(`Skipping debt reminders for ${user.email} (email notifications disabled)`);
+          // Skip notifications
           continue;
         }
       const debtDetails = debts.map(debt => `
@@ -68,14 +72,13 @@ const sendDebtReminders = async () => {
           <p>Best regards,<br>BachatSaathi Team</p>
         `
       };
-      const emailSent = await emailService.sendBudgetAlert(user.email, emailContent);
-      if (emailSent) {
-        console.log(`Debt reminder sent to ${user.email}`);
-      } else {
+      try {
+        await emailService.sendBudgetAlert(user.email, emailContent);
+        // Reminder sent
+      } catch (err) {
         console.error(`Failed to send debt reminder to ${user.email}`);
       }
     }
-    console.log(`Sent ${Object.keys(debtsByUser).length} debt reminder emails`);
   } catch (error) {
     console.error('Error sending debt reminders:', error);
   }

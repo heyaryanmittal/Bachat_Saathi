@@ -35,10 +35,6 @@ const getFinancialContext = async (userId, period = '6 months') => {
   if (!transactions || transactions.length === 0) {
     transactions = await Transaction.find({ userId }).sort({ date: -1 }).limit(50);
   }
-  console.log('DEBUG: Transactions fetched for user', userId);
-  transactions.forEach(t => {
-    console.log(`  - Date: ${t.date}, Type: '${t.type}', Amount: ${t.amount}, Category: '${t.category}'`);
-  });
   const [
     wallets,
     budgets,

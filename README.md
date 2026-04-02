@@ -10,7 +10,7 @@ BachatSaathi is a premium, full-stack personal finance management application de
 
 ## 🚀 Key Features
 
-### 🤖 Intelligent AI Assistant
+### 🤖 Intelligent Bachat Saathi AI Assistant
 - **Gemini Powered Insights**: Integrated AI companion for real-time financial advice and transaction analysis.
 - **Automated Financial Guidance**: Personalized suggestions for budget optimization based on spending patterns.
 - **Floating Matrix Interface**: Accessible from anywhere in the app with a premium, animated UI.

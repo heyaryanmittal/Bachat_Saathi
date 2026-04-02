@@ -10,7 +10,7 @@ const AIAssistant = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            content: "Protocol Online. I am your BachatSaathi Financial Intelligence Unit. How shall we optimize your capital today?",
+            content: "• Welcome to Bachat Saathi AI Assistant.\n• I am your financial intelligence unit.\n• How shall we optimize your capital today?",
         },
     ]);
     const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +57,7 @@ const AIAssistant = () => {
                             <div className="flex items-center gap-3 relative z-10">
                                 <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white"><Terminal className="w-5 h-5" /></div>
                                 <div>
-                                    <h3 className="font-black text-white text-lg tracking-tighter uppercase tracking-widest leading-none">Intelligence <span className="opacity-70">Unit</span></h3>
+                                    <h3 className="font-black text-white text-lg tracking-tighter uppercase tracking-widest leading-none">Bachat Saathi <span className="opacity-70 text-xs">AI Assistant</span></h3>
                                     <p className="text-[9px] font-black text-white/70 uppercase tracking-widest mt-1 italic">Operative: {user?.name || 'Authorized User'}</p>
                                 </div>
                             </div>
@@ -95,7 +95,7 @@ const AIAssistant = () => {
                                     name="message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Enter query protocol..."
+                                    placeholder="Ask about your budget or money..."
                                     className="pl-12 pr-12 py-4 text-[11px] font-black uppercase tracking-tighter"
                                     disabled={isLoading}
                                     aria-label="Ask AI Assistant"

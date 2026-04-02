@@ -129,28 +129,29 @@ const Profile = () => {
     return (
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {}
-            <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
-                <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg"><ChevronLeft className="mr-2 w-5 h-5" />Back to Matrix</Button>
+            <div className="flex flex-col sm:flex-row items-center sm:justify-end gap-6 px-2">
+                <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto"><ChevronLeft className="mr-2 w-5 h-5" />Back to Matrix</Button>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {}
-                <Card variant="glass" className="lg:col-span-1 h-fit sticky top-24 p-2">
-                    <div className="space-y-1">
-                        {TABS.map(tab => {
-                            const Icon = tab.icon;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest ${activeTab === tab.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-muted/50'}`}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                    <span>{tab.label}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </Card>
+                <div className="lg:col-span-1">
+                    <Card variant="glass" className="h-fit lg:sticky lg:top-24 p-2 overflow-x-auto lg:overflow-x-visible no-scrollbar">
+                        <div className="flex lg:flex-col gap-2 min-w-max lg:min-w-0">
+                            {TABS.map(tab => {
+                                const Icon = tab.icon;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start space-x-3 px-6 lg:px-4 py-4 lg:py-3 rounded-2xl lg:rounded-xl transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap ${activeTab === tab.id ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]' : 'text-muted-foreground hover:bg-muted/50'}`}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                        <span>{tab.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </Card>
+                </div>
                 {}
                 <div className="lg:col-span-3 space-y-8">
                     {activeTab === 'overview' && (
@@ -158,35 +159,42 @@ const Profile = () => {
                             <Card variant="glass" className="saas-card p-6 sm:p-8">
                                 <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
                                     <div className="relative group">
-                                        <div className="w-32 h-32 gradient-primary rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-primary/30 group-hover:scale-105 transition-transform duration-500">
+                                        <div className="w-28 h-28 sm:w-32 sm:h-32 gradient-primary rounded-full flex items-center justify-center text-white text-3xl sm:text-4xl font-black shadow-2xl shadow-primary/30 group-hover:scale-105 transition-transform duration-500">
                                             {(user?.name || 'U').charAt(0).toUpperCase()}
                                         </div>
-                                        <button className="absolute bottom-1 right-1 w-10 h-10 bg-background border-2 border-border rounded-full flex items-center justify-center shadow-xl hover:text-primary transition-colors">
-                                            <Camera className="w-5 h-5" />
+                                        <button className="absolute bottom-1 right-1 w-8 h-8 sm:w-10 sm:h-10 bg-background border-2 border-border rounded-full flex items-center justify-center shadow-xl hover:text-primary transition-colors">
+                                            <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
                                         </button>
                                     </div>
                                     <div className="flex-1 text-center md:text-left space-y-4">
                                         <div>
-                                            <h2 className="text-3xl font-black tracking-tighter mb-1">{user?.name}</h2>
-                                            <p className="text-sm font-black text-muted-foreground uppercase tracking-widest flex items-center justify-center md:justify-start">
-                                                <Mail className="w-3.5 h-3.5 mr-2 text-primary" />
-                                                {user?.email}
+                                            <h2 className="text-2xl sm:text-3xl font-black tracking-tighter mb-1">{user?.name}</h2>
+                                            <p className="text-xs sm:text-sm font-black text-muted-foreground uppercase tracking-widest flex items-center justify-center md:justify-start">
+                                                <Mail className="w-3.5 h-3.5 mr-2 text-primary shrink-0" />
+                                                <span className="truncate max-w-[200px] sm:max-w-none">{user?.email}</span>
                                             </p>
                                         </div>
-                                        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                                            <div className="bg-muted/30 px-3 py-1.5 rounded-xl border border-border/50 flex items-center">
-                                                <Calendar className="w-3.5 h-3.5 mr-2 text-primary" />
-                                                <span className="text-[10px] font-black uppercase tracking-tight">Joined {new Date(user?.createdAt).toLocaleDateString()}</span>
+                                        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                                            <div className="bg-muted/30 px-3 py-1.5 rounded-xl border border-border/50 flex items-center max-w-full">
+                                                <Calendar className="w-3.5 h-3.5 mr-2 text-primary shrink-0" />
+                                                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-tight truncate">Joined {new Date(user?.createdAt).toLocaleDateString()}</span>
                                             </div>
                                             <div className="bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 flex items-center">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2"></div>
-                                                <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Free Plan</span>
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-2 shrink-0"></div>
+                                                <span className="text-[9px] sm:text-[10px] font-black uppercase text-emerald-500 tracking-widest text-[9px] sm:text-[10px]">Free Plan</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <Button variant={isEditing ? 'danger' : 'secondary'} size="lg" onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}>
-                                        {isEditing ? <><X className="mr-2 w-4 h-4" /> Cancel</> : <><Edit3 className="mr-2 w-4 h-4" /> Modify</>}
-                                    </Button>
+                                    <div className="w-full md:w-auto">
+                                        <Button 
+                                            variant={isEditing ? 'danger' : 'secondary'} 
+                                            size="lg" 
+                                            onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
+                                            className="w-full md:w-auto"
+                                        >
+                                            {isEditing ? <><X className="mr-2 w-4 h-4" /> Cancel</> : <><Edit3 className="mr-2 w-4 h-4" /> Modify</>}
+                                        </Button>
+                                    </div>
                                 </div>
                             </Card>
                             <form onSubmit={e => { e.preventDefault(); isEditing && handleSave(); }} className="saas-card p-6 sm:p-8 space-y-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-3xl overflow-hidden glass-card">
@@ -225,26 +233,32 @@ const Profile = () => {
                                 <Globe className="w-5 h-5" />
                                 <h3 className="font-black text-xs uppercase tracking-widest">Interface Logic</h3>
                             </div>
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-2xl hover:bg-muted/30 transition-colors">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="p-3 bg-primary/10 rounded-xl"><Bell className="w-6 h-6 text-primary" /></div>
-                                        <div>
-                                            <p className="font-black text-lg tracking-tight">Email Notifications</p>
-                                            <label htmlFor="pref-email-notify" className="text-xs text-muted-foreground font-medium cursor-pointer">Receive monthly financial reports via email.</label>
+                            <div className="grid gap-4 sm:gap-6">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 sm:p-6 bg-muted/20 border border-border/50 rounded-3xl hover:bg-muted/30 transition-all gap-6">
+                                    <div className="flex items-start sm:items-center space-x-4">
+                                        <div className="p-3 bg-primary/10 rounded-2xl shrink-0"><Bell className="w-6 h-6 text-primary" /></div>
+                                        <div className="space-y-1">
+                                            <p className="font-black text-base sm:text-lg tracking-tight leading-tight">Email Notifications</p>
+                                            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium leading-relaxed">Receive monthly financial reports via email.</p>
                                         </div>
                                     </div>
-                                    <input id="pref-email-notify" name="emailNotifications" type="checkbox" className="w-6 h-6 border-2 border-primary rounded accent-primary bg-transparent focus:ring-primary cursor-pointer" checked={user?.emailNotificationsEnabled} readOnly />
+                                    <div className="flex items-center justify-end border-t border-border/30 pt-4 sm:pt-0 sm:border-0">
+                                        <input id="pref-email-notify" name="emailNotifications" type="checkbox" className="w-7 h-7 border-2 border-primary rounded-lg accent-primary bg-transparent focus:ring-primary cursor-pointer transition-transform active:scale-95" checked={user?.emailNotificationsEnabled} readOnly />
+                                        <label htmlFor="pref-email-notify" className="sm:hidden ml-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Enabled</label>
+                                    </div>
                                 </div>
-                                <div className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-2xl hover:bg-muted/30 transition-colors">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="p-3 bg-amber-500/10 rounded-xl"><Lock className="w-6 h-6 text-amber-500" /></div>
-                                        <div>
-                                            <p className="font-black text-lg tracking-tight">Constraint Alerts</p>
-                                            <label htmlFor="pref-budget-alerts" className="text-xs text-muted-foreground italic font-medium cursor-pointer">Get notified when proxies reach 90% consumption.</label>
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 sm:p-6 bg-muted/20 border border-border/50 rounded-3xl hover:bg-muted/30 transition-all gap-6">
+                                    <div className="flex items-start sm:items-center space-x-4">
+                                        <div className="p-3 bg-amber-500/10 rounded-2xl shrink-0"><Lock className="w-6 h-6 text-amber-500" /></div>
+                                        <div className="space-y-1">
+                                            <p className="font-black text-base sm:text-lg tracking-tight leading-tight">Constraint Alerts</p>
+                                            <p className="text-[11px] sm:text-xs text-muted-foreground italic font-medium leading-relaxed">Get notified when proxies reach 90% consumption.</p>
                                         </div>
                                     </div>
-                                    <input id="pref-budget-alerts" name="budgetAlerts" type="checkbox" className="w-6 h-6 border-2 border-amber-500 rounded accent-amber-500 bg-transparent cursor-pointer" checked={user?.budgetAlertEnabled} readOnly />
+                                    <div className="flex items-center justify-end border-t border-border/30 pt-4 sm:pt-0 sm:border-0">
+                                        <input id="pref-budget-alerts" name="budgetAlerts" type="checkbox" className="w-7 h-7 border-2 border-amber-500 rounded-lg accent-amber-500 bg-transparent cursor-pointer transition-transform active:scale-95" checked={user?.budgetAlertEnabled} readOnly />
+                                        <label htmlFor="pref-budget-alerts" className="sm:hidden ml-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Enabled</label>
+                                    </div>
                                 </div>
                             </div>
                         </Card>
@@ -255,30 +269,32 @@ const Profile = () => {
                                 <Shield className="w-5 h-5" />
                                 <h3 className="font-black text-xs uppercase tracking-widest">Vault Security</h3>
                             </div>
-                            <div className="space-y-6">
-                                <div className="p-6 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
-                                    <div className="flex items-center space-x-4">
-                                         <div className="p-3 bg-rose-500/10 rounded-xl"><Key className="w-6 h-6 text-rose-500" /></div>
-                                         <div>
-                                            <p className="font-black text-lg tracking-tight">Password</p>
-                                            <p className="text-xs text-muted-foreground font-medium">Change your account password.</p>
+                            <div className="grid gap-4 sm:gap-6">
+                                <div className="p-5 sm:p-6 bg-muted/20 border border-border/50 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-muted/30 transition-all">
+                                    <div className="flex items-start sm:items-center space-x-4">
+                                         <div className="p-3 bg-rose-500/10 rounded-2xl shrink-0"><Key className="w-6 h-6 text-rose-500" /></div>
+                                         <div className="space-y-1">
+                                            <p className="font-black text-base sm:text-lg tracking-tight leading-tight">Password</p>
+                                            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium leading-relaxed">Change your account security credentials.</p>
                                          </div>
                                     </div>
-                                    <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>Change Password</Button>
+                                    <Button variant="secondary" className="w-full sm:w-auto" onClick={() => setShowPasswordModal(true)}>Change Password</Button>
                                 </div>
-                                <div className="p-6 bg-muted/20 border border-border/50 rounded-2xl flex items-center justify-between">
-                                    <div className="flex items-center space-x-4">
-                                         <div className={`p-3 rounded-xl ${is2FAEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}><Smartphone className={`w-6 h-6 ${is2FAEnabled ? 'text-emerald-500' : 'text-muted-foreground'}`} /></div>
-                                         <div>
-                                            <p className="font-black text-lg tracking-tight">Two-Factor Authentication</p>
-                                            <p className="text-xs text-muted-foreground font-medium">Add an extra layer of security to your account.</p>
+                                <div className="p-5 sm:p-6 bg-muted/20 border border-border/50 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-muted/30 transition-all">
+                                    <div className="flex items-start sm:items-center space-x-4">
+                                         <div className={`p-3 rounded-2xl shrink-0 ${is2FAEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}><Smartphone className={`w-6 h-6 ${is2FAEnabled ? 'text-emerald-500' : 'text-muted-foreground'}`} /></div>
+                                         <div className="space-y-1">
+                                            <p className="font-black text-base sm:text-lg tracking-tight leading-tight">Two-Factor Authentication</p>
+                                            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium leading-relaxed">Add an extra layer of security to your vault.</p>
                                          </div>
                                     </div>
-                                    {is2FAEnabled ? (
-                                        <span className="font-black text-[10px] uppercase tracking-widest text-emerald-500 flex items-center"><CheckCircle className="w-4 h-4 mr-2" /> Enabled</span>
-                                    ) : (
-                                        <Button variant="secondary" onClick={handleEnable2FA} loading={isLoading}>Activate</Button>
-                                    )}
+                                    <div className="w-full sm:w-auto flex justify-end">
+                                        {is2FAEnabled ? (
+                                            <span className="font-black text-[10px] uppercase tracking-widest text-emerald-500 bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/10 flex items-center"><CheckCircle className="w-4 h-4 mr-2" /> Secured</span>
+                                        ) : (
+                                            <Button variant="secondary" className="w-full sm:w-auto" onClick={handleEnable2FA} loading={isLoading}>Activate 2FA</Button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </Card>

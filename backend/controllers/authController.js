@@ -19,7 +19,8 @@ const generateToken = (userId) => {
 
 exports.signupRequestOtp = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email: rawEmail, password } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
     const existingUser = await User.findOne({ email });
     
     if (existingUser && existingUser.passwordHash) {
@@ -59,7 +60,8 @@ exports.signupRequestOtp = async (req, res) => {
 
 exports.signupVerifyOtp = async (req, res) => {
   try {
-    const { name, email, password, otp } = req.body;
+    const { name, email: rawEmail, password, otp } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
     const user = await User.findOne({ email });
 
     if (!user || !user.signupOTP || !user.signupOTPExpiry) {
@@ -151,7 +153,8 @@ exports.get2FAStatus = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email: rawEmail, password } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -196,7 +199,8 @@ exports.signup = async (req, res) => {
 };
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email: rawEmail, password } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
     logger.info(`Login attempt for email: ${email}`);
     
     const user = await User.findOne({ email });
@@ -267,7 +271,8 @@ exports.login = async (req, res) => {
 };
 exports.login2FAVerify = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email: rawEmail, otp } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ status: 'error', message: 'Invalid credentials' });
     if (!user.is2FAEnabled) return res.status(400).json({ status: 'error', message: '2FA not enabled for this user' });

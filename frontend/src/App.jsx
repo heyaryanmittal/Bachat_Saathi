@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Route, Routes, Navigate, useLocation, unstable_HistoryRouter as HistoryRouter, Outlet } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
@@ -24,6 +24,7 @@ import TransferHistory from './pages/TransferHistory';
 import AIAssistant from './components/AIAssistant';
 import Sidebar from './components/Sidebar';
 import ThemeToggle from './components/ThemeToggle';
+import { Menu, X } from 'lucide-react';
 
 const history = createBrowserHistory({ window });
 const routerConfig = {
@@ -77,6 +78,7 @@ const getPageContext = (path) => {
 function ProtectedLayout() {
   const { token } = useAuth();
   const location = useLocation();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { title, desc } = getPageContext(location.pathname);
 
   useEffect(() => {
@@ -89,16 +91,24 @@ function ProtectedLayout() {
 
   return (
     <div className="flex min-h-screen bg-background transition-colors duration-500">
-      <Sidebar />
+      <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
       <div className="flex-1 flex flex-col min-w-0 lg:ml-72">
         <header className="h-20 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 transition-all duration-300">
-          <div className="flex-1">
-             <h2 className="text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1">
-               {title}
-             </h2>
-             <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest opacity-60 leading-none">
-               {desc}
-             </p>
+          <div className="flex items-center gap-4 flex-1">
+             <button 
+                onClick={() => setIsMobileOpen(true)}
+                className="lg:hidden p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground"
+             >
+                <Menu className="w-6 h-6" />
+             </button>
+             <div>
+                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1 truncate max-w-[150px] sm:max-w-none">
+                  {title}
+                </h2>
+                <p className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-widest opacity-60 leading-none truncate max-w-[150px] sm:max-w-none">
+                  {desc}
+                </p>
+             </div>
           </div>
           <div className="flex items-center space-x-6">
             <ThemeToggle />

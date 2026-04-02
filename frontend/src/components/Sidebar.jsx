@@ -42,12 +42,11 @@ function IconRenderer({ iconName, className = "h-5 w-5" }) {
   const IconComponent = iconMap[iconName];
   return IconComponent ? <IconComponent className={className} /> : null;
 }
-function Sidebar() {
+function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { darkMode } = useTheme();
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const isActive = (path) => location.pathname === path;
   const isDropdownActive = (item) => {
     if (item.path && isActive(item.path)) return true;
@@ -117,12 +116,7 @@ function Sidebar() {
   return (
     <>
       {}
-      <button 
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 p-4 bg-primary text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all"
-      >
-        {isMobileOpen ? <X /> : <Menu />}
-      </button>
+      {}
       {}
       {isMobileOpen && (
         <div 

@@ -10,7 +10,7 @@ const AIAssistant = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            content: "• Welcome to Bachat Saathi AI Assistant.\n• I am your financial intelligence unit.\n• How shall we optimize your capital today?",
+            content: "• Welcome to Bachat Saathi.\n• I am your financial AI Assistant.\n• How shall we optimize your capital today?",
         },
     ]);
     const [isLoading, setIsLoading] = useState(false);
@@ -95,8 +95,7 @@ const AIAssistant = () => {
                                     name="message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Ask about your budget or money..."
-                                    className="pl-12 pr-12 py-4 text-[11px] font-black uppercase tracking-tighter"
+                                    className="pl-12 pr-12 py-4 text-[11px] font-black lowercase tracking-tighter"
                                     disabled={isLoading}
                                     aria-label="Ask AI Assistant"
                                 />

@@ -36,9 +36,12 @@ const routerConfig = {
 
 if (import.meta.env.VITE_API_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-} else {
+} else if (import.meta.env.MODE === 'development') {
   axios.defaults.baseURL = 'http://localhost:5001/api';
-  console.warn('Using default API URL. Set VITE_API_URL in .env for production.');
+  console.warn('Using default local API URL (localhost:5001). For production, set VITE_API_URL in your Vercel/environment settings.');
+} else {
+  // In production, fallback to relative path if not specified
+  axios.defaults.baseURL = '/api'; 
 }
 
 function ProtectedRoute({ children }) {

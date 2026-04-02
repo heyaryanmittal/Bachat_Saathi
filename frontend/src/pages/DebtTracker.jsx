@@ -176,12 +176,12 @@ const DebtTracker = () => {
                         <thead>
                             <tr className="bg-muted/30">
                                 <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Source</th>
-                                <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Original</th>
+                                <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">Original</th>
                                 <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Remaining</th>
-                                <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Interest %</th>
-                                <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Interest Amt</th>
+                                <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground hidden lg:table-cell">Interest %</th>
+                                <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground hidden lg:table-cell">Interest Amt</th>
                                 <th className="px-6 py-4 text-left font-black text-[10px] uppercase tracking-widest text-muted-foreground">Due Date</th>
-                                <th className="px-6 py-4 text-center font-black text-[10px] uppercase tracking-widest text-muted-foreground">Status</th>
+                                <th className="px-6 py-4 text-center font-black text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:table-cell">Status</th>
                                 <th className="px-6 py-4 text-right font-black text-[10px] uppercase tracking-widest text-muted-foreground">Actions</th>
                             </tr>
                         </thead>
@@ -207,15 +207,15 @@ const DebtTracker = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 font-black text-xs">₹{d.amount.toLocaleString()}</td>
+                                            <td className="px-6 py-4 font-black text-xs hidden md:table-cell">₹{d.amount.toLocaleString()}</td>
                                             <td className="px-6 py-4 font-black text-xs text-rose-500">₹{d.remainingAmount.toLocaleString()}</td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 hidden lg:table-cell">
                                                 <div className="flex items-center gap-1.5 font-black text-xs">
                                                     <Percent className="w-3 h-3 text-muted-foreground" />
                                                     {d.interestRate}%
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 font-black text-xs text-orange-500">
+                                            <td className="px-6 py-4 font-black text-xs text-orange-500 hidden lg:table-cell">
                                                 ₹{accumulatedInterest.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="px-6 py-4">
@@ -224,7 +224,7 @@ const DebtTracker = () => {
                                                     {format(new Date(d.dueDate), 'MMM dd, yyyy')}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 hidden sm:table-cell">
                                                 <div className={`mx-auto w-fit px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm ${statusColor}`}>
                                                     <StatusIcon className="w-3 h-3" />
                                                     {label}
@@ -368,7 +368,7 @@ const DebtTracker = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 grid grid-cols-2 gap-4">
+                        <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             {actionsModal.debt?.status !== 'closed' ? (
                                 <>
                                     <button 

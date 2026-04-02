@@ -77,9 +77,12 @@ exports.getUserRankContext = async (req, res) => {
     const range = parseInt(req.query.range) || 2;
     const context = await LeaderboardService.getUserRankContext(userId, type, range);
     if (!context) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'User rank context not found'
+      return res.json({
+        status: 'success',
+        data: {
+            userStats: { username: req.user.name, rank: 0, points: 0 },
+            context: []
+        }
       });
     }
     res.json({

@@ -93,9 +93,9 @@ const Goals = () => {
                 <Button onClick={() => setShowCreateModal(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />New Goal</Button>
             </div>
             {}
-            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
+            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 w-full md:max-w-md">
                 {['all', 'in-progress', 'completed'].map(t => (
-                    <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t.replace('-', ' ')}</button>
+                    <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-3 sm:py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t.replace('-', ' ')}</button>
                 ))}
             </div>
             {}

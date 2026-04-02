@@ -21,7 +21,7 @@ const Profile = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [editedUser, setEditedUser] = useState({});
+    const [editedUser, setEditedUser] = useState({ name: '', email: '', phone: '', location: '', bio: '' });
     const [is2FAEnabled, setIs2FAEnabled] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [show2FAModal, setShow2FAModal] = useState(false);
@@ -155,7 +155,7 @@ const Profile = () => {
                 <div className="lg:col-span-3 space-y-8">
                     {activeTab === 'overview' && (
                         <>
-                            <Card variant="glass" className="saas-card p-8">
+                            <Card variant="glass" className="saas-card p-6 sm:p-8">
                                 <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
                                     <div className="relative group">
                                         <div className="w-32 h-32 gradient-primary rounded-full flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-primary/30 group-hover:scale-105 transition-transform duration-500">
@@ -189,7 +189,7 @@ const Profile = () => {
                                     </Button>
                                 </div>
                             </Card>
-                            <Card variant="glass" className="saas-card p-8 space-y-8">
+                            <form onSubmit={e => { e.preventDefault(); isEditing && handleSave(); }} className="saas-card p-6 sm:p-8 space-y-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-3xl overflow-hidden glass-card">
                                 <div className="flex items-center space-x-2 text-primary">
                                     <Smartphone className="w-5 h-5" />
                                     <h3 className="font-black text-xs uppercase tracking-widest">Temporal Records</h3>
@@ -214,9 +214,9 @@ const Profile = () => {
                                     />
                                 </div>
                                 {isEditing && (
-                                    <Button variant="primary" size="xl" className="w-full btn-saas-primary" onClick={handleSave} loading={isSaving}>Save Changes</Button>
+                                    <Button type="submit" variant="primary" size="xl" className="w-full btn-saas-primary" loading={isSaving}>Save Changes</Button>
                                 )}
-                            </Card>
+                            </form>
                         </>
                     )}
                     {activeTab === 'settings' && (

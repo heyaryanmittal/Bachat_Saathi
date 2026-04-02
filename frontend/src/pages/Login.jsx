@@ -73,11 +73,11 @@ function Login() {
   };
 
   return (
-    <div className="h-screen grid lg:grid-cols-2 bg-background overflow-hidden relative">
-      <div className="absolute top-8 left-8 z-50 pointer-events-auto">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-background relative">
+      <div className="absolute top-4 left-4 sm:top-8 sm:left-8 z-50 pointer-events-auto">
         <Logo isLight={true} />
       </div>
-      <div className="absolute top-8 right-8 z-50">
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
         <ThemeToggle />
       </div>
 
@@ -101,7 +101,7 @@ function Login() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-8 sm:p-12 animate-entrance bg-white dark:bg-gray-950 overflow-y-auto">
+      <div className="flex items-center justify-center p-6 sm:p-12 animate-entrance bg-white dark:bg-gray-950 pt-20 sm:pt-12">
         <div className="max-w-md w-full">
           {step === 'credentials' ? (
             <>

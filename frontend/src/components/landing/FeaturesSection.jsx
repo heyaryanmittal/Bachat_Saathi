@@ -106,7 +106,7 @@ const FeaturesSection = () => {
                 }}
               >
                 { }
-                <div className="relative h-full bg-primary rounded-[2.5rem] p-8 flex flex-col items-start text-left shadow-2xl shadow-primary/20 group-hover:bg-emerald-700 transition-all duration-500 overflow-hidden">
+                <div className="relative h-full bg-primary rounded-[2.5rem] p-6 sm:p-8 flex flex-col items-start text-left shadow-2xl shadow-primary/20 group-hover:bg-emerald-700 transition-all duration-500 overflow-hidden">
                   { }
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
                   { }

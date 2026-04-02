@@ -15,6 +15,7 @@ const Transactions = () => {
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [filters, setFilters] = useState({ walletId: '', type: '', category: '', startDate: '', endDate: '' });
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,7 +91,19 @@ const Transactions = () => {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {}
         <div className="xl:col-span-1 space-y-6">
-            <Card variant="glass" className="h-fit sticky top-24">
+            <Button 
+                variant="secondary" 
+                className="xl:hidden w-full flex items-center justify-between py-4"
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+            >
+                <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4" />
+                    <span className="font-black text-xs uppercase tracking-widest">Filter Matrix</span>
+                </div>
+                {showMobileFilters ? <ChevronRight className="w-4 h-4 rotate-90 transition-transform" /> : <ChevronRight className="w-4 h-4 transition-transform" />}
+            </Button>
+
+            <Card variant="glass" className={`h-fit xl:sticky xl:top-24 ${showMobileFilters ? 'block animate-entrance' : 'hidden xl:block'}`}>
                 <div className="flex items-center space-x-2 mb-6">
                     <Filter className="w-5 h-5 text-primary" />
                     <h3 className="font-black text-sm uppercase tracking-widest">Filter Transactions</h3>

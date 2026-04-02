@@ -15,10 +15,10 @@ const cardVariants = cva(
             },
             size: {
                 none: "",
-                sm: "p-4",
-                md: "p-6",
-                lg: "p-8",
-                xl: "p-10"
+                sm: "p-3 sm:p-4",
+                md: "p-4 sm:p-6",
+                lg: "p-5 sm:p-8",
+                xl: "p-6 sm:p-10"
             },
             hover: {
                 none: "",
@@ -487,7 +487,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
                     </button>
                 </div>
                 {}
-                <div className="px-8 py-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
+                <div className="px-4 py-6 sm:px-8 sm:py-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
                     {children}
                 </div>
             </Card>

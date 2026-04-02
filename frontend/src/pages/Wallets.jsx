@@ -98,13 +98,13 @@ const Wallets = () => {
         <StatsCard title="Accounts Count" value={wallets.filter(w => w.type !== 'Cash').length} variant="secondary" icon={<History />} />
       </div>
       {}
-      <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
-        <div className="flex items-center space-x-3">
-          <Link to="/transfers">
-            <Button variant="secondary" size="md"><History className="mr-2 w-4 h-4" />History</Button>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2 mb-2">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <Link to="/transfers" className="w-full sm:w-auto">
+            <Button variant="secondary" size="md" className="w-full"><History className="mr-2 w-4 h-4" />History</Button>
           </Link>
-          <Button onClick={fetchWallets} variant="secondary" size="md"><RefreshCw className="mr-2 w-4 h-4" />Refresh</Button>
-          <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />New Wallet</Button>
+          <Button onClick={fetchWallets} variant="secondary" size="md" className="w-full sm:w-auto"><RefreshCw className="mr-2 w-4 h-4" />Refresh</Button>
+          <Button onClick={() => setIsCreating(true)} className="btn-saas-primary w-full sm:w-auto" size="md"><Plus className="mr-2 w-4 h-4" />New Wallet</Button>
         </div>
       </div>
       {infoMessage && (

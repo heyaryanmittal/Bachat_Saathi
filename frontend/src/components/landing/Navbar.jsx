@@ -73,10 +73,9 @@ const Navbar = () => {
               {link.label}
             </a>
           ))}
-          <div className="flex gap-3 pt-2">
-            <Button variant="ghost" size="sm" className="flex-1" onClick={() => navigate('/login')}>Log in</Button>
-            <Button size="sm" className="flex-1 bg-white text-black dark:bg-primary dark:text-white" onClick={() => navigate('/signup')}>Get Started</Button>
-
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button variant="ghost" size="sm" className="flex-1 min-h-[48px]" onClick={() => navigate('/login')}>Log in</Button>
+            <Button size="sm" className="flex-1 bg-white text-black dark:bg-primary dark:text-white min-h-[48px]" onClick={() => navigate('/signup')}>Get Started</Button>
           </div>
         </div>
       )}

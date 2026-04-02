@@ -90,7 +90,7 @@ const PricingSection = () => {
           {plans.map((plan, i) => (
             <div
               key={plan.name}
-              className={`group relative p-10 rounded-[2.5rem] border transition-all duration-700 hover:scale-[1.08] hover:-translate-y-6 cursor-default overflow-hidden ${plan.backgroundClass} shadow-xl flex flex-col`}
+              className={`group relative p-6 sm:p-10 rounded-[2.5rem] border transition-all duration-700 hover:scale-[1.05] hover:-translate-y-6 cursor-default overflow-hidden ${plan.backgroundClass} shadow-xl flex flex-col`}
               style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? "translateY(0)" : "translateY(32px)",

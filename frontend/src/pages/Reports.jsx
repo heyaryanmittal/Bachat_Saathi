@@ -53,22 +53,22 @@ const Reports = () => {
     };
     useEffect(() => { fetchData(); }, [activeTab, dateRange]);
     const renderHeader = () => (
-        <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
-            <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2 mb-4">
+            <div className="flex items-center space-x-3 bg-muted/30 p-1.5 sm:p-2 rounded-2xl border border-border/50 w-full md:w-auto">
                 <UISelect 
                     id="report-date-range"
                     name="dateRange"
                     value={dateRange} 
                     onChange={e => setDateRange(e.target.value)} 
-                    className="border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4"
+                    className="border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-2 sm:px-4"
                     options={DATE_RANGES}
                 />
-                <Button variant="secondary" onClick={() => toast.success('Exporting report...')}><Download className="w-4 h-4 mr-2" />Download</Button>
+                <Button variant="secondary" size="sm" onClick={() => toast.success('Exporting report...')} className="text-[10px]"><Download className="w-4 h-4 mr-1.5" />Download</Button>
             </div>
         </div>
     );
     const renderTabs = () => (
-        <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 max-w-md">
+        <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/50 w-full md:max-w-md">
             {['spending', 'income', 'budget'].map(t => (
                 <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-background shadow-lg text-primary border border-border/50' : 'text-muted-foreground'}`}>{t}</button>
             ))}
@@ -87,7 +87,7 @@ const Reports = () => {
                 {renderHeader()}
                 {renderTabs()}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <Card variant="glass" className="p-8 saas-card min-h-[400px]">
+                    <Card variant="glass" className="p-6 sm:p-8 saas-card min-h-[400px]">
                         <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center"><PieChart className="w-4 h-4 mr-2" /> Spending Distribution</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <RePie>
@@ -99,7 +99,7 @@ const Reports = () => {
                             </RePie>
                         </ResponsiveContainer>
                     </Card>
-                    <Card variant="glass" className="p-8 saas-card overflow-y-auto max-h-[400px]">
+                    <Card variant="glass" className="p-6 sm:p-8 saas-card overflow-y-auto max-h-[400px]">
                          <h3 className="text-xs font-black uppercase tracking-widest mb-8">Category Breakdown</h3>
                          <div className="space-y-6">
                             {(d.categories || []).map((c, i) => (
@@ -131,7 +131,7 @@ const Reports = () => {
                 </div>
                 {renderHeader()}
                 {renderTabs()}
-                <Card variant="glass" className="p-8 saas-card h-[400px]">
+                <Card variant="glass" className="p-6 sm:p-8 saas-card h-[400px]">
                     <h3 className="text-xs font-black uppercase tracking-widest mb-8 flex items-center"><BarChart2 className="w-4 h-4 mr-2" /> Income Breakdown</h3>
                     <ResponsiveContainer width="100%" height="100%">
                         <ReBar data={chartData} layout="vertical">

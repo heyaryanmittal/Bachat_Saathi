@@ -155,7 +155,7 @@ const Leaderboard = () => {
                                     const points = activeTab === 'monthly' ? entry.monthlyPoints : entry.lifetimePoints;
                                     const isUser = entry.username === user?.name;
                                     return (
-                                        <motion.div key={entry.username} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
+                                        <motion.div key={`${entry.username}-${idx}`} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
                                             <div className="flex items-center gap-6">
                                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl ${isUser ? 'bg-white/20' : 'bg-background border border-border/50'}`}>
                                                     {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
@@ -188,7 +188,7 @@ const Leaderboard = () => {
                                             const points = activeTab === 'monthly' ? entry.monthlyPoints : entry.lifetimePoints;
                                             const isUser = entry.username === user?.name;
                                             return (
-                                                <motion.div key={entry.username + '_ctx'} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
+                                                <motion.div key={`${entry.username}-ctx-${idx}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className={`flex items-center justify-between p-6 rounded-2xl border transition-all duration-300 group ${isUser ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-[1.02]' : 'bg-muted/20 border-border/50 hover:bg-muted/30'}`}>
                                                     <div className="flex items-center gap-6">
                                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl ${isUser ? 'bg-white/20' : 'bg-background border border-border/50'}`}>
                                                             #{rank}

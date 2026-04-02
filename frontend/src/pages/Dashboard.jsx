@@ -118,7 +118,7 @@ function Dashboard() {
   }
   if (!hasData) {
     return (
-      <div className="h-[calc(100vh-140px)] flex flex-col justify-center animate-entrance selection:bg-primary/20 overflow-hidden">
+      <div className="min-h-[calc(100vh-140px)] flex flex-col justify-center animate-entrance selection:bg-primary/20">
         <div className="max-w-4xl mx-auto text-center relative px-6">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
           <h2 className="text-4xl sm:text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">

@@ -91,7 +91,7 @@ function ProtectedLayout() {
     <div className="flex min-h-screen bg-background transition-colors duration-500">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 lg:ml-72">
-        <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 transition-all duration-300">
+        <header className="h-20 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 transition-all duration-300">
           <div className="flex-1">
              <h2 className="text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1">
                {title}

@@ -98,8 +98,8 @@ const Budgets = () => {
         />
       </div>
       {}
-      <div className="flex flex-col md:flex-row items-center justify-end gap-6 px-2">
-        <div className="flex items-center space-x-3 bg-muted/30 p-2 rounded-2xl border border-border/50 shadow-sm relative">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2">
+        <div className="flex flex-col sm:flex-row items-center gap-3 bg-muted/30 p-2 rounded-2xl border border-border/50 shadow-sm relative w-full md:w-auto">
              <label htmlFor="budget-month-selector" className="sr-only">Select Budget Month</label>
              <input 
                 id="budget-month-selector"
@@ -107,9 +107,9 @@ const Budgets = () => {
                 type="month" 
                 value={currentMonth} 
                 onChange={e => setCurrentMonth(e.target.value)} 
-                className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4" 
+                className="input-saas border-none bg-transparent font-black uppercase text-[10px] tracking-widest px-4 w-full sm:w-auto text-center sm:text-left" 
              />
-             <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="md"><Plus className="mr-2 w-4 h-4" />New Budget</Button>
+             <Button onClick={() => setIsCreating(true)} className="btn-saas-primary w-full sm:w-auto" size="md"><Plus className="mr-2 w-4 h-4" />New Budget</Button>
         </div>
       </div>
       {}

@@ -400,6 +400,7 @@ exports.verifyChangePassword = async (req, res) => {
       message: 'Password updated successfully'
     });
   } catch (error) {
+    logger.error('Password update verification failed:', error);
     res.status(500).json({
       status: 'error',
       message: 'Password update verification failed',
@@ -432,6 +433,12 @@ exports.updateProfile = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     ).select('-passwordHash');
+
+    if (name) {
+      const Leaderboard = require('../models/Leaderboard');
+      await Leaderboard.updateOne({ userId: req.user.id }, { username: name });
+    }
+
     res.status(200).json({
       status: 'success',
       data: {

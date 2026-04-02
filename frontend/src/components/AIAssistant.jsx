@@ -47,10 +47,10 @@ const AIAssistant = () => {
         }
     };
     return (
-        <div className="fixed bottom-8 right-8 z-[1000]">
+        <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[1000]">
             <AnimatePresence>
                 {isOpen ? (
-                    <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-background/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-[400px] h-[650px] flex flex-col border border-primary/20 overflow-hidden mb-4 relative">
+                    <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-background/80 backdrop-blur-2xl rounded-3xl shadow-2xl w-[calc(100vw-2rem)] sm:w-[400px] h-[60vh] sm:h-[650px] flex flex-col border border-primary/20 overflow-hidden mb-4 relative">
                         {}
                         <div className="gradient-primary p-6 flex justify-between items-center relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-10 animate-pulse"><Brain className="w-16 h-16"/></div>

@@ -30,7 +30,7 @@ const CTASection = () => {
           transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-8 text-balance leading-tight">
+        <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-8 text-balance leading-tight">
           Start your savings journey today
         </h2>
         <p className="text-white/70 text-xl max-w-2xl mx-auto mb-12 leading-relaxed">

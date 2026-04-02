@@ -22,7 +22,7 @@ const HowItWorksSection = () => {
       <div className="container mx-auto px-6" ref={ref}>
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-primary text-base font-bold uppercase tracking-widest">How It Works</span>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground mt-4 mb-6 text-balance leading-tight">
+          <h2 className="font-display text-3xl sm:text-5xl font-bold text-foreground mt-4 mb-6 text-balance leading-tight">
             From signup to savings in minutes
           </h2>
         </div>

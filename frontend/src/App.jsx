@@ -102,10 +102,10 @@ function ProtectedLayout() {
                 <Menu className="w-6 h-6" />
              </button>
              <div>
-                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-widest text-foreground leading-none mb-1 truncate max-w-[150px] sm:max-w-none">
+                <h2 className="text-lg sm:text-2xl font-black uppercase tracking-widest text-foreground leading-tight mb-1">
                   {title}
                 </h2>
-                <p className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-widest opacity-60 leading-none truncate max-w-[150px] sm:max-w-none">
+                <p className="text-[9px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-widest opacity-60 leading-tight">
                   {desc}
                 </p>
              </div>

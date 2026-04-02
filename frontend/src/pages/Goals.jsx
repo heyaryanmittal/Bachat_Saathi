@@ -116,7 +116,7 @@ const Goals = () => {
                                         {getIcon(g.category)}
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black tracking-tight uppercase truncate max-w-[150px]">{g.title}</h3>
+                                        <h3 className="text-xl font-black tracking-tight uppercase leading-tight">{g.title}</h3>
                                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic">{g.category}</p>
                                     </div>
                                 </div>

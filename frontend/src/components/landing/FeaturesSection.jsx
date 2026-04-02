@@ -74,7 +74,7 @@ const FeaturesSection = () => {
       <div className="container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-primary text-base font-bold uppercase tracking-widest">Features</span>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground mt-4 mb-6 text-balance leading-tight">
+          <h2 className="font-display text-3xl sm:text-5xl font-bold text-foreground mt-4 mb-6 text-balance leading-tight">
             Everything you need to manage your money
           </h2>
           <p className="text-muted-foreground text-xl leading-relaxed">

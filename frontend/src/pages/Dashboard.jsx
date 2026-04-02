@@ -167,7 +167,7 @@ function Dashboard() {
       {}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-lg shadow-slate-200/20 dark:shadow-black/20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
             Howdy, <span className="text-primary italic">{user?.name || 'Saver'}!</span>
           </h2>
           <div className="flex items-center gap-3">

@@ -15,7 +15,7 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="space-y-8 md:ml-10 lg:ml-20 xl:ml-28">
             <h1
-              className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight text-balance animate-fade-up"
+              className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight text-balance animate-fade-up"
               style={{ animationDelay: '100ms' }}
             >
               Your money deserves<br />

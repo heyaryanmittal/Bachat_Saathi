@@ -73,10 +73,10 @@ const Leaderboard = () => {
                                 <Crown className="w-24 h-24" />
                              </div>
                              <div className="flex flex-col items-center text-center relative z-10">
-                                <div className="text-6xl mb-6 animate-float">🥇</div>
-                                <h3 className="font-black text-3xl tracking-tighter uppercase mb-1">{currentLeaderboard[0].username}</h3>
+                                <div className="text-5xl sm:text-6xl mb-6 animate-float">🥇</div>
+                                <h3 className="font-black text-2xl sm:text-3xl tracking-tighter uppercase mb-1">{currentLeaderboard[0].username}</h3>
                                 <p className="text-[11px] font-black text-yellow-500/70 uppercase mb-8 tracking-widest">Saving Champion</p>
-                                <div className="text-5xl font-black text-primary tracking-tighter mb-2">
+                                <div className="text-3xl sm:text-5xl font-black text-primary tracking-tighter mb-2">
                                     {Number((activeTab === 'monthly' ? currentLeaderboard[0].monthlyPoints : currentLeaderboard[0].lifetimePoints) || 0).toLocaleString()}
                                 </div>
                                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Points</p>

@@ -1,6 +1,6 @@
 # 💰 BachatSaathi - Advanced Personal Finance Manager
 
-BachatSaathi is a premium, full-stack personal finance management application designed to help users take control of their financial life. Built with the **MERN stack**, it combines enterprise-grade security, comprehensive debt management, and stunning data visualizations into a seamless user experience.
+BachatSaathi is a premium, full-stack personal finance management application designed to help users take control of their financial life. Built with the **MERN stack**, it combines enterprise-grade security, comprehensive debt management, and stunning data visualizations into a seamless, **mobile-responsive** user experience.
 
 ![BachatSaathi Banner](https://img.shields.io/badge/Bachat-Saathi-blue?style=for-the-badge&logo=google-cloud&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
@@ -10,102 +10,97 @@ BachatSaathi is a premium, full-stack personal finance management application de
 
 ## 🚀 Key Features
 
-### 🏢 Landing Page & Branding
-- **Premium Marketing Presence**: A modern, 3D-animated landing page with a clear conversion funnel.
-- **Showcase Sections**: Comprehensive feature highlights, testimonials, and "About Us" statistics.
-- **Functional Contact System**: Integrated contact form with backend storage and admin management for user inquiries.
-- **Animated Experience**: Dynamic blob animations, floating 3D icons, and smooth staggered transitions.
+### 🤖 Intelligent AI Assistant
+- **Gemini Powered Insights**: Integrated AI companion for real-time financial advice and transaction analysis.
+- **Automated Financial Guidance**: Personalized suggestions for budget optimization based on spending patterns.
+- **Floating Matrix Interface**: Accessible from anywhere in the app with a premium, animated UI.
+
+### 🌓 Premium Responsive UI
+- **Mobile-First Excellence**: Fully optimized for smartphones, tablets, and desktops with zero layout overflow.
+- **Adaptive Navigation**: Dynamic sidebar/hamburger menu system designed for professional-grade navigation.
+- **Ultra-Modern Aesthetics**: Glassmorphism effects, 3D animations, and smooth Framer Motion transitions.
+- **Dynamic Dark/Light Mode**: Seamless theme switching with persistent user preferences.
 
 ### 🔐 Advanced Security
-- **Secure Authentication**: JWT-based login and registration system.
-- **Two-Factor Authentication (2FA)**: Email-based OTP system for extra account protection during login and setup.
-- **Signup Verification**: OTP-based email verification for new account creation.
-- **Secure Sessions**: Protected routes and automatic token management.
+- **Secure Authentication**: JWT-based login and registration with case-insensitive email normalization.
+- **Two-Factor Authentication (2FA)**: Mandatory/Optional email-based OTP system for account vault protection.
+- **Signup Verification**: Multi-step OTP email verification to ensure genuine user registration.
+- **Secure Sessions**: Protected routes with automatic session expiry and local storage synchronization.
 
 ### 💳 Core Financial Management
-- **Multiple Wallet System**: Manage different accounts (Cash, Bank, Credit Card) separately.
-- **Smart Wallet Protection**: 24-hour creation/transaction protection to prevent accidental wallet deletion.
-- **Transaction Tracking**: Daily income and expense logging with automatic balance updates.
-- **Wallet-to-Wallet Transfers**: Seamlessly move funds between wallets with real-time balance adjustment.
-- **Partial Payment Settlement**: Record payments with numerical and word-format amount displays for clarity.
+- **Multiple Wallet System**: Manage different accounts (Cash, Bank, Credit Card) separately with unique identifiers.
+- **Smart Wallet Protection**: 24-hour protection buffer for newly created wallets to prevent accidental deletion.
+- **Transaction Tracking**: Comprehensive income/expense logging with instant balance recalculations.
+- **Wallet-to-Wallet Transfers**: Move funds between internal accounts with full history tracking.
 
 ### 📊 Professional Analytics
-- **Dynamic Dashboard**: Glassmorphism-based UI with interactive charts (Donut, Bar, Line).
-- **Spending Reports**: Detailed category-wise breakdowns and trend analysis.
-- **Budget Performance**: Contrast planned vs. actual spending with color-coded health indicators.
-- **Cash Flow Analysis**: Monitor daily money movement and net flow automatically.
-- **Financial Exports**: Download professional reports in **CSV** and **PDF** formats.
-
-### 📉 Debt & Goal Tracker
-- **Comprehensive Debt Manager**: Track personal, credit, and business loans.
-- **Interest Calculation Engine**: Automated monthly compound interest calculations with preview mode.
-- **Savings Goals**: Set financial targets with real-time progress bars and achievement tracking.
-
-### 🏆 Gamification & Rewards
-- **Points System**: Earn points for financial discipline (staying under budget, debt payments, savings).
-- **Leaderboard**: Compare financial milestones with other users (Global Ranking).
-- **Achievements**: Unlock badges for milestones like "Budget Master," "Goal Crusher," and "Debt Destroyer."
+- **Dynamic Dashboard**: Interactive Recharts-driven visualizers (Donut, Bar, Line) for cashflow analysis.
+- **Financial Exports**: One-click professional exports in **CSV** and **PDF** formats.
+- **Monthly Tier System**: Gain ranks and badges based on your monthly financial discipline.
 
 ---
 
 ## 🛠️ Tech Stack
 
 **Frontend:**
-- **Core**: React.js with React Router
-- **Styling**: Tailwind CSS, Vanilla CSS (3D Animations, Glassmorphism)
-- **State Management**: React Hooks & Context API
-- **Charts**: Recharts (Custom Gradient Visuals)
-- **Forms**: React Hook Form with validation
+- **Core**: React.js 18 (Vite)
+- **Styling**: Tailwind CSS, Framer Motion
+- **Icons**: Lucide React
+- **Visuals**: Recharts (Custom Gradient Visuals)
 
 **Backend:**
 - **Platform**: Node.js & Express.js
-- **Database**: MongoDB with Mongoose
-- **Auth**: JWT, BcryptJS
-- **Communication**: Nodemailer (OTP & Alert Emails)
-- **Automation**: Node-cron (Interest calculations & Recurring tasks)
+- **Database**: MongoDB (Atlas) with Mongoose
+- **AI Engine**: Google Gemini API
+- **Security**: JWT, BcryptJS, Email-OTP
+- **Automation**: Node-cron (Recurring interest & points calculation)
 
 ---
 
 ## ⚙️ Installation & Setup
 
 ### Prerequisites
-- Node.js (v16+)
-- MongoDB (Local or Atlas)
-- SMTP Server (e.g., Mailtrap, Gmail) for OTP emails
+- Node.js (v18+)
+- MongoDB Atlas account
+- Vercel account (for production deployment)
+- Google AI (Gemini) API Key
 
 ### Step-by-Step Setup
 
-1. **Clone the Repository**
+1. **Clone & Explore**
    ```bash
    git clone https://github.com/heyaryanmittal/bachatSaathi.git
    cd BachatSaathi
    ```
 
-2. **Backend Configuration**
+2. **Environment Configuration**
+   The project uses standardized `.env.example` templates. 
+   - **Frontend**: `cd frontend && cp .env.example .env`
+   - **Backend**: `cd backend && cp .env.example .env`
+
+3. **Backend Setup**
    ```bash
    cd backend
    npm install
-   # Create .env file based on .env.example
-   ```
-   *Required Environment Variables:*
-   ```env
-   PORT=5000
-   MONGODB_URI=your_mongodb_uri
-   JWT_SECRET=your_secret_key
-   SMTP_HOST=your_smtp_host
-   SMTP_USER=your_email
-   SMTP_PASS=your_password
+   # Configure MONGODB_URI and JWT_SECRET in .env
+   npm run dev
    ```
 
-3. **Frontend Configuration**
+4. **Frontend Setup**
    ```bash
    cd ../frontend
    npm install
+   # Set VITE_API_URL to your backend (default: http://localhost:5001/api)
+   npm run dev
    ```
 
-4. **Running the App**
-   - **Start Backend:** `cd backend && npm run dev`
-   - **Start Frontend:** `cd frontend && npm run dev`
+---
+
+## 🚀 Deployment
+
+The project is architected for seamless deployment on **Vercel**:
+- **Backend**: Deployed as Serverless Functions using `vercel.json` configurations.
+- **Frontend**: Optimized Vite build with SPA routing support.
 
 ---
 

@@ -121,17 +121,17 @@ function Login() {
                 )}
                 
                 <Input
-                  label="Email Workspace"
+                  label="Email"
                   id="login-email"
                   name="email"
                   type="email"
-                  placeholder="name@company.com"
+                  placeholder="name@gmail.com"
                   {...register('email', { required: 'Email required' })}
                   error={errors.email?.message}
                 />
                 
                 <Input
-                  label="Password Key"
+                  label="Password"
                   id="login-password"
                   name="password"
                   type="password"

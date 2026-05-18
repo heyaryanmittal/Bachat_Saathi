@@ -106,7 +106,7 @@ function Signup() {
                 <Wallet className="text-white w-7 h-7" />
             </div>
             <h2 className="text-4xl font-black tracking-tighter mb-2">
-              {step === 1 ? <>Global <span className="text-gradient">Signup</span></> : <>Verify <span className="text-gradient">Email</span></>}
+              {step === 1 ? <><span className="text-gradient">Signup</span></> : <>Verify <span className="text-gradient">Email</span></>}
             </h2>
             <p className="text-muted-foreground font-medium text-sm">
               {step === 1 ? 'Start your premium financial experience.' : `Enter the 6-digit code sent to ${formData.email}`}
@@ -120,7 +120,7 @@ function Signup() {
                 </div>
               )}
               <Input
-                label="Identity Display Name"
+                label="Display Name"
                 id="signup-name"
                 name="name"
                 autoComplete="name"
@@ -129,7 +129,7 @@ function Signup() {
                 error={errors.name?.message}
               />
               <Input
-                label="Secure Email Workspace"
+                label="Email"
                 id="signup-email"
                 name="email"
                 type="email"
@@ -139,7 +139,7 @@ function Signup() {
                 error={errors.email?.message}
               />
               <Input
-                label="Master Access Key"
+                label="Password"
                 id="signup-password"
                 name="password"
                 type="password"
@@ -149,7 +149,7 @@ function Signup() {
                 error={errors.password?.message}
               />
               <Input
-                label="Confirm Access Key"
+                label="Confirm Password"
                 id="signup-confirm-password"
                 name="confirmPassword"
                 type="password"

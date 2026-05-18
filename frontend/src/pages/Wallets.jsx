@@ -9,7 +9,7 @@ import { numberToWords } from '../utils/numberToWords';
 const Wallets = () => {
   const [wallets, setWallets] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
-  const [newWallet, setNewWallet] = useState({ name: '', type: 'Cash', openingBalance: 0 });
+  const [newWallet, setNewWallet] = useState({ name: '', type: 'Cash', openingBalance: '' });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
@@ -65,8 +65,8 @@ const Wallets = () => {
     e.preventDefault();
     try {
       const payload = editingWallet 
-        ? { name: editingWallet.name, type: editingWallet.type, openingBalance: editingWallet.openingBalance }
-        : { name: newWallet.name, type: newWallet.type, openingBalance: newWallet.openingBalance };
+        ? { name: editingWallet.name, type: editingWallet.type, openingBalance: Number(editingWallet.openingBalance) || 0 }
+        : { name: newWallet.name, type: newWallet.type, openingBalance: Number(newWallet.openingBalance) || 0 };
       if (editingWallet) {
         await api.updateWallet(editingWallet._id, payload);
         toast.success('Wallet updated!');
@@ -77,7 +77,7 @@ const Wallets = () => {
       await fetchWallets();
       setIsCreating(false);
       setEditingWallet(null);
-      setNewWallet({ name: '', type: 'Cash', openingBalance: 0 });
+      setNewWallet({ name: '', type: 'Cash', openingBalance: '' });
     } catch (err) {
         toast.error('Action failed.');
     }
@@ -171,7 +171,7 @@ const Wallets = () => {
                           label="Initial Value (₹)"
                           type="number"
                           value={editingWallet ? editingWallet.openingBalance : newWallet.openingBalance}
-                          onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, openingBalance: Number(e.target.value)}) : setNewWallet({...newWallet, openingBalance: Number(e.target.value)})}
+                          onChange={(e) => editingWallet ? setEditingWallet({...editingWallet, openingBalance: e.target.value}) : setNewWallet({...newWallet, openingBalance: e.target.value})}
                           placeholder="0.00"
                         />
                         {(editingWallet ? editingWallet.openingBalance : newWallet.openingBalance) > 0 && (

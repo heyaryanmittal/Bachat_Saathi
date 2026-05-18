@@ -9,7 +9,7 @@ function BudgetForm({ onSubmit, initialData = null }) {
   const { register, handleSubmit, formState: { errors }, setValue, control } = useForm({
     defaultValues: {
       category: initialData?.category || '',
-      amount: initialData?.amount || 0,
+      amount: initialData?.amount !== undefined ? initialData.amount : '',
       alertThreshold: initialData?.alertThreshold ? initialData.alertThreshold * 100 : 80,
       monthYear: initialData ? `${initialData.year}-${String(initialData.month).padStart(2, '0')}` : ''
     },

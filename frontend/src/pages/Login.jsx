@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Button, Card, Input } from '../components/ui';
-import { Wallet, LogIn, ShieldCheck, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { Wallet, LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import Logo from '../components/Logo';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -15,6 +15,7 @@ function Login() {
   const [pendingEmail, setPendingEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpError, setOtpError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login, verify2FA } = useAuth();
   const navigate = useNavigate();
@@ -130,15 +131,27 @@ function Login() {
                   error={errors.email?.message}
                 />
                 
-                <Input
-                  label="Password"
-                  id="login-password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  {...register('password', { required: 'Password required' })}
-                  error={errors.password?.message}
-                />
+                <div className="relative">
+                  <Input
+                    label="Password"
+                    id="login-password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    {...register('password', { required: 'Password required' })}
+                    error={errors.password?.message}
+                    className="pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className="absolute right-3 top-[45px] text-muted-foreground hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
 
                 <Button
                   type="submit"

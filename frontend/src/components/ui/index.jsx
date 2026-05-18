@@ -64,7 +64,7 @@ export const StatsCard = ({
     ...props
 }) => (
     <Card variant={variant} size={size} className={cn("relative overflow-hidden group", className)} {...props}>
-        {}
+        { }
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
         <div className="relative z-10 flex items-center justify-between">
             <div className="flex-1">
@@ -80,9 +80,9 @@ export const StatsCard = ({
                 {trend && trendValue && (
                     <div className={cn(
                         "flex items-center text-sm font-bold mt-2 px-2 py-0.5 rounded-full w-fit",
-                        trend === 'up' 
-                          ? 'bg-emerald-100/50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' 
-                          : 'bg-rose-100/50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'
+                        trend === 'up'
+                            ? 'bg-emerald-100/50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-rose-100/50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'
                     )}>
                         <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={
@@ -135,7 +135,7 @@ export const Button = React.forwardRef(({
     variant,
     size,
     loading = false,
-    loadingText = "", 
+    loadingText = "",
     children,
     ...props
 }, ref) => (
@@ -460,24 +460,22 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
     };
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <div 
+            <div
                 className="absolute inset-0 bg-background/80 backdrop-blur-md animate-entrance"
                 onClick={onClose}
             />
-            <Card 
-                variant="glass" 
-                size="none" 
+            <div
                 className={cn(
-                    "relative z-10 w-full animate-entrance shadow-2xl overflow-hidden",
+                    "relative z-10 w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-entrance",
                     sizeClasses[size]
                 )}
             >
-                {}
-                <div className="px-8 py-6 border-b border-border/50 flex items-center justify-between gradient-surface">
+                {/* Header */}
+                <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
                     <h3 className="text-2xl font-black tracking-tighter uppercase tracking-widest leading-none">
                         {title}
                     </h3>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                     >
@@ -486,11 +484,11 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
                         </svg>
                     </button>
                 </div>
-                {}
+                {/* Body */}
                 <div className="px-4 py-6 sm:px-8 sm:py-8 overflow-y-auto max-h-[80vh] custom-scrollbar">
                     {children}
                 </div>
-            </Card>
+            </div>
         </div>
     );
 };

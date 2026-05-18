@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import * as api from '../services/api';
 import TransactionForm from '../components/TransactionForm';
-import { UISelect, Card, Button, Input, LoadingSpinner, StatsCard } from '../components/ui/index';
+import { UISelect, Card, Button, Input, LoadingSpinner, StatsCard, Modal } from '../components/ui/index';
 import { 
   TrendingUp, TrendingDown, Search, Plus, Edit3, Trash2, 
   Calendar, CreditCard, Filter, ChevronLeft, ChevronRight, Layers
@@ -36,7 +36,7 @@ const Transactions = () => {
   const fetchTransactions = async () => {
     try {
       setIsLoading(true);
-      const response = await api.getTransactions({ ...filters, page: currentPage, limit: 10 });
+      const response = await api.getTransactions({ ...filters, page: currentPage, limit: 10, sortBy: 'date', sortOrder: 'desc' });
       setTransactions(response.data.data.transactions || []);
       setTotalPages(response.data.data.pagination.pages);
     } catch (e) { toast.error('Failed to load transactions.'); }
@@ -120,14 +120,14 @@ const Transactions = () => {
                         placeholder="All Wallets"
                     />
                     <UISelect 
-                        label="TransactionType"
+                        label="Transaction Type"
                         id="filter-type"
                         name="type"
                         value={filters.type} 
                         onChange={e => setFilters({...filters, type: e.target.value})}
                         options={[
-                            { value: 'Income', label: 'Inbound' },
-                            { value: 'Expense', label: 'Outbound' }
+                            { value: 'Income', label: 'Credit' },
+                            { value: 'Expense', label: 'Debit' }
                         ]}
                         placeholder="All Types"
                     />
@@ -158,8 +158,14 @@ const Transactions = () => {
                 <table className="w-full text-left">
                     <thead className="bg-muted/50 border-b border-border">
                         <tr>
-                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Date</th>
-                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Wallet / Category</th>
+                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-3.5 h-3.5 text-primary" />
+                                    Date
+                                </div>
+                            </th>
+                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Wallet</th>
+                            <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Category</th>
                             <th className="p-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Amount</th>
                             <th className="p-4 text-right text-[10px] font-black uppercase tracking-widest text-muted-foreground">Actions</th>
                         </tr>
@@ -167,30 +173,35 @@ const Transactions = () => {
                     <tbody className="divide-y divide-border/50">
                         {transactions.map(t => (
                             <tr key={t._id} className="hover:bg-muted/30 transition-colors group">
+                                {/* Date column - icon only in header */}
                                 <td className="p-4">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                            <Calendar className="w-4 h-4 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm">{new Date(t.date).toLocaleDateString()}</p>
-                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-tighter">{t.notes || 'No notes'}</p>
-                                        </div>
-                                    </div>
+                                    <p className="font-bold text-sm">
+                                        {new Date(t.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                    </p>
+                                    <p className="text-[10px] font-semibold text-muted-foreground mt-0.5 truncate max-w-[140px]">{t.notes || '—'}</p>
                                 </td>
+                                {/* Wallet column */}
                                 <td className="p-4">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="p-1.5 bg-primary/10 rounded-lg"><CreditCard className="w-3.5 h-3.5 text-primary" /></div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 bg-primary/10 rounded-lg flex-shrink-0">
+                                            <CreditCard className="w-3.5 h-3.5 text-primary" />
+                                        </div>
                                         <span className="text-xs font-bold">{t.walletId?.name || 'Unknown'}</span>
-                                        <span className="mx-2 text-muted-foreground/30">•</span>
-                                        <span className="px-2 py-0.5 bg-muted rounded-md text-[10px] font-black uppercase tracking-widest">{t.category || 'General'}</span>
                                     </div>
                                 </td>
+                                {/* Category column */}
+                                <td className="p-4">
+                                    <span className="px-2.5 py-1 bg-muted rounded-lg text-[10px] font-black uppercase tracking-widest inline-block">
+                                        {t.category || 'General'}
+                                    </span>
+                                </td>
+                                {/* Amount column */}
                                 <td className="p-4">
                                     <div className={`font-black tracking-tighter text-lg ${t.type?.toLowerCase() === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
                                         {t.type?.toLowerCase() === 'income' ? '+' : '-'}₹{t.amount.toLocaleString()}
                                     </div>
                                 </td>
+                                {/* Actions column */}
                                 <td className="p-4 text-right">
                                     <div className="flex items-center justify-end space-x-2">
                                         <Button variant="secondary" size="sm" onClick={() => { setEditingTransaction(t); setIsEditing(true); }}><Edit3 className="w-4 h-4" /></Button>
@@ -212,27 +223,24 @@ const Transactions = () => {
         </Card>
       </div>
       {}
-      {(isCreating || isEditing) && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
-              <Card variant="glass" className="max-w-2xl w-full animate-entrance" size="xl">
-                  <h3 className="text-2xl font-black mb-8 tracking-tighter uppercase tracking-widest">
-                      {isEditing ? 'Edit Transaction' : 'Add New Transaction'}
-                  </h3>
-                  <TransactionForm
-                    onSubmit={data => handleAction(data, isEditing)}
-                    wallets={wallets}
-                    initialData={isEditing ? { 
-                      ...editingTransaction, 
-                      description: editingTransaction.notes,
-                      walletId: editingTransaction.walletId?._id || editingTransaction.walletId,
-                      date: editingTransaction.date ? new Date(editingTransaction.date).toLocaleDateString('sv-SE').split(' ')[0] : ''
-                    } : null}
-                    isEditing={isEditing}
-                  />
-                  <Button variant="ghost" className="w-full mt-4 font-black text-xs uppercase tracking-widest text-muted-foreground" onClick={() => { setIsEditing(false); setIsCreating(false); setEditingTransaction(null); }}>Cancel</Button>
-              </Card>
-          </div>
-      )}
+      <Modal 
+          isOpen={isCreating || isEditing} 
+          onClose={() => { setIsEditing(false); setIsCreating(false); setEditingTransaction(null); }}
+          title={isEditing ? 'Edit Transaction' : 'Add New Transaction'}
+          size="md"
+      >
+          <TransactionForm
+            onSubmit={data => handleAction(data, isEditing)}
+            wallets={wallets}
+            initialData={isEditing ? { 
+              ...editingTransaction, 
+              description: editingTransaction.notes,
+              walletId: editingTransaction.walletId?._id || editingTransaction.walletId,
+              date: editingTransaction.date ? new Date(editingTransaction.date).toLocaleDateString('sv-SE').split(' ')[0] : ''
+            } : null}
+            isEditing={isEditing}
+          />
+      </Modal>
       {}
       {deleteDialog.isOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">

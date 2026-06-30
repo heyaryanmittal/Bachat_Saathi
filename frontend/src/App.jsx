@@ -25,6 +25,7 @@ import AIAssistant from './components/AIAssistant';
 import Sidebar from './components/Sidebar';
 import ThemeToggle from './components/ThemeToggle';
 import { Menu, X } from 'lucide-react';
+import VisitorLogger from './hooks/visit_log';
 
 const history = createBrowserHistory({ window });
 const routerConfig = {
@@ -162,6 +163,7 @@ function App() {
     <HistoryRouter history={history} future={routerConfig.future}>
       <ThemeProvider>
         <AuthProvider>
+          <VisitorLogger />
           <Toaster 
             position="top-center" 
             gutter={12} 

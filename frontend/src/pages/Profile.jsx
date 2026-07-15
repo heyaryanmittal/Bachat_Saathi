@@ -130,7 +130,7 @@ const Profile = () => {
         <div className="space-y-6 animate-entrance pb-12 overflow-x-hidden pt-2">
             {}
             <div className="flex flex-col sm:flex-row items-center sm:justify-end gap-6 px-2">
-                <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto"><ChevronLeft className="mr-2 w-5 h-5" />Back to Matrix</Button>
+                <Button variant="secondary" onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto"><ChevronLeft className="mr-2 w-5 h-5" />Back to Dashboard</Button>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <div className="lg:col-span-1">

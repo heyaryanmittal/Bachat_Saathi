@@ -5,7 +5,7 @@ import {
   Trash2, Plus, DollarSign, Calendar, 
   ArrowRight, Landmark, CreditCard, ShoppingBag, 
   Briefcase, GraduationCap, Car, ShieldAlert,
-  Percent, History, Info, MoreVertical, RotateCcw,
+  Percent, History, MoreVertical, RotateCcw,
   Edit, Trash, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -159,11 +159,7 @@ const DebtTracker = () => {
                 <StatsCard title="Settled History" value={stats.totalDebts - stats.activeDebts || 0} variant="success" icon={<CheckCircle2 />} />
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-2">
-                <div className="bg-primary/5 border border-primary/10 py-2.5 px-5 rounded-2xl flex items-center gap-3 text-primary w-fit">
-                    <Info className="w-4 h-4 opacity-70 flex-shrink-0" />
-                    <p className="text-sm font-black italic tracking-tight uppercase">Advanced Debt Shield: Active</p>
-                </div>
+            <div className="flex justify-end px-2">
                 <Button onClick={() => setIsCreating(true)} className="btn-saas-primary" size="lg"><Plus className="mr-2 w-5 h-5" />New Debt Record</Button>
             </div>
 

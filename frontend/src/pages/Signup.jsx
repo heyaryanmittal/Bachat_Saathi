@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { Button, Card, Input } from '../components/ui';
-import { Wallet, UserPlus, ShieldCheck, Mail, Lock, CheckCircle2 } from 'lucide-react';
+import { Wallet, UserPlus, ShieldCheck, Mail, Lock, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
 import Logo from '../components/Logo';
@@ -17,6 +17,8 @@ function Signup() {
   const [otp, setOtp] = useState('');
   const [otpError, setOtpError] = useState('');
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { setAuthData } = useAuth();
   const navigate = useNavigate();
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -138,29 +140,53 @@ function Signup() {
                 {...register('email', { required: 'Email required' })}
                 error={errors.email?.message}
               />
-              <Input
-                label="Password"
-                id="signup-password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                {...register('password', { required: 'Password required', minLength: 6 })}
-                error={errors.password?.message}
-              />
-              <Input
-                label="Confirm Password"
-                id="signup-confirm-password"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                {...register('confirmPassword', { 
-                    required: 'Confirmation required',
-                    validate: v => v === password || 'Keys must match'
-                })}
-                error={errors.confirmPassword?.message}
-              />
+              <div className="relative">
+                <Input
+                  label="Password"
+                  id="signup-password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  {...register('password', { required: 'Password required', minLength: 6 })}
+                  error={errors.password?.message}
+                  className="pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute right-3 top-[45px] text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div className="relative">
+                <Input
+                  label="Confirm Password"
+                  id="signup-confirm-password"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  {...register('confirmPassword', { 
+                      required: 'Confirmation required',
+                      validate: v => v === password || 'Keys must match'
+                  })}
+                  error={errors.confirmPassword?.message}
+                  className="pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(prev => !prev)}
+                  className="absolute right-3 top-[45px] text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               <Button
                 type="submit"
                 size="xl"

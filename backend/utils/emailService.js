@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+
 const transporter = nodemailer.createTransport({
   service: process.env.SMTP_SERVICE || 'gmail',
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -10,142 +11,242 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS || process.env.SMTP_PASS
   }
 });
+
 const FROM_EMAIL = process.env.SMTP_USER || process.env.EMAIL_USER || 'no-reply@bachatsaathi.com';
 const FROM_NAME = process.env.EMAIL_FROM_NAME || 'BachatSaathi';
+
+const renderEmailWrapper = ({
+  headerBg = 'linear-gradient(135deg, #0f172a 0%, #065f46 100%)',
+  headerIcon = '💰',
+  title = 'Notification',
+  subtitle = '',
+  contentHtml = '',
+  footerText = 'This is an automated notification from BachatSaathi.',
+}) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${title}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+          body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            background-color: #f8fafc;
+            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+          }
+          table {
+            border-collapse: collapse;
+          }
+          @media only screen and (max-width: 600px) {
+            .container {
+              width: 100% !important;
+              padding: 10px !important;
+            }
+            .content-card {
+              padding: 30px 20px !important;
+              border-radius: 12px !important;
+            }
+            .header-bar {
+              padding: 30px 20px !important;
+              border-radius: 12px 12px 0 0 !important;
+            }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f8fafc;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 40px 10px;">
+          <tr>
+            <td align="center">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="container" style="max-width: 600px; width: 100%;">
+                <!-- Header -->
+                <tr>
+                  <td align="center" class="header-bar" style="background: ${headerBg}; padding: 40px; border-radius: 16px 16px 0 0; text-align: center; border-bottom: 4px solid #10b981;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">${headerIcon}</div>
+                    <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Outfit', sans-serif;">BachatSaathi</h1>
+                    ${subtitle ? `<p style="margin: 6px 0 0 0; font-size: 14px; color: #a7f3d0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'Inter', sans-serif;">${subtitle}</p>` : ''}
+                  </td>
+                </tr>
+                <!-- Body -->
+                <tr>
+                  <td class="content-card" style="background-color: #ffffff; padding: 45px; border-radius: 0 0 16px 16px; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0; border-top: none;">
+                    <div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: #334155;">
+                      ${contentHtml}
+                    </div>
+                    
+                    <!-- Footer Info -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 40px; border-top: 1px solid #f1f5f9; padding-top: 25px;">
+                      <tr>
+                        <td style="color: #94a3b8; font-size: 12px; line-height: 1.6; text-align: center; font-family: 'Inter', sans-serif;">
+                          <p style="margin: 0 0 8px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; font-family: 'Outfit', sans-serif;">BachatSaathi</p>
+                          <p style="margin: 0 0 16px 0; color: #64748b;">${footerText}</p>
+                          <p style="margin: 0; font-size: 11px; color: #cbd5e1;">&copy; ${new Date().getFullYear()} BachatSaathi. All rights reserved.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+};
+
 exports.sendSignupOtpEmail = async (userEmail, { name, otp }) => {
   try {
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello ${name || 'there'},</p>
+      <p style="margin-bottom: 25px; color: #475569;">Thank you for registering with BachatSaathi! To complete your signup and verify your email address, please use the secure passcode below:</p>
+      
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+        <p style="margin: 0 0 10px 0; color: #166534; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Your One-Time Passcode</p>
+        <div style="font-size: 42px; font-weight: 800; color: #15803d; letter-spacing: 8px; font-family: 'Outfit', monospace; line-height: 1; margin: 15px 0;">${otp}</div>
+        <p style="margin: 0; color: #64748b; font-size: 12px; font-weight: 500;">⏱️ This secure code will expire in <strong style="color: #ef4444;">10 minutes</strong>.</p>
+      </div>
+
+      <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin: 25px 0; font-size: 13px; color: #991b1b; line-height: 1.5;">
+        <strong>Security Notice:</strong> Never share this passcode with anyone. BachatSaathi team members will never request your OTP via email, call, or chat support.
+      </div>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject: 'BachatSaathi Signup OTP - Verify Your Email',
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">Verify Your Email</h1>
-          </div>
-          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Hello <strong>${name || 'there'}</strong>,</p>
-            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">Thank you for registering with BachatSaathi! To complete your signup, please use the OTP below:</p>
-            <div style="background-color: #f0f4ff; border-left: 4px solid #4f46e5; padding: 20px; border-radius: 5px; margin: 25px 0; text-align: center;">
-              <p style="margin: 0; color: #666; font-size: 14px; margin-bottom: 10px;">Your One-Time Password:</p>
-              <p style="margin: 0; font-size: 36px; font-weight: 700; color: #4f46e5; letter-spacing: 5px;">${otp}</p>
-            </div>
-            <p style="color: #f44336; font-size: 14px; text-align: center; margin: 20px 0;">⏱️ This code will expire in <strong>10 minutes</strong>.</p>
-            <p style="color: #999; font-size: 13px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-              If you didn't request this, please ignore this email. Do not share this OTP with anyone.
-            </p>
-            <p style="color: #999; font-size: 13px; margin-top: 15px;">Best regards,<br><strong>The BachatSaathi Team</strong></p>
-          </div>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)',
+        headerIcon: '✉️',
+        title: 'Verify Your Email',
+        subtitle: 'Email Verification',
+        contentHtml: htmlContent,
+        footerText: 'You received this email because you registered on BachatSaathi.'
+      })
     });
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error.message };
   }
 };
-exports.sendWelcomeEmail = async (userEmail, { name, email, password }) => {
+
+exports.sendWelcomeEmail = async (userEmail, { name, email }) => {
   try {
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello ${name},</p>
+      <p style="margin-bottom: 25px; color: #475569;">Welcome onboard! Your BachatSaathi account has been successfully created. We are excited to support you on your financial tracking and wealth multiplication journey.</p>
+      
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin: 25px 0;">
+        <p style="margin: 0 0 15px 0; color: #0f172a; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Account Information</p>
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td style="padding: 6px 0; font-size: 14px; color: #64748b; width: 120px;"><strong>Registered Email:</strong></td>
+            <td style="padding: 6px 0; font-size: 14px; color: #0f172a; font-family: monospace; font-weight: 600;">${email}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 25px 0; font-size: 13px; color: #78350f; line-height: 1.5;">
+        🔒 <strong>Important Reminder:</strong> For security, we recommend that you immediately update or verify your account password upon your first login. Always use a strong and unique password.
+      </div>
+
+      <div style="text-align: center; margin: 35px 0;">
+        <a href="http://localhost:3000/dashboard" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); font-family: 'Outfit', sans-serif;">Go to Dashboard</a>
+      </div>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject: 'Welcome to BachatSaathi - Your Personal Finance Manager',
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">🎉 Welcome to BachatSaathi!</h1>
-          </div>
-          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <p style="color: #333; font-size: 16px; margin-bottom: 10px;">Hello <strong>${name}</strong>,</p>
-            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">Welcome aboard! Your BachatSaathi account has been successfully created. We're excited to help you manage your finances better.</p>
-            <div style="background-color: #f0f4ff; border-left: 4px solid #4f46e5; padding: 20px; border-radius: 5px; margin: 25px 0;">
-              <p style="margin: 0; color: #666; font-size: 14px; margin-bottom: 12px;"><strong>Your Login Credentials:</strong></p>
-              <p style="margin: 8px 0; color: #333; font-size: 14px;"><strong>Email:</strong> <code style="background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px;">${email}</code></p>
-              <p style="margin: 8px 0; color: #333; font-size: 14px;"><strong>Password:</strong> <code style="background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px;">${password}</code></p>
-            </div>
-            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p style="margin: 0; color: #856404; font-size: 13px;">🔒 <strong>For security:</strong> We recommend changing your password after your first login.</p>
-            </div>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000/dashboard" style="background-color: #4f46e5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block;">Go to Dashboard</a>
-            </div>
-            <p style="color: #999; font-size: 13px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-              If you didn't create this account, please contact our support team immediately.
-            </p>
-            <p style="color: #999; font-size: 13px; margin-top: 15px;">Best regards,<br><strong>The BachatSaathi Team</strong></p>
-          </div>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
+        headerIcon: '🎉',
+        title: 'Welcome to BachatSaathi',
+        subtitle: 'Account Activated',
+        contentHtml: htmlContent,
+        footerText: 'You received this email because you created an account on BachatSaathi.'
+      })
     });
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error.message };
   }
 };
+
 exports.send2FAOtpEmail = async (userEmail, { name, otp }) => {
   try {
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello ${name || 'there'},</p>
+      <p style="margin-bottom: 25px; color: #475569;">A login attempt has been detected on your BachatSaathi account. To complete the login, please confirm your identity using the verification code below:</p>
+      
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+        <p style="margin: 0 0 10px 0; color: #166534; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Verification Code</p>
+        <div style="font-size: 42px; font-weight: 800; color: #16a34a; letter-spacing: 8px; font-family: 'Outfit', monospace; line-height: 1; margin: 15px 0;">${otp}</div>
+        <p style="margin: 0; color: #64748b; font-size: 12px; font-weight: 500;">⏱️ This secure code will expire in <strong style="color: #ef4444;">10 minutes</strong>.</p>
+      </div>
+
+      <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 25px 0; font-size: 13px; color: #78350f; line-height: 1.5;">
+        ⚠️ <strong>Security Advisory:</strong> Never share this code with anyone. Our support team or security team will never ask for your verification code.
+      </div>
+
+      <p style="color: #64748b; font-size: 12px; line-height: 1.6; margin-top: 25px;">
+        If you did not perform this login, someone else may be attempting to access your account. We highly recommend that you change your password immediately.
+      </p>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject: 'BachatSaathi Two-Factor Authentication Code',
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">🔐 BachatSaathi-Your personal financial manager</h1>
-          </div>
-          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Hello <strong>${name || 'there'}</strong>,</p>
-            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">A login attempt has been detected on your BachatSaathi account. Please use the code below to verify it's you:</p>
-            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 5px; margin: 25px 0; text-align: center;">
-              <p style="margin: 0; color: #666; font-size: 14px; margin-bottom: 10px;">Your Verification Code:</p>
-              <p style="margin: 0; font-size: 36px; font-weight: 700; color: #10b981; letter-spacing: 5px;">${otp}</p>
-            </div>
-            <p style="color: #f44336; font-size: 14px; text-align: center; margin: 20px 0;">⏱️ This code will expire in <strong>10 minutes</strong>.</p>
-            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p style="margin: 0; color: #856404; font-size: 13px;">⚠️ <strong>Never share this code with anyone.</strong> BachatSaathi will never ask for it via email or chat.</p>
-            </div>
-            <p style="color: #999; font-size: 13px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-              If you didn't attempt to log in, please change your password immediately.
-            </p>
-            <p style="color: #999; font-size: 13px; margin-top: 15px;">Best regards,<br><strong>The BachatSaathi Security Team</strong></p>
-          </div>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        headerIcon: '🔐',
+        title: 'Security Verification',
+        subtitle: 'Two-Factor Authentication',
+        contentHtml: htmlContent,
+        footerText: 'If you did not attempt to login, please secure your account immediately.'
+      })
     });
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error.message };
   }
 };
-exports.sendPasswordChanged = async (userEmail, { name, newPassword }) => {
+
+exports.sendPasswordChanged = async (userEmail, { name }) => {
   try {
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hi ${name || 'there'},</p>
+      <p style="margin-bottom: 20px; color: #475569;">This email confirms that your BachatSaathi account password was successfully updated.</p>
+      
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin: 25px 0; font-size: 14px; color: #334155; line-height: 1.6;">
+        🔒 For security reasons, we never send passwords in emails. If you made this change, you are all set! You can log in using your new credentials.
+      </div>
+
+      <p style="color: #ef4444; font-size: 13px; line-height: 1.6; font-weight: 600; margin-top: 25px; background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px;">
+        ⚠️ <strong>Did not request this change?</strong> If you did not update your password, your account may be compromised. Please use the password reset options on the login screen or contact BachatSaathi support immediately.
+      </p>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject: 'BachatSaathi: Your password was changed',
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #111827, #374151); padding: 20px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
-            <h1 style="margin: 0; font-size: 20px; font-weight: 600;">Password Changed</h1>
-          </div>
-          <div style="background-color: white; padding: 20px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-            <p style="color: #333; font-size: 15px;">Hi <strong>${name || 'there'}</strong>,</p>
-            <p style="color: #555; font-size: 15px; line-height: 1.6;">This is to confirm that your BachatSaathi account password was successfully changed.</p>
-            <p style="color: #555; font-size: 15px; line-height: 1.6;">If you requested this change, no further action is required. If you did not request this change, please reset your password immediately or contact support.</p>
-            ${newPassword ? `
-              <div style="margin-top:12px; padding:12px; background:#f8fafc; border-radius:6px; border:1px solid #e6eef8;">
-                <p style="margin:0 0 8px 0; font-size:14px; color:#111827;">Your new password:</p>
-                <div style="background:#111827;color:#fff;padding:10px;border-radius:6px;display:inline-block;font-family:monospace;">${newPassword}</div>
-              </div>
-            ` : ''}
-            <div style="background:#f0f4ff; border-left:4px solid #2563eb; padding:12px; border-radius:6px; margin-top:16px;">
-              <p style="margin:0; font-size:13px; color:#374151;">We do not recommend sharing your password. If you want to view the new password, please check the app or use the password reset flow.</p>
-            </div>
-            <p style="color:#999; font-size:12px; margin-top:18px;">If you didn't change your password, please secure your account immediately.</p>
-            <p style="color:#999; font-size:12px;">Best regards,<br/><strong>The BachatSaathi Team</strong></p>
-          </div>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #1e293b 0%, #475569 100%)',
+        headerIcon: '🛡️',
+        title: 'Password Changed',
+        subtitle: 'Security Update',
+        contentHtml: htmlContent,
+        footerText: 'You received this notification because your password was modified.'
+      })
     });
     return { ok: true };
   } catch (error) {
@@ -153,63 +254,75 @@ exports.sendPasswordChanged = async (userEmail, { name, newPassword }) => {
     return { ok: false, error: error.message };
   }
 };
+
 exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmount, threshold }) => {
   try {
     const percentUsed = Math.round((spentAmount / budgetAmount) * 100);
     const remainingBudget = budgetAmount - spentAmount;
-    const alertColor = threshold === 100 ? '#f44336' : '#ff9800';
-    const alertTitle = threshold === 100 ? '⚠️ Budget Exceeded!' : '🔔 Budget Alert (80%)';
+    const alertColorBg = threshold === 100 
+      ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' 
+      : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    const alertTitle = threshold === 100 ? '⚠️ Budget Exceeded' : '🔔 Budget Threshold Reached';
     const subject = threshold === 100 
       ? `BachatSaathi: Budget Exceeded for ${category}`
       : `BachatSaathi: Budget Alert for ${category}`;
+
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello,</p>
+      <p style="margin-bottom: 25px; color: #475569;">This is an automated alert regarding your budget limits. Your spending in the <strong style="color: #0f172a;">${category}</strong> category has crossed a defined threshold.</p>
+      
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 12px; margin: 25px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+          <tr>
+            <td style="width: 50%; vertical-align: top;">
+              <p style="margin: 0; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Budgeted Limit</p>
+              <p style="margin: 5px 0 0 0; color: #0f172a; font-size: 22px; font-weight: 800;">₹${budgetAmount.toLocaleString('en-IN')}</p>
+            </td>
+            <td style="width: 50%; vertical-align: top;">
+              <p style="margin: 0; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Amount Spent</p>
+              <p style="margin: 5px 0 0 0; color: ${threshold === 100 ? '#ef4444' : '#d97706'}; font-size: 22px; font-weight: 800;">₹${spentAmount.toLocaleString('en-IN')}</p>
+            </td>
+          </tr>
+        </table>
+        
+        <div style="background-color: #ffffff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 8px; font-weight: 600;">
+            <span>Usage: ${percentUsed}%</span>
+            <span style="color: ${threshold === 100 ? '#ef4444' : '#d97706'};">${threshold === 100 ? 'Limit Exceeded' : '80% Threshold'}</span>
+          </div>
+          <div style="background-color: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: ${threshold === 100 ? 'linear-gradient(90deg, #f97316, #ef4444)' : 'linear-gradient(90deg, #10b981, #f59e0b)'}; height: 100%; width: ${Math.min(percentUsed, 100)}%;"></div>
+          </div>
+        </div>
+        
+        <p style="margin: 15px 0 0 0; font-size: 14px; font-weight: 700; color: ${threshold === 100 ? '#ef4444' : '#d97706'};">
+          ${threshold === 100 
+            ? `You have exceeded your limit by ₹${Math.abs(remainingBudget).toLocaleString('en-IN')}` 
+            : `Remaining balance: ₹${remainingBudget.toLocaleString('en-IN')}`}
+        </p>
+      </div>
+
+      <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 20px 0; font-size: 13px; color: #78350f; line-height: 1.5;">
+        💡 <strong>Budget Tip:</strong> Consider reviewing recent transactions under <strong>${category}</strong> and try to adjust your spending habits to stay on track this month.
+      </div>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="http://localhost:3000/budgets" style="background: ${threshold === 100 ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'}; color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-block; font-family: 'Outfit', sans-serif;">View Budget Details</a>
+      </div>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject,
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
-          <div style="background: linear-gradient(135deg, ${alertColor}, #d32f2f); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 600;">${alertTitle}</h1>
-          </div>
-          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Your <strong>${category}</strong> budget ${threshold === 100 ? 'has been exceeded' : 'is running low'}.</p>
-            <div style="background-color: #f5f5f5; border-left: 4px solid ${alertColor}; padding: 20px; border-radius: 5px; margin: 25px 0;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-                <div>
-                  <p style="margin: 0; color: #999; font-size: 13px; text-transform: uppercase;">Budget Amount</p>
-                  <p style="margin: 5px 0 0 0; color: #333; font-size: 20px; font-weight: 700;">₹${budgetAmount.toLocaleString('en-IN')}</p>
-                </div>
-                <div>
-                  <p style="margin: 0; color: #999; font-size: 13px; text-transform: uppercase;">Amount Spent</p>
-                  <p style="margin: 5px 0 0 0; color: ${threshold === 100 ? '#f44336' : '#ff9800'}; font-size: 20px; font-weight: 700;">₹${spentAmount.toLocaleString('en-IN')}</p>
-                </div>
-              </div>
-              <div style="background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                  <span style="font-size: 14px; color: #666;">Usage: <strong>${percentUsed}%</strong></span>
-                  <span style="font-size: 12px; color: #999;">${threshold === 100 ? 'Over Budget' : '80% Threshold'}</span>
-                </div>
-                <div style="background-color: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">
-                  <div style="background-color: ${alertColor}; height: 100%; width: ${Math.min(percentUsed, 100)}%; border-radius: 4px;"></div>
-                </div>
-              </div>
-              ${threshold === 100 
-                ? `<p style="margin: 0; color: #f44336; font-size: 14px; font-weight: 600;">You have exceeded your budget by ₹${Math.abs(remainingBudget).toLocaleString('en-IN')}</p>` 
-                : `<p style="margin: 0; color: #ff9800; font-size: 14px; font-weight: 600;">Remaining Budget: ₹${remainingBudget.toLocaleString('en-IN')}</p>`}
-            </div>
-            <div style="background-color: #fef3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p style="margin: 0; color: #856404; font-size: 13px;">💡 <strong>Tip:</strong> Review your spending in the ${category} category and adjust if needed.</p>
-            </div>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000/budgets" style="background-color: ${alertColor}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block;">View Budget Details</a>
-            </div>
-            <p style="color: #999; font-size: 13px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-              You can manage your budget alerts in your profile settings. This is an automated message, please do not reply.
-            </p>
-            <p style="color: #999; font-size: 13px; margin-top: 15px;">Best regards,<br><strong>The BachatSaathi Team</strong></p>
-          </div>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: alertColorBg,
+        headerIcon: threshold === 100 ? '⚠️' : '🔔',
+        title: alertTitle,
+        subtitle: 'Budget Alert',
+        contentHtml,
+        footerText: 'You received this notification because your expenses crossed defined limits.'
+      })
     });
     return { ok: true };
   } catch (error) {
@@ -217,90 +330,99 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
     return { ok: false, error: error.message };
   }
 };
+
 exports.sendPasswordChangeOtpEmail = async (userEmail, { name, otp }) => {
   try {
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello ${name || 'there'},</p>
+      <p style="margin-bottom: 25px; color: #475569;">A request was made to update your BachatSaathi password. To authorize this change, please enter the confirmation code below:</p>
+      
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+        <p style="margin: 0 0 10px 0; color: #991b1b; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Verification Code</p>
+        <div style="font-size: 42px; font-weight: 800; color: #b91c1c; letter-spacing: 8px; font-family: 'Outfit', monospace; line-height: 1; margin: 15px 0;">${otp}</div>
+        <p style="margin: 0; color: #64748b; font-size: 12px; font-weight: 500;">⏱️ This secure code will expire in <strong style="color: #ef4444;">10 minutes</strong>.</p>
+      </div>
+
+      <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 25px 0; font-size: 13px; color: #78350f; line-height: 1.5;">
+        ⚠️ <strong>Security Advisory:</strong> If you did not make this request, someone else may be attempting to access your account. Please ignore this email and secure your credentials immediately.
+      </div>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject: 'BachatSaathi: Confirm Password Change',
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #ef4444, #b91c1c); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
-            <h1 style="margin: 0; font-size: 28px; font-weight: 600;">Security Verification</h1>
-          </div>
-          <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <p style="color: #333; font-size: 16px; margin-bottom: 20px;">Hello <strong>${name || 'there'}</strong>,</p>
-            <p style="color: #555; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">You requested to change your BachatSaathi password. Please enter the following code to verify your request:</p>
-            <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 5px; margin: 25px 0; text-align: center;">
-              <p style="margin: 0; color: #666; font-size: 14px; margin-bottom: 10px;">Verification Code:</p>
-              <p style="margin: 0; font-size: 36px; font-weight: 700; color: #b91c1c; letter-spacing: 5px;">${otp}</p>
-            </div>
-            <p style="color: #f44336; font-size: 14px; text-align: center; margin: 20px 0;">⏱️ This code will expire in <strong>10 minutes</strong>.</p>
-            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p style="margin: 0; color: #856404; font-size: 13px;">⚠️ <strong>Security Notice:</strong> If you did not request this change, please contact support and secure your account immediately.</p>
-            </div>
-            <p style="color: #999; font-size: 13px; margin-top: 15px;">Best regards,<br><strong>The BachatSaathi Security Team</strong></p>
-          </div>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+        headerIcon: '🛡️',
+        title: 'Security Verification',
+        subtitle: 'Confirm Password Change',
+        contentHtml,
+        footerText: 'This verification code was requested for a password change.'
+      })
     });
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error.message };
   }
 };
+
 exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount }) => {
   try {
     const percentUsed = Math.round((spentAmount / budgetAmount) * 100);
     const exceededBy = spentAmount - budgetAmount;
     const subject = `BachatSaathi: Budget Exceeded for ${category}`;
+
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello,</p>
+      <p style="margin-bottom: 25px; color: #475569;">This is an automated alert letting you know that you have exceeded your budget for the <strong style="color: #0f172a;">${category}</strong> category.</p>
+      
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 12px; margin: 25px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+          <tr>
+            <td style="width: 50%; vertical-align: top;">
+              <p style="margin: 0; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Budgeted Limit</p>
+              <p style="margin: 5px 0 0 0; color: #0f172a; font-size: 22px; font-weight: 800;">₹${budgetAmount.toLocaleString('en-IN')}</p>
+            </td>
+            <td style="width: 50%; vertical-align: top;">
+              <p style="margin: 0; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Total Spent</p>
+              <p style="margin: 5px 0 0 0; color: #ef4444; font-size: 22px; font-weight: 800;">₹${spentAmount.toLocaleString('en-IN')}</p>
+            </td>
+          </tr>
+        </table>
+        
+        <div style="background-color: #ffffff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 8px; font-weight: 600;">
+            <span>Usage: ${percentUsed}%</span>
+            <span style="color: #ef4444;">Exceeded by ₹${exceededBy.toLocaleString('en-IN')}</span>
+          </div>
+          <div style="background-color: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, #f97316, #ef4444); height: 100%; width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin: 20px 0; font-size: 13px; color: #991b1b; line-height: 1.5;">
+        💡 <strong>Action Recommended:</strong> You have gone over budget by <strong>₹${exceededBy.toLocaleString('en-IN')}</strong>. Consider reviewing recent transactions or shifting budgets from under-spent categories to balance your sheet.
+      </div>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="http://localhost:3000/budgets" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; padding: 12px 26px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-block; font-family: 'Outfit', sans-serif;">View Budget Details</a>
+      </div>
+    `;
+
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: userEmail,
       subject,
-      html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f4f6f8; padding:24px 0;">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:680px; margin:0 auto;">
-            <tr>
-              <td style="background:linear-gradient(90deg,#ef4444,#dc2626); padding:28px 36px; border-radius:8px 8px 0 0; color:#fff; text-align:left;">
-                <h2 style="margin:0; font-size:20px; font-weight:700;">⚠️ Budget Exceeded</h2>
-                <p style="margin:6px 0 0 0; opacity:0.95; font-size:14px;">Your ${category} budget has been exceeded</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="background:#ffffff; padding:24px 28px; border-radius:0 0 8px 8px; box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="width:50%; vertical-align:top; padding-right:12px;">
-                      <div style="font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:0.6px;">Budgeted</div>
-                      <div style="font-size:20px; font-weight:700; color:#111827; margin-top:6px;">₹${budgetAmount.toLocaleString('en-IN')}</div>
-                    </td>
-                    <td style="width:50%; vertical-align:top; padding-left:12px;">
-                      <div style="font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:0.6px;">Amount Spent</div>
-                      <div style="font-size:20px; font-weight:700; color:#b91c1c; margin-top:6px;">₹${spentAmount.toLocaleString('en-IN')}</div>
-                    </td>
-                  </tr>
-                </table>
-                <div style="margin-top:18px;">
-                  <div style="height:12px; background:#e6eef8; border-radius:8px; overflow:hidden;">
-                    <div style="width:${Math.min(percentUsed, 200)}%; background:linear-gradient(90deg,#f97316,#ef4444); height:100%;"></div>
-                  </div>
-                  <div style="margin-top:8px; font-size:13px; color:#374151;">Usage: <strong>${percentUsed}%</strong> — Exceeded by <strong>₹${exceededBy.toLocaleString('en-IN')}</strong></div>
-                </div>
-                <div style="margin-top:20px; padding:14px; background:#fff7ed; border-left:4px solid #f59e0b; border-radius:6px;">
-                  <div style="font-size:13px; color:#92400e;"><strong>Tip:</strong> Review recent transactions in this category and consider transferring funds or adjusting upcoming expenses.</div>
-                </div>
-                <div style="text-align:center; margin-top:22px;">
-                  <a href="http://localhost:3000/budgets" style="background:#ef4444; color:#fff; display:inline-block; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:700; font-size:14px;">Review My Budget</a>
-                </div>
-                <hr style="border:none; border-top:1px solid #f1f5f9; margin:22px 0;" />
-                <div style="font-size:12px; color:#6b7280;">You can manage your budget alerts in your <a href="http://localhost:3000/profile" style="color:#2563eb; text-decoration:none;">Profile Settings</a>.</div>
-                <div style="margin-top:14px; font-size:12px; color:#9ca3af;">© ${new Date().getFullYear()} BachatSaathi</div>
-              </td>
-            </tr>
-          </table>
-        </div>
-      `
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        headerIcon: '⚠️',
+        title: 'Budget Exceeded',
+        subtitle: 'Budget Warning',
+        contentHtml,
+        footerText: 'You received this notification because your expenses crossed defined limits.'
+      })
     });
     return { ok: true };
   } catch (error) {

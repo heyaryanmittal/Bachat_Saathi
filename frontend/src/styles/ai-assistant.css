@@ -278,15 +278,26 @@
 }
 
 .ai-chat-form:focus-within {
-    @apply border-primary/40;
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.08);
+    border-color: hsl(var(--primary) / 0.35);
 }
 
 .ai-chat-input {
-    @apply flex-1 bg-transparent outline-none border-none text-sm text-foreground;
+    @apply flex-1 bg-transparent text-sm text-foreground;
     @apply placeholder:text-muted-foreground/50;
     padding: 8px 0;
     min-width: 0;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.ai-chat-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    ring: 0 !important;
 }
 
 .ai-chat-input:disabled {

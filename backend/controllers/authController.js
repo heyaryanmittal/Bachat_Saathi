@@ -488,7 +488,11 @@ exports.forgotPasswordRequestOtp = async (req, res) => {
 
     const emailResult = await sendForgotPasswordOtpEmail(email, { name: user.name, otp });
     if (!emailResult.ok) {
-      return res.status(400).json({ status: 'error', message: 'Failed to send OTP email. Please try again later.' });
+      logger.error(`Failed to send forgot password OTP email to ${email}: ${emailResult.error}`);
+      return res.status(400).json({ 
+        status: 'error', 
+        message: emailResult.error || 'Failed to send OTP email. Please try again later.' 
+      });
     }
 
     res.status(200).json({

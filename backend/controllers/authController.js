@@ -7,7 +7,8 @@ const {
   sendWelcomeEmail, 
   send2FAOtpEmail, 
   sendPasswordChanged,
-  sendPasswordChangeOtpEmail 
+  sendPasswordChangeOtpEmail,
+  sendForgotPasswordOtpEmail
 } = require('../utils/emailService');
 const logger = require('../utils/logger');
 
@@ -458,3 +459,125 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
+
+exports.forgotPasswordRequestOtp = async (req, res) => {
+  try {
+    const { email: rawEmail } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
+
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ status: 'error', message: 'Please enter a valid email address.' });
+    }
+
+    const user = await User.findOne({ email });
+
+    // Strict requirement: Only for registered emails
+    if (!user || !user.passwordHash) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'This email is not registered with us. Please check your email or signup.'
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.forgotPasswordOTP = otp;
+    user.forgotPasswordOTPExpiry = expiry;
+    await user.save();
+
+    const emailResult = await sendForgotPasswordOtpEmail(email, { name: user.name, otp });
+    if (!emailResult.ok) {
+      return res.status(400).json({ status: 'error', message: 'Failed to send OTP email. Please try again later.' });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'OTP has been sent to your registered email address.'
+    });
+  } catch (error) {
+    logger.error('Forgot password OTP request error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to process forgot password request', error: error.message });
+  }
+};
+
+exports.forgotPasswordVerifyOtp = async (req, res) => {
+  try {
+    const { email: rawEmail, otp } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
+
+    if (!email || !otp) {
+      return res.status(400).json({ status: 'error', message: 'Email and OTP are required.' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user || !user.forgotPasswordOTP || !user.forgotPasswordOTPExpiry) {
+      return res.status(400).json({ status: 'error', message: 'No password reset requested for this email.' });
+    }
+
+    if (user.forgotPasswordOTPExpiry < new Date()) {
+      return res.status(400).json({ status: 'error', message: 'OTP has expired. Please request a new one.' });
+    }
+
+    if (user.forgotPasswordOTP !== otp) {
+      return res.status(400).json({ status: 'error', message: 'Invalid OTP code. Please check and try again.' });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'OTP verified successfully.'
+    });
+  } catch (error) {
+    logger.error('Forgot password OTP verification error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to verify OTP', error: error.message });
+  }
+};
+
+exports.forgotPasswordReset = async (req, res) => {
+  try {
+    const { email: rawEmail, otp, newPassword } = req.body;
+    const email = String(rawEmail || '').toLowerCase().trim();
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ status: 'error', message: 'Email, OTP, and new password are required.' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ status: 'error', message: 'Password must be at least 6 characters long.' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user || !user.forgotPasswordOTP || !user.forgotPasswordOTPExpiry) {
+      return res.status(400).json({ status: 'error', message: 'No password reset requested for this email.' });
+    }
+
+    if (user.forgotPasswordOTPExpiry < new Date()) {
+      return res.status(400).json({ status: 'error', message: 'OTP has expired. Please request a new one.' });
+    }
+
+    if (user.forgotPasswordOTP !== otp) {
+      return res.status(400).json({ status: 'error', message: 'Invalid OTP code.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+
+    user.passwordHash = passwordHash;
+    user.forgotPasswordOTP = undefined;
+    user.forgotPasswordOTPExpiry = undefined;
+    await user.save();
+
+    sendPasswordChanged(user.email, { name: user.name || '' }).catch(err => {
+      logger.error('Failed to send password changed confirmation email:', err);
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Password reset successful. You can now log in with your new password.'
+    });
+  } catch (error) {
+    logger.error('Forgot password reset error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to reset password', error: error.message });
+  }
+};
+

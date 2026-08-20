@@ -71,6 +71,8 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangeOTP: String,
   passwordChangeOTPExpiry: Date,
-  pendingPasswordHash: String
+  pendingPasswordHash: String,
+  forgotPasswordOTP: String,
+  forgotPasswordOTPExpiry: Date
 }, { timestamps: true });
 module.exports = mongoose.model('User', userSchema);

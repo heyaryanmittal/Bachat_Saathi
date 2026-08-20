@@ -9,6 +9,7 @@ import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Wallets from './pages/Wallets';
 import Transactions from './pages/Transactions';
@@ -179,14 +180,15 @@ function App() {
             }} 
           />
           <Routes>
-            {}
+            {/* Public Routes */}
             <Route element={<PublicLayout showNavbar={false} />}>
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
             </Route>
 
-            {}
+            {/* Private Routes */}
             <Route element={<ProtectedRoute><ProtectedLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/wallets" element={<Wallets />} />

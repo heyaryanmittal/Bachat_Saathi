@@ -12,6 +12,10 @@ router.get('/2fa/status', protect, authController.get2FAStatus);
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
+router.post('/forgot-password/request-otp', authController.forgotPasswordRequestOtp);
+router.post('/forgot-password/verify-otp', authController.forgotPasswordVerifyOtp);
+router.post('/forgot-password/reset-password', authController.forgotPasswordReset);
+
 router.get('/profile', protect, authController.getProfile);
 router.put('/profile', protect, authController.updateProfile);
 router.put('/change-password', protect, authController.changePassword);

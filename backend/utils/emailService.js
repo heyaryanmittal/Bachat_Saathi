@@ -367,6 +367,42 @@ exports.sendPasswordChangeOtpEmail = async (userEmail, { name, otp }) => {
   }
 };
 
+exports.sendForgotPasswordOtpEmail = async (userEmail, { name, otp }) => {
+  try {
+    const htmlContent = `
+      <p style="margin-top: 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hello ${name || 'Valued User'},</p>
+      <p style="margin-bottom: 25px; color: #475569;">We received a request to reset the password for your BachatSaathi account associated with <strong>${userEmail}</strong>.</p>
+      
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+        <p style="margin: 0 0 10px 0; color: #166534; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Password Reset Verification Code</p>
+        <div style="font-size: 42px; font-weight: 800; color: #059669; letter-spacing: 8px; font-family: 'Outfit', monospace; line-height: 1; margin: 15px 0;">${otp}</div>
+        <p style="margin: 0; color: #64748b; font-size: 12px; font-weight: 500;">⏱️ This secure code will expire in <strong style="color: #ef4444;">10 minutes</strong>.</p>
+      </div>
+
+      <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin: 25px 0; font-size: 13px; color: #991b1b; line-height: 1.5;">
+        🔒 <strong>Security Warning:</strong> If you did not request a password reset, please ignore this email or reach out to support. Never share this OTP with anyone.
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to: userEmail,
+      subject: 'BachatSaathi: Password Reset Verification Code',
+      html: renderEmailWrapper({
+        headerBg: 'linear-gradient(135deg, #065f46 0%, #047857 100%)',
+        headerIcon: '🔑',
+        title: 'Reset Your Password',
+        subtitle: 'Password Recovery',
+        contentHtml,
+        footerText: 'This verification code was sent to authorize a password reset.'
+      })
+    });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error.message };
+  }
+};
+
 exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount }) => {
   try {
     const percentUsed = Math.round((spentAmount / budgetAmount) * 100);

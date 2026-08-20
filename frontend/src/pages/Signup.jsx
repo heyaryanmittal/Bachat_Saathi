@@ -197,9 +197,10 @@ function Signup() {
                 Join the Ecosystem
                 <UserPlus className="ml-2 w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
               </Button>
-              <p className="text-center text-sm font-medium text-muted-foreground mt-6">
-                Already member? <Link to="/login" className="text-primary font-bold hover:underline">Log in securely</Link>
-              </p>
+              <div className="text-center text-sm font-medium text-muted-foreground mt-6 space-y-2">
+                <div>Already a member? <Link to="/login" className="text-primary font-bold hover:underline">Log in securely</Link></div>
+                <div>Forgot your password? <Link to="/forgot-password" className="text-primary font-bold hover:underline">Reset password</Link></div>
+              </div>
             </form>
           ) : (
             <form className="space-y-6" onSubmit={handleOtpVerification}>

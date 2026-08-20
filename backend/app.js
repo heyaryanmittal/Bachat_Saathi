@@ -19,9 +19,9 @@ const monthlySavingsTierRoutes = require('./routes/monthlySavingsTierRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const app = express();
 const corsOptions = {
-  origin: '*', 
+  origin: true,
   credentials: true,
-  optionsSuccessStatus: 200 
+  optionsSuccessStatus: 200
 };
 app.use(express.json());
 app.use(cors(corsOptions));

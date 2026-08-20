@@ -153,6 +153,15 @@ function Login() {
                   </button>
                 </div>
 
+                <div className="flex justify-end">
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-xs font-bold text-primary hover:underline transition-colors"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+
                 <Button
                   type="submit"
                   size="xl"

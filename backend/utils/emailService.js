@@ -320,7 +320,7 @@ exports.sendBudgetAlert = async (userEmail, { category, budgetAmount, spentAmoun
         headerIcon: threshold === 100 ? '⚠️' : '🔔',
         title: alertTitle,
         subtitle: 'Budget Alert',
-        contentHtml,
+        contentHtml: htmlContent,
         footerText: 'You received this notification because your expenses crossed defined limits.'
       })
     });
@@ -357,7 +357,7 @@ exports.sendPasswordChangeOtpEmail = async (userEmail, { name, otp }) => {
         headerIcon: '🛡️',
         title: 'Security Verification',
         subtitle: 'Confirm Password Change',
-        contentHtml,
+        contentHtml: htmlContent,
         footerText: 'This verification code was requested for a password change.'
       })
     });
@@ -393,7 +393,7 @@ exports.sendForgotPasswordOtpEmail = async (userEmail, { name, otp }) => {
         headerIcon: '🔑',
         title: 'Reset Your Password',
         subtitle: 'Password Recovery',
-        contentHtml,
+        contentHtml: htmlContent,
         footerText: 'This verification code was sent to authorize a password reset.'
       })
     });
@@ -456,7 +456,7 @@ exports.sendOverBudget = async (userEmail, { category, budgetAmount, spentAmount
         headerIcon: '⚠️',
         title: 'Budget Exceeded',
         subtitle: 'Budget Warning',
-        contentHtml,
+        contentHtml: htmlContent,
         footerText: 'You received this notification because your expenses crossed defined limits.'
       })
     });

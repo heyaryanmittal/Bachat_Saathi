@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import api from '../services/api';
 import Logo from '../components/Logo';
 import ThemeToggle from '../components/ThemeToggle';
+import PasswordStrengthBar, { evaluatePasswordStrength } from '../components/PasswordStrengthBar';
 
 function ForgotPassword() {
   const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
@@ -97,6 +98,13 @@ function ForgotPassword() {
   // Step 3: Reset Password with Confirm Password
   const onResetPassword = async (data) => {
     setError('');
+    
+    const strength = evaluatePasswordStrength(data.newPassword);
+    if (!strength.isStrong) {
+      setError('Password must be Strong to reset your password. Please meet all criteria below (8+ characters, uppercase & lowercase, number, and special symbol).');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await api.post('/auth/forgot-password/reset-password', {
@@ -304,6 +312,7 @@ function ForgotPassword() {
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+                <PasswordStrengthBar password={newPassword} />
               </div>
 
               <div className="relative">

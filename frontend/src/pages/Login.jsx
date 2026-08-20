@@ -8,6 +8,7 @@ import { Wallet, LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Eye, EyeOff, KeyRoun
 import Logo from '../components/Logo';
 import ThemeToggle from '../components/ThemeToggle';
 import api from '../services/api';
+import PasswordStrengthBar, { evaluatePasswordStrength } from '../components/PasswordStrengthBar';
 
 function Login() {
   const [error, setError] = useState('');
@@ -141,6 +142,13 @@ function Login() {
   // Forgot Password - Step 3: Reset & Confirm Password
   const handleResetPassSubmit = async (data) => {
     setError('');
+    
+    const strength = evaluatePasswordStrength(data.newPassword);
+    if (!strength.isStrong) {
+      setError('Password must be Strong to reset your password. Please meet all criteria below (8+ characters, uppercase & lowercase, number, and special symbol).');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await api.post('/auth/forgot-password/reset-password', {
@@ -497,6 +505,7 @@ function Login() {
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
+                  <PasswordStrengthBar password={newPasswordValue} />
                 </div>
 
                 <div className="relative">

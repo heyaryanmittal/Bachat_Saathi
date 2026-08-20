@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import api from '../services/api';
 import Logo from '../components/Logo';
 import ThemeToggle from '../components/ThemeToggle';
+import PasswordStrengthBar, { evaluatePasswordStrength } from '../components/PasswordStrengthBar';
 
 function Signup() {
   const [error, setError] = useState('');
@@ -28,6 +29,14 @@ function Signup() {
   const onSubmit = async (data) => {
     try {
       setError('');
+
+      // Enforce Strong Password Requirement
+      const strength = evaluatePasswordStrength(data.password);
+      if (!strength.isStrong) {
+        setError('Password must be Strong to create an account. Please meet all criteria below (8+ characters, uppercase & lowercase, number, and special symbol).');
+        return;
+      }
+
       setIsLoading(true);
       await api.post('/auth/signup/request-otp', {
         name: data.name,
@@ -161,6 +170,7 @@ function Signup() {
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+                <PasswordStrengthBar password={password} />
               </div>
               <div className="relative">
                 <Input
